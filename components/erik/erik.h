@@ -9,22 +9,24 @@
 namespace esphome {
 namespace erik {
 
-class ErikDisplay : public display::DisplayBuffer {
+class ErikDisplay : public Component {
  public:
   void setup() override;
-  void update() override;
-  void draw(display::DisplayBuffer &it) override;
-
-  int get_width() override { return 540; }
-  int get_height() override { return 960; }
+  void loop() override;
 
   void set_touch_callback(std::function<void()> &&callback) {
     this->touch_callback_ = std::move(callback);
   }
 
+  void show_state(bool on);
+
  protected:
   bool last_touch_state_ = false;
+  bool light_on_ = false;
   std::function<void()> touch_callback_;
+
+  void draw_screen_();
+  bool is_touch_inside_button_();
 };
 
 }  // namespace erik
