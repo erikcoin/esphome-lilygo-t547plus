@@ -1,4 +1,4 @@
-#include "m5papers3_epd.h"
+#include "m5papers3epd.h"
 
 namespace esphome {
 namespace m5papers3ns {
