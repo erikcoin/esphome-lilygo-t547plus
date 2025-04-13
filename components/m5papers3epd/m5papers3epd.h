@@ -7,7 +7,7 @@
 
 
 namespace esphome {
-namespace m5papers3epd {
+namespace m5papers3ns {
 
 class M5PaperS3EPD : public Component {
  public:
@@ -19,5 +19,5 @@ class M5PaperS3EPD : public Component {
   void draw_demo();
 };
 
-}  // namespace m5papers3epd
+}  // namespace m5papers3ns
 }  // namespace esphome
