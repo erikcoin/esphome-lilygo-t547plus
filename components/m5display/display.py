@@ -1,52 +1,33 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome import pins
-from esphome.components import display
-from esphome.const import (
-    CONF_ID,
-    CONF_LAMBDA,
-    CONF_PAGES,
-)
-from esphome.const import __version__ as ESPHOME_VERSION
+from esphome import core
+from esphome.components.display import DisplayBuffer, DisplayElement
 
-DEPENDENCIES = ["esp32"]
+# Import the C++ class (this should match the C++ class name in your m5paper_display.cpp)
+from esphome.components.m5display import M5PaperDisplay
 
-CONF_GREYSCALE = "greyscale"
+# Define a new namespace for this component
+m5display_ns = cg.esphome_ns.namespace("m5display")
+M5PaperDisplay = m5display_ns.class_("M5PaperDisplay", cg.PollingComponent)
 
+# The `display` function that will be exposed in the YAML
+def to_code(config):
+    # The lambda in YAML will create a new instance of M5PaperDisplay
+    var = cg.new_Pvariable(config[core.ConfItem("id")], config["id"])
 
-t547_ns = cg.esphome_ns.namespace("t547")
-T547 = t547_ns.class_(
-    "T547", cg.PollingComponent, display.DisplayBuffer
-)
+    # Register this as a component
+    cg.add(var.set_name(config["id"]))
+    cg.add_app_component(var)
 
-CONFIG_SCHEMA = cv.All(
-    display.FULL_DISPLAY_SCHEMA.extend(
-        {
-            cv.GenerateID(): cv.declare_id(T547),
-            cv.Optional(CONF_GREYSCALE, default=False): cv.boolean,
-        }
-    )
-    .extend(cv.polling_component_schema("5s")),
-    cv.has_at_most_one_key(CONF_PAGES, CONF_LAMBDA),
-    cv.only_with_arduino,
-)
+    # We can specify settings for the display (like update_interval, etc)
+    cg.add(var.set_update_interval(config["update_interval"]))
+
+    return var
 
 
-async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
-
-    if cv.Version.parse(ESPHOME_VERSION) < cv.Version.parse("2023.12.0"):
-        await cg.register_component(var, config)
-    await display.register_display(var, config)
-
-    if CONF_LAMBDA in config:
-        lambda_ = await cg.process_lambda(
-            config[CONF_LAMBDA], [(display.DisplayRef, "it")], return_type=cg.void
-        )
-        cg.add(var.set_writer(lambda_))
-
-    cg.add(var.set_greyscale(config[CONF_GREYSCALE]))
-
-    cg.add_build_flag("-DBOARD_HAS_PSRAM")
-
-
+# Define the schema for the component
+CONFIG_SCHEMA = cv.Schema({
+    cv.GenerateID(): cv.declare_id(M5PaperDisplay),  # Declare the component id
+    cv.Required("id"): cv.use_id(core.ID),
+    cv.Optional("update_interval", default=1000): cv.positive_int,
+}).extend(core.COMPONENT_SCHEMA)
