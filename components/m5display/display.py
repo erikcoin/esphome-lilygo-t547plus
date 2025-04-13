@@ -3,8 +3,8 @@ import esphome.config_validation as cv
 from esphome.components import display
 from esphome.const import CONF_ID
 
-m5gfx_ns = cg.esphome_ns.namespace('m5gfx')
-M5Display = m5gfx_ns.class_('M5Display', cg.Component, display.DisplayBuffer)
+M5_ns = cg.esphome_ns.namespace('M5')
+M5Display = M5_ns.class_('M5Display', cg.Component, display.DisplayBuffer)
 
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(M5Display),
