@@ -4,18 +4,20 @@ namespace esphome {
 namespace erik {
 
 void ErikComponent::setup() {
-  display_.begin();
-  display_.setRotation(0);
-  display_.fillScreen(TFT_WHITE);
-  display_.display();
+  auto cfg = M5.config();  // Optional, but allows customization
+  M5.begin(cfg);           // Init M5 stack
+
+  M5.Display.setRotation(0);
+  M5.Display.fillScreen(TFT_WHITE);
+  M5.Display.display();  // Commit the clear screen to EPD
 }
 
 void ErikComponent::update() {
-  display_.fillScreen(TFT_WHITE);
-  display_.setTextColor(TFT_BLACK);
-  display_.setTextSize(size_);
-  display_.drawString(text_.c_str(), x_, y_);
-  display_.display();  // Push to EPD
+  M5.Display.fillScreen(TFT_WHITE);
+  M5.Display.setTextColor(TFT_BLACK);
+  M5.Display.setTextSize(size_);
+  M5.Display.drawString(text_.c_str(), x_, y_);
+  M5.Display.display();  // Push to EPD
 }
 
 }  // namespace erik
