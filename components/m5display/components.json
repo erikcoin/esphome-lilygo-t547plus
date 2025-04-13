@@ -1,0 +1,9 @@
+{
+  "name": "m5display",
+  "files": [
+    "m5display.cpp",
+    "m5display.h"
+  ],
+  "platforms": ["esp32"],
+  "dependencies": ["display"]
+}
