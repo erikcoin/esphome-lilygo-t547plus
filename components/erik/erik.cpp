@@ -10,7 +10,7 @@ void ErikDisplay::setup() {
   draw_screen_();
 }
 
-void ErikDisplay::loop() {
+void ErikDisplay::update() {
   M5.update();
 
   auto touch = M5.Touch.getDetail();
