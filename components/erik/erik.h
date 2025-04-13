@@ -1,27 +1,30 @@
 #pragma once
 
 #include "esphome/core/component.h"
+#include "esphome/components/display/display_buffer.h"
+#include "esphome/components/text_sensor/text_sensor.h"
 #include <epdiy.h>
-#include <M5Unified.h>  // Only M5Unified now
+#include <M5Unified.h>
 
 namespace esphome {
 namespace erik {
 
-class ErikComponent : public PollingComponent {
+class ErikDisplay : public display::DisplayBuffer, public PollingComponent {
  public:
-  void set_text(const std::string &text) { text_ = text; }
-  void set_x(int x) { x_ = x; }
-  void set_y(int y) { y_ = y; }
-  void set_size(int size) { size_ = size; }
+  void set_light_state(text_sensor::TextSensor *state) { this->light_state_ = state; }
 
   void setup() override;
   void update() override;
+  void draw_display() override {}
+
+  int get_width() override { return 540; }
+  int get_height() override { return 960; }
 
  protected:
-  std::string text_;
-  int x_ = 10;
-  int y_ = 10;
-  int size_ = 2;
+  text_sensor::TextSensor *light_state_{nullptr};
+
+  void draw_button_(bool state);
+  void toggle_light_();
 };
 
 }  // namespace erik
