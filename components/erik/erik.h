@@ -3,7 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-#include "esphome/api.h"  // Include API for calls
+
 #include <M5Unified.h>
 
 namespace esphome {
