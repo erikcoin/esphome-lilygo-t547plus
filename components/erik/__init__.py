@@ -16,7 +16,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_X, default=10): cv.int_,
     cv.Optional(CONF_Y, default=10): cv.int_,
     cv.Optional(CONF_SIZE, default=2): cv.int_,
-}).extend(cv.COMPONENT_SCHEMA)
+}).extend(cv.polling_component_schema("60s"))
 
 def to_code(config):
     var = cg.new_Pvariable(config[cv.GenerateID()])
