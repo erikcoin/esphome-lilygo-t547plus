@@ -9,7 +9,7 @@
 namespace esphome {
 namespace erik {
 
-class ErikDisplay : public display::DisplayBuffer, public PollingComponent {
+class ErikDisplay : public display::DisplayBuffer, public Component {
  public:
   void set_light_state(text_sensor::TextSensor *state) { this->light_state_ = state; }
 
