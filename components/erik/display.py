@@ -17,7 +17,7 @@ CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
 def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield display.register_display(var, config)
-    yield cg.register_component(var, config)
+    #yield cg.register_component(var, config)
 
     light_state = yield cg.get_variable(config[CONF_LIGHT_STATE])
     cg.add(var.set_light_state(light_state))
