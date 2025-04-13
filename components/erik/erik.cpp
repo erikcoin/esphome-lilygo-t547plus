@@ -5,8 +5,8 @@ namespace esphome {
 namespace erik {
 
 void ErikComponent::setup() {
-  auto cfg = m5.config();
-  M5.begin(cfg);
+//  auto cfg = m5.config();
+//  M5.begin(cfg);
 
   display_.begin();
   display_.setRotation(0);
