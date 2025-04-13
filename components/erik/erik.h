@@ -9,11 +9,11 @@
 namespace esphome {
 namespace erik {
 
-class ErikDisplay : public display::DisplayBuffer, public PollingComponent {
+class ErikDisplay : public display::DisplayBuffer {
  public:
   void setup() override;
   void update() override;
-  void draw_display() override;
+  void update_display() override;
 
   int get_width() override { return 540; }
   int get_height() override { return 960; }
