@@ -1,5 +1,6 @@
 #include "erik.h"
-
+#include <epdiy.h>
+#include <M5GFX.h>
 namespace esphome {
 namespace erik {
 
