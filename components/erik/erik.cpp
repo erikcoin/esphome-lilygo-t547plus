@@ -6,52 +6,40 @@ namespace erik {
 
 void ErikDisplay::setup() {
   M5.begin();
-  M5.Lcd.setRotation(3);  // Adjust rotation as needed
+  M5.Display.setRotation(3);
 }
 
 void ErikDisplay::update() {
-  // Update touch screen state
-  M5.Touch.update(millis());
+  M5.update();
 
-  // Perform other update actions, like checking for touch events
-  if (M5.Touch.isPressed()) {
-    // Handle touch events here (e.g., toggle light)
+  bool is_touched = M5.Touch.isPressed();
+  if (is_touched && !last_touch_state_) {
+    if (this->touch_callback_) {
+      this->touch_callback_();
+    }
   }
+  last_touch_state_ = is_touched;
 }
 
 void ErikDisplay::draw_display() {
-  // Clear the screen
-  M5.Lcd.fillScreen(TFT_BLACK);
+  M5.Display.fillScreen(TFT_BLACK);
+  M5.Display.setCursor(40, 50);
+  M5.Display.setTextColor(TFT_WHITE);
+  M5.Display.setTextSize(2);
+  M5.Display.print("Bibliotheeklamp");
 
-  // Draw text or other graphics
-  M5.Lcd.setTextColor(TFT_WHITE);
-  M5.Lcd.setTextSize(2);
-  M5.Lcd.setCursor(10, 10);
-  M5.Lcd.print("Bibliotheek Lamp");
-
-  // Draw button (example)
-  draw_button_(true);  // Change 'true' to the actual light state
+  draw_button_(true);  // Always ON as example; you can add state binding later
 }
 
 void ErikDisplay::draw_button_(bool state) {
-  if (state) {
-    M5.Lcd.fillRect(50, 200, 200, 50, TFT_GREEN);
-    M5.Lcd.setTextColor(TFT_BLACK);
-    M5.Lcd.setCursor(70, 215);
-    M5.Lcd.print("Turn Off");
-  } else {
-    M5.Lcd.fillRect(50, 200, 200, 50, TFT_RED);
-    M5.Lcd.setTextColor(TFT_BLACK);
-    M5.Lcd.setCursor(70, 215);
-    M5.Lcd.print("Turn On");
-  }
-}
+  int x = 100, y = 150, w = 200, h = 60;
 
-void ErikDisplay::toggle_light_() {
-  // Toggle light state (for example, you could make an API call to Home Assistant)
-  // Example of calling a service:
-  auto call = esphome::api::global_api_server->make_service_call();
-  // Toggle logic goes here
+  uint32_t color = state ? TFT_GREEN : TFT_RED;
+  M5.Display.fillRoundRect(x, y, w, h, 10, color);
+  M5.Display.setTextColor(TFT_BLACK);
+  M5.Display.setCursor(x + 30, y + 20);
+  M5.Display.setTextSize(2);
+  M5.Display.print(state ? "Turn Off" : "Turn On");
 }
 
 }  // namespace erik
