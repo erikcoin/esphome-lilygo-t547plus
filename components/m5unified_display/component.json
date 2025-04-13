@@ -1,0 +1,9 @@
+{
+  "name": "m5unified_display",
+  "files": [
+    "m5unified_display.cpp",
+    "m5unified_display.h"
+  ],
+  "platforms": ["esp32"],
+  "dependencies": ["display"]
+}
