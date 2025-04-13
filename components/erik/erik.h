@@ -17,12 +17,7 @@ class ErikComponent : public PollingComponent {
   void setup() override;
   void update() override;
 
- protected:
-  M5GFX display_;
-  std::string text_;
-  int x_ = 10;
-  int y_ = 10;
-  int size_ = 2;
+
 };
 
 }  // namespace erik
