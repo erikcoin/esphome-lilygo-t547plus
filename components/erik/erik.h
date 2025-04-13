@@ -2,7 +2,7 @@
 
 #include "esphome/core/component.h"
 #include <epdiy.h>
-#include <M5unified.h>
+#include <M5Unified.h>
 
 namespace esphome {
 namespace erik {
