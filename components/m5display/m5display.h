@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esphome.h"
+#include <epdiy.h>
 #include <M5Unified.h>  // Include the M5Unified library
 
 class M5PaperDisplay : public PollingComponent {  // Inherit from PollingComponent
