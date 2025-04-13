@@ -1,27 +1,21 @@
-
 import esphome.codegen as cg
 import esphome.config_validation as cv
-
-CONF_TEXT = "text"
-CONF_X = "x"
-CONF_Y = "y"
-CONF_SIZE = "size"
+from esphome.components import light
+from esphome.const import CONF_ID
 
 erik_ns = cg.esphome_ns.namespace("erik")
-ErikComponent = erik_ns.class_("ErikComponent", cg.Component)
+ErikComponent = erik_ns.class_("ErikComponent", cg.PollingComponent)
+
+CONF_LIGHT = "light"
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(ErikComponent),
-    cv.Required(CONF_TEXT): cv.string,
-    cv.Optional(CONF_X, default=10): cv.int_,
-    cv.Optional(CONF_Y, default=10): cv.int_,
-    cv.Optional(CONF_SIZE, default=2): cv.int_,
-}).extend(cv.polling_component_schema("60s"))
+    cv.Required(CONF_LIGHT): cv.use_id(light.LightState),
+}).extend(cv.polling_component_schema("1s"))
 
 def to_code(config):
-    var = cg.new_Pvariable(config[cv.GenerateID()])
+    var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
-    cg.add(var.set_text(config[CONF_TEXT]))
-    cg.add(var.set_x(config[CONF_X]))
-    cg.add(var.set_y(config[CONF_Y]))
-    cg.add(var.set_size(config[CONF_SIZE]))
+
+    lt = yield cg.get_variable(config[CONF_LIGHT])
+    cg.add(var.set_light(lt))
