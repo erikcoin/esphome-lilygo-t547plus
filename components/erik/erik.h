@@ -2,7 +2,7 @@
 
 #include "esphome/core/component.h"
 #include <epdiy.h>
-#include <M5Unified.h>
+#include <M5Unified.h>  // Only M5Unified now
 
 namespace esphome {
 namespace erik {
@@ -17,7 +17,11 @@ class ErikComponent : public PollingComponent {
   void setup() override;
   void update() override;
 
-
+ protected:
+  std::string text_;
+  int x_ = 10;
+  int y_ = 10;
+  int size_ = 2;
 };
 
 }  // namespace erik
