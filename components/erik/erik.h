@@ -13,7 +13,7 @@ class ErikDisplay : public display::DisplayBuffer {
  public:
   void setup() override;
   void update() override;
-  void display() override;
+  void draw(display::DisplayBuffer &it) override;
 
   int get_width() override { return 540; }
   int get_height() override { return 960; }
@@ -25,8 +25,6 @@ class ErikDisplay : public display::DisplayBuffer {
  protected:
   bool last_touch_state_ = false;
   std::function<void()> touch_callback_;
-
-  void draw_button_(bool state);
 };
 
 }  // namespace erik
