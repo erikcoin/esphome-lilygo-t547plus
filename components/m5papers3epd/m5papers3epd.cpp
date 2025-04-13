@@ -10,17 +10,15 @@ void M5PaperS3EPD::setup() {
   display_.begin();
   display_.setRotation(0);
   display_.fillScreen(TFT_WHITE);
-  draw_demo();
+  display_.display();
 }
 
-void M5PaperS3EPD::loop() {
-  // Optional: Update logic
-}
-
-void M5PaperS3EPD::draw_demo() {
+void M5PaperS3EPD::update() {
+  display_.fillScreen(TFT_WHITE);
   display_.setTextColor(TFT_BLACK);
-  display_.setTextSize(2);
-  display_.drawString("Hello from M5PaperS3!", 10, 10);
+  display_.setTextSize(size_);
+  display_.drawString(text_.c_str(), x_, y_);
+  display_.display();  // Push to EPD
 }
 
 }  // namespace m5papers3ns
