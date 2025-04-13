@@ -7,7 +7,7 @@
 namespace esphome {
 namespace erik {
 
-class ErikComponent : public Component {
+class ErikComponent : public PollingComponent {
  public:
   void set_text(const std::string &text) { text_ = text; }
   void set_x(int x) { x_ = x; }
