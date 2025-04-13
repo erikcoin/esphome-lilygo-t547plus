@@ -1,5 +1,3 @@
-
-from esphome.components import Component
 import esphome.codegen as cg
 import esphome.config_validation as cv
 
@@ -8,10 +6,8 @@ CONF_X = "x"
 CONF_Y = "y"
 CONF_SIZE = "size"
 
-DEPENDENCIES = ["wifi"]
-
-m5papers3epd_ns = cg.esphome_ns.namespace("m5papers3ns")
-M5PaperS3EPD = m5papers3epd_ns.class_("M5PaperS3EPD", cg.Component)
+m5papers3_epd_ns = cg.esphome_ns.namespace("m5papers3_epd")
+M5PaperS3EPD = m5papers3_epd_ns.class_("M5PaperS3EPD", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(M5PaperS3EPD),
