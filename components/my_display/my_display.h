@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esphome/core/component.h"
+#include "esphome/core/hal.h"
 #include "esphome/components/display/display_buffer.h"
 #include <epdiy.h>
 #include <M5GFX.h>
@@ -8,7 +9,7 @@
 namespace esphome {
 namespace my_display {  // 👈 MUST MATCH display.py namespace
 
-class MyDisplay : public esphome::display::DisplayBuffer, public esphome::Component {
+class MyDisplay : public esphome::display::DisplayBuffer,  {
  public:
   void setup() override;
   void update() override;
