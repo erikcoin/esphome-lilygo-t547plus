@@ -8,7 +8,7 @@
 namespace esphome {
 namespace my_display {
 
-class MyDisplay : public display::DisplayBuffer, public Component {
+class MyDisplay : public display::DisplayBuffer,  {
  public:
   void setup() override;
   void update() override;
