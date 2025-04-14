@@ -27,7 +27,7 @@ class Erik : public display::DisplayBuffer {
 
   void setup() override;
 
-  uint8_t get_panel_state() { return this->panel_on_; }
+  
   bool get_greyscale() { return this->greyscale_; }
 
 
