@@ -9,7 +9,7 @@
 namespace esphome {
 namespace my_display {  // 👈 MUST MATCH display.py namespace
 
-class MyDisplay : public esphome::display::DisplayBuffer  {
+class MyDisplay : public display::DisplayBuffer  {
  public:
   void setup() override;
   void update() override;
