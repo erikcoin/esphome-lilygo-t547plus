@@ -25,3 +25,4 @@ class MyDisplay : public esphome::display::DisplayBuffer, public esphome::Compon
 
 }  // namespace my_display
 }  // namespace esphome
+using ::esphome::my_display::MyDisplay;
