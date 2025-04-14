@@ -26,4 +26,4 @@ class MyDisplay : public display::DisplayBuffer  {
 
 }  // namespace my_display
 }  // namespace esphome
-using ::esphome::my_display::MyDisplay;
+
