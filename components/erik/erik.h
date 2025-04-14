@@ -1,33 +1,24 @@
 #pragma once
 
-#include "esphome/core/component.h"
+#include "esphome.h"
+#include "esphome/components/display/display_buffer.h"
 #include <epdiy.h>
-#include <M5Unified.h>
-#include <functional>
+#include <M5GFX.h>
 
 namespace esphome {
 namespace erik {
 
-class ErikDisplay : public PollingComponent {
+class Erik : public PollingComponent, public display::DisplayBuffer {
  public:
-  ErikDisplay() : PollingComponent(1000) {}  // Default update interval: 1000ms
-
   void setup() override;
   void update() override;
+  void draw_absolute_pixel_internal(int x, int y, Color color) override;
 
-  void set_touch_callback(std::function<void()> &&callback) {
-    this->touch_callback_ = std::move(callback);
-  }
-
-  void show_state(bool on);
+  int get_width() override { return 960; }
+  int get_height() override { return 540; }
 
  protected:
-  bool last_touch_state_ = false;
-  bool light_on_ = false;
-  std::function<void()> touch_callback_;
-
-  void draw_screen_();
-  bool is_touch_inside_button_();
+  M5GFX display_;
 };
 
 }  // namespace erik
