@@ -50,7 +50,7 @@ void HOT Erik::draw_absolute_pixel_internal(int x, int y, Color color) {
 }
 
 void Erik::dump_config() {
-  LOG_DISPLAY("", "T547", this);
+  LOG_DISPLAY("", "Erik", this);
   LOG_UPDATE_INTERVAL(this);
 }
 
@@ -82,7 +82,7 @@ void Erik::display() {
   ESP_LOGV(TAG, "Display finished (full) (%ums)", millis() - start_time);
 }
 
-}  // namespace T547
+}  // namespace Erik
 }  // namespace esphome
 
 #endif  // USE_ESP32_FRAMEWORK_ARDUINO
