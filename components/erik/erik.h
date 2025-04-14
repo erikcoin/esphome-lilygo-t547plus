@@ -1,14 +1,15 @@
 #pragma once
 
-#include "esphome.h"
+#include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
+#include "esphome/components/display/display_color_utils.h"
 #include <epdiy.h>
 #include <M5GFX.h>
 
 namespace esphome {
 namespace erik {
 
-class Erik : public PollingComponent, public display::DisplayBuffer {
+class Erik : public Component, public display::DisplayBuffer {
  public:
   void setup() override;
   void update() override;
