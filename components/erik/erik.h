@@ -43,6 +43,7 @@ class Erik : public display::DisplayBuffer {
 
 
  protected:
+bool greyscale_;
   M5GFX display_;
 };
 
