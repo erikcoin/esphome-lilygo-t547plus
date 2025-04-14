@@ -4,7 +4,8 @@ from esphome.components import display
 from esphome.const import CONF_ID
 
 erik_ns = cg.esphome_ns.namespace('erik')
-Erik = erik_ns.class_('Erik', cg.PollingComponent, display.DisplayBuffer)
+
+Erik = erik_ns.class_("Erik", cg.Component, display.DisplayBuffer)
 
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(Erik),
