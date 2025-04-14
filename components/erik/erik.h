@@ -9,7 +9,10 @@
 namespace esphome {
 namespace erik {
 
-class Erik : public Component, public display::DisplayBuffer {
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2023, 12, 0)
+class Erik : public display::DisplayBuffer {
+
+//class Erik : public Component, public display::DisplayBuffer {
  public:
   void setup() override;
   void update() override;
