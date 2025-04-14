@@ -8,9 +8,11 @@ CODEOWNERS = ["@your-github-username"]  # Optional
 DEPENDENCIES = ["display"]
 
 my_display_ns = cg.esphome_ns.namespace("my_display")
-MyDisplay = my_display_ns.class_("MyDisplay", cg.PollingComponent, display.DisplayBuffer)
 
 
+MyDisplay = my_display_ns.class_(
+    "MyDisplay", cg.PollingComponent, display.DisplayBuffer
+)
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(MyDisplay),
 }).extend(cv.COMPONENT_SCHEMA)
