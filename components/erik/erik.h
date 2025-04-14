@@ -12,14 +12,35 @@ namespace erik {
 
 class Erik : public display::DisplayBuffer {
 
-
  public:
-  void setup() override;
+  void set_greyscale(bool greyscale) {
+    this->greyscale_ = greyscale;
+  }
+
+  float get_setup_priority() const override;
+
+  void dump_config() override;
+
+  void display();
+  void clean();
   void update() override;
+
+  void setup() override;
+
+  uint8_t get_panel_state() { return this->panel_on_; }
+  bool get_greyscale() { return this->greyscale_; }
+
+
+  display::DisplayType get_display_type() override {
+    return get_greyscale() ? display::DisplayType::DISPLAY_TYPE_GRAYSCALE : display::DisplayType::DISPLAY_TYPE_BINARY;
+  }
+
+
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
 
   int get_width() override { return 960; }
   int get_height() override { return 540; }
+
 
  protected:
   M5GFX display_;
