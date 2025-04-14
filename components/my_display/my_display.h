@@ -2,7 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
-
+#include <epdiy.h>
 #include <M5GFX.h>
 
 namespace esphome {
