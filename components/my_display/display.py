@@ -1,11 +1,10 @@
 import esphome.codegen as cg
 import esphome.components.display as display
-from esphome.components import font
-import esphome.config_validation as cv
 from esphome.const import CONF_ID
+import esphome.config_validation as cv
 
-my_epaper_ns = cg.esphome_ns.namespace("my_epaper_display")
-MyEpaperDisplay = my_epaper_ns.class_("MyEpaperDisplay", cg.Component, display.DisplayBuffer)
+my_display_ns = cg.esphome_ns.namespace("my_display")
+MyEpaperDisplay = my_display_ns.class_("MyEpaperDisplay", cg.Component, display.DisplayBuffer)
 
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(MyEpaperDisplay),
