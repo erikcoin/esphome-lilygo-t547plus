@@ -2,7 +2,8 @@
 #include <M5GFX.h>
 #include <epd_driver.h>
 
-class MyEpaperDisplay : public display::DisplayBuffer {
+class MyEpaperDisplay : public esphome::Component, public esphome::display::DisplayBuffer {
+
  public:
   MyEpaperDisplay() : DisplayBuffer(960, 540) {}
 
