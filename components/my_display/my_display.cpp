@@ -38,7 +38,7 @@ int MyEpaperDisplay::get_height() {
   return 540;
 }
 esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
-  return esphome::display::DisplayType::DISPLAY_TYPE_COLOR;  // of MONOCHROME
+  return esphome::display::DisplayType::DISPLAY_TYPE_MONOCHROME;  // of MONOCHROME
 }
 
 int MyEpaperDisplay::get_width_internal() {
