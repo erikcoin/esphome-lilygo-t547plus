@@ -3,7 +3,7 @@
 #include <epdiy.h>
 #include <M5GFX.h>
 
-class MyEpaperDisplay : public esphome::display::DisplayBuffer {
+class MyEpaperDisplay : public display::DisplayBuffer {
  public:
   MyEpaperDisplay();
   void setup() override;
