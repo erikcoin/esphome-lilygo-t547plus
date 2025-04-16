@@ -8,9 +8,9 @@ void MyEpaperDisplay::setup() {
   // Initieer de M5GFX bibliotheek
   gfx.begin();
   gfx.setRotation(1); // Zet de rotatie van het scherm (pas aan naar behoefte)
-  gfx.setTextColor(EPD_BLACK); // Zet de tekstkleur
+  gfx.setTextColor(TFT_BLACK); // Zet de tekstkleur
   gfx.setTextSize(1); // Zet de tekstgrootte
-  gfx.fillScreen(EPD_WHITE); // Vul het scherm met wit
+  gfx.fillScreen(TFT_WHITE); // Vul het scherm met wit
   gfx.display(); // Werk de weergave bij
 }
 
@@ -21,10 +21,10 @@ void MyEpaperDisplay::update() {
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
   // Teken individuele pixels, afhankelijk van de kleur
-  gfx.drawPixel(x, y, color.is_on() ? EPD_BLACK : EPD_WHITE);
+  gfx.drawPixel(x, y, color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
   // Vul het scherm met de opgegeven kleur
-  gfx.fillScreen(color.is_on() ? EPD_BLACK : EPD_WHITE);
+  gfx.fillScreen(color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
