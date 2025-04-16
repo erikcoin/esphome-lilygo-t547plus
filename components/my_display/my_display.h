@@ -19,7 +19,5 @@ class MyEpaperDisplay : public esphome::display::DisplayBuffer {
  protected:
   M5GFX gfx;
 };
-esphome::display::DisplayType get_display_type() override;
-int get_width_internal() override;
-int get_height_internal() override;
+
 }  // <-- sluit de namespace af
