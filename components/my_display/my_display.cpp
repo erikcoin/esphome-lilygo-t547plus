@@ -1,4 +1,6 @@
 #include "my_display.h"
+#include <epdiy.h>
+#include <M5GFX.h>
 //#include <epd_driver.h>
 
 MyEpaperDisplay::MyEpaperDisplay() : DisplayBuffer(960, 540) {}
