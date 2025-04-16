@@ -1,29 +1,16 @@
 #pragma once
-
-#include "esphome/core/component.h"
-#include "esphome/core/hal.h"
-#include "esphome/components/display/display_buffer.h"
+#include "esphome.h"
 #include <epdiy.h>
 #include <M5GFX.h>
 
-namespace esphome {
-namespace my_display {  // 👈 MUST MATCH display.py namespace
-
-class MyDisplay : public display::DisplayBuffer  {
+class MyEpaperDisplay : public esphome::display::DisplayBuffer {
  public:
+  MyEpaperDisplay();
   void setup() override;
   void update() override;
-  void dump_config() override;
+  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) override;
+  void fill(esphome::Color color) override;
 
  protected:
-  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) override;
-  int get_width_internal() override { return 960; }
-  int get_height_internal() override { return 540; }
-
- private:
-  M5GFX display_;
+  M5GFX gfx;
 };
-
-}  // namespace my_display
-}  // namespace esphome
-
