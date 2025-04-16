@@ -1,40 +1,43 @@
 #include "my_display.h"
 
-namespace my_display22 {  // zelfde als in .h
+namespace my_display2 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  this->gfx.begin();
-  this->gfx.setEpdMode(epd_mode_t::epd_quality);
-  this->gfx.setRotation(3);
-  this->gfx.setTextColor(TFT_WHITE);
-  this->gfx.fillScreen(TFT_WHITE);
-  this->gfx.setCursor(10, 10);
-  this->gfx.print("Init display");
-
-  this->gfx.display();  // forceer draw
+  gfx.begin();
+  gfx.setRotation(0);
+  gfx.setTextColor(0x0000);  // zwart
+  gfx.fillScreen(0xFFFF);    // wit
 }
 
 void MyEpaperDisplay::update() {
-  this->gfx.setCursor(10, 30);
-  this->gfx.print("Update");
-  this->gfx.display();
+  // Roep ESPHome's draw routine aan
+  this->do_update_();
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  this->gfx.drawPixel(x, y, color.is_on() ? TFT_BLACK : TFT_WHITE);
+  // Zwart of wit
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  gfx.drawPixel(x, y, col);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
-  this->gfx.fillScreen(color.is_on() ? TFT_BLACK : TFT_WHITE);
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  gfx.fillScreen(col);
 }
 
-int MyEpaperDisplay::get_width() {
+// === Verplichte overrides ===
+
+esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
+  return esphome::display::DisplayType::DISPLAY_TYPE_MONOCHROME;
+}
+
+int MyEpaperDisplay::get_width_internal() {
   return 960;
 }
 
-int MyEpaperDisplay::get_height() {
+int MyEpaperDisplay::get_height_internal() {
   return 540;
 }
 
