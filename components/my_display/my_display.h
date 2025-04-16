@@ -1,6 +1,7 @@
 #pragma once
 #include "esphome.h"
-#include <M5GFX.h>
+#include <epdiy.h>
+#include <M5GFX.h> // Gebruik M5GFX voor de display bediening
 
 class MyEpaperDisplay : public esphome::Component, public esphome::display::DisplayBuffer {
  public:
