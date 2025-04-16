@@ -5,9 +5,9 @@ MyEpaperDisplay::MyEpaperDisplay() {}
 void MyEpaperDisplay::setup() {
   gfx.begin();
   gfx.setRotation(1);
-  gfx.setTextColor(BLACK);
+  gfx.setTextColor(TFT_BLACK);
   gfx.setTextSize(1);
-  gfx.fillScreen(WHITE);
+  gfx.fillScreen(TFT_WHITE);
   gfx.display();
 
   this->set_writer([](esphome::display::Display &d) {
@@ -20,11 +20,11 @@ void MyEpaperDisplay::update() {
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  gfx.drawPixel(x, y, color.is_on() ? BLACK : WHITE);
+  gfx.drawPixel(x, y, color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
-  gfx.fillScreen(color.is_on() ? BLACK : WHITE);
+  gfx.fillScreen(color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
 
 int MyEpaperDisplay::get_width() {
