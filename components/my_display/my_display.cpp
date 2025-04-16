@@ -1,41 +1,27 @@
 #include "my_display.h"
-#include "esphome/core/log.h"
+#include <epd_driver.h>
 
-namespace esphome {
-namespace my_display {
+MyEpaperDisplay::MyEpaperDisplay() : DisplayBuffer(960, 540) {}
 
-static const char *const TAG = "my_display";
-
-void MyDisplay::setup() {
-  ESP_LOGI(TAG, "Setting up display...");
-
-  display_.begin();
-  display_.setEpdMode(epd_mode_t::epd_quality);
-  display_.clearDisplay();
-  display_.setTextColor(TFT_BLACK);
-  display_.setTextSize(2);
-  display_.setCursor(10, 10);
-  display_.print("Init Display");
-  display_.display();  // push to screen
+void MyEpaperDisplay::setup() {
+  epd_init();
+  gfx.init();
+  gfx.setRotation(1);
+  gfx.setTextColor(EPD_BLACK);
+  gfx.setTextSize(1);
+  gfx.fillScreen(EPD_WHITE);
+  gfx.display();
 }
 
-void MyDisplay::update() {
-  ESP_LOGI(TAG, "Updating display...");
-
-  display_.clearDisplay();
-  display_.setCursor(10, 10);
-  display_.print("Updated!");
-  display_.display();
+void MyEpaperDisplay::update() {
+  this->do_draw_();
+  gfx.display();
 }
 
-void MyDisplay::draw_absolute_pixel_internal(int x, int y, Color color) {
-  // Optional if you want display buffering via ESPHome API
-  display_.drawPixel(x, y, color.raw_8);
+void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
+  gfx.drawPixel(x, y, color.is_on() ? EPD_BLACK : EPD_WHITE);
 }
 
-void MyDisplay::dump_config() {
-  ESP_LOGCONFIG(TAG, "MyDisplay configured.");
+void MyEpaperDisplay::fill(esphome::Color color) {
+  gfx.fillScreen(color.is_on() ? EPD_BLACK : EPD_WHITE);
 }
-
-}  // namespace my_display
-}  // namespace esphome
