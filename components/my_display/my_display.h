@@ -11,6 +11,9 @@ class MyEpaperDisplay : public esphome::display::DisplayBuffer {
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color) override;
   void fill(esphome::Color color) override;
 
+  int get_width() override;
+  int get_height() override;
+
  protected:
   M5GFX gfx;
 };
