@@ -8,8 +8,8 @@ void MyEpaperDisplay::setup() {
   this->gfx.begin();
   this->gfx.setEpdMode(epd_mode_t::epd_quality);
   this->gfx.setRotation(3);
-  this->gfx.setTextColor(M5GFX::TFT_WHITE);
-  this->gfx.fillScreen(M5GFX::TFT_WHITE);
+  this->gfx.setTextColor(TFT_WHITE);
+  this->gfx.fillScreen(TFT_WHITE);
   this->gfx.setCursor(10, 10);
   this->gfx.print("Init display");
 
@@ -23,11 +23,11 @@ void MyEpaperDisplay::update() {
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  this->gfx.drawPixel(x, y, color.is_on() ? M5GFX::TFT_BLACK : M5GFX::TFT_WHITE);
+  this->gfx.drawPixel(x, y, color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
-  this->gfx.fillScreen(color.is_on() ? M5GFX::TFT_BLACK : M5GFX::TFT_WHITE);
+  this->gfx.fillScreen(color.is_on() ? TFT_BLACK : TFT_WHITE);
 }
 
 int MyEpaperDisplay::get_width() {
