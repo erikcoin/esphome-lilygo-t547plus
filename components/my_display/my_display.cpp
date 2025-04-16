@@ -1,4 +1,4 @@
-#include "my_epaper_display.h"
+#include "my_display.h"
 #include <epdiy.h>
 #include <M5GFX.h> // M5GFX voor display functies
 
