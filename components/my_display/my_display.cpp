@@ -1,5 +1,5 @@
 #include "my_display.h"
-#include <epd_driver.h>
+//#include <epd_driver.h>
 
 MyEpaperDisplay::MyEpaperDisplay() : DisplayBuffer(960, 540) {}
 
