@@ -1,30 +1,33 @@
 #include "my_display.h"
 
+namespace my_display2 {  // zelfde als in .h
+
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  gfx.begin();
-  gfx.setRotation(1);
-  gfx.setTextColor(TFT_BLACK);
-  gfx.setTextSize(1);
-  gfx.fillScreen(TFT_WHITE);
-  gfx.display();
+  this->gfx.begin();
+  this->gfx.setEpdMode(epd_mode_t::epd_quality);
+  this->gfx.setRotation(3);
+  this->gfx.setTextColor(M5GFX::GFX_WHITE);
+  this->gfx.fillScreen(M5GFX::GFX_WHITE);
+  this->gfx.setCursor(10, 10);
+  this->gfx.print("Init display");
 
-  this->set_writer([](esphome::display::Display &d) {
-    // eventueel: d.print("Test");
-  });
+  this->gfx.display();  // forceer draw
 }
 
 void MyEpaperDisplay::update() {
-  gfx.display(); // Update M5GFX scherm
+  this->gfx.setCursor(10, 30);
+  this->gfx.print("Update");
+  this->gfx.display();
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  gfx.drawPixel(x, y, color.is_on() ? TFT_BLACK : TFT_WHITE);
+  this->gfx.drawPixel(x, y, color.is_on() ? M5GFX::GFX_BLACK : M5GFX::GFX_WHITE);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
-  gfx.fillScreen(color.is_on() ? TFT_BLACK : TFT_WHITE);
+  this->gfx.fillScreen(color.is_on() ? M5GFX::GFX_BLACK : M5GFX::GFX_WHITE);
 }
 
 int MyEpaperDisplay::get_width() {
@@ -34,3 +37,5 @@ int MyEpaperDisplay::get_width() {
 int MyEpaperDisplay::get_height() {
   return 540;
 }
+
+}  // namespace my_display2
