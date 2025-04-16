@@ -3,21 +3,24 @@
 #include <epdiy.h>
 #include <M5GFX.h>
 
-namespace my_display22 {  // <-- voeg dit toe
+namespace my_display2 {
 
 class MyEpaperDisplay : public esphome::display::DisplayBuffer {
  public:
   MyEpaperDisplay();
+
   void setup() override;
   void update() override;
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color) override;
   void fill(esphome::Color color) override;
 
-  int get_width() override;
-  int get_height() override;
+  // Verplichte implementaties voor pure virtuals
+  esphome::display::DisplayType get_display_type() override;
+  int get_width_internal() override;
+  int get_height_internal() override;
 
  protected:
   M5GFX gfx;
 };
 
-}  // <-- sluit de namespace af
+}  // namespace my_display2
