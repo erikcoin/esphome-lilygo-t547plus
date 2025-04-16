@@ -1,6 +1,5 @@
 #pragma once
 #include "esphome.h"
-#include <epdiy.h>
 #include <M5GFX.h>
 
 class MyEpaperDisplay : public esphome::Component, public esphome::display::DisplayBuffer {
