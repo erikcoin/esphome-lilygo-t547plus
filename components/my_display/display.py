@@ -3,7 +3,7 @@ import esphome.components.display as display
 from esphome.const import CONF_ID
 import esphome.config_validation as cv
 
-my_display_ns = cg.esphome_ns.namespace("my_display22")
+my_display_ns = cg.esphome_ns.namespace("my_display2")
 MyEpaperDisplay = my_display_ns.class_("MyEpaperDisplay", cg.Component, display.DisplayBuffer)
 
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
