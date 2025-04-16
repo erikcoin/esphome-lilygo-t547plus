@@ -1,6 +1,6 @@
 #include "my_display.h"
 
-namespace my_display2 {  // zelfde als in .h
+namespace my_display22 {  // zelfde als in .h
 
 MyEpaperDisplay::MyEpaperDisplay() {}
 
