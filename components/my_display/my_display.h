@@ -1,11 +1,12 @@
 #include "esphome.h"
+#include <epdiy.h>
 #include <M5GFX.h>
 #include <epd_driver.h>
 
 class MyEpaperDisplay : public esphome::Component, public esphome::display::DisplayBuffer {
 
  public:
-  MyEpaperDisplay() : DisplayBuffer(960, 540) {}
+  MyEpaperDisplay() 
 
   void setup() override {
     epd_init();
