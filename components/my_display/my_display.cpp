@@ -2,7 +2,7 @@
 #include <epdiy.h>
 #include <M5GFX.h> // M5GFX voor display functies
 
-MyEpaperDisplay::MyEpaperDisplay() : DisplayBuffer(960, 540) {} // Resolutie van het ED047TC1 scherm
+MyEpaperDisplay::MyEpaperDisplay() //: DisplayBuffer(960, 540) {} // Resolutie van het ED047TC1 scherm
 
 void MyEpaperDisplay::setup() {
   // Initieer de M5GFX bibliotheek
