@@ -1,6 +1,6 @@
 #include "my_display.h"
 
-namespace my_display2 {
+namespace my_display22 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
 
