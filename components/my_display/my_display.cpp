@@ -37,5 +37,16 @@ int MyEpaperDisplay::get_width() {
 int MyEpaperDisplay::get_height() {
   return 540;
 }
+esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
+  return esphome::display::DisplayType::DISPLAY_TYPE_COLOR;  // of MONOCHROME
+}
+
+int MyEpaperDisplay::get_width_internal() {
+  return 960;
+}
+
+int MyEpaperDisplay::get_height_internal() {
+  return 540;
+}
 
 }  // namespace my_display2
