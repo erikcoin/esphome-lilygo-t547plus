@@ -13,6 +13,12 @@ void MyEpaperDisplay::setup() {
 
 void MyEpaperDisplay::update() {
   // Roep ESPHome's draw routine aan
+    this->gfx.fillScreen(TFT_WHITE);
+  this->gfx.setTextColor(TFT_BLACK);
+  this->gfx.setCursor(10, 10);
+  this->gfx.setTextSize(2);
+  this->gfx.print("Hello EPD");
+  this->gfx.display();  // heel belangrijk!
   this->do_update_();
 }
 
