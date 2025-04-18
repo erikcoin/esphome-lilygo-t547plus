@@ -1,4 +1,5 @@
 #include "my_display.h"
+#include "esphome/core/component.h"
 #include "esphome/components/display/display.h"
 
 //namespace my_display22 {
