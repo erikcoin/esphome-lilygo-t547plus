@@ -14,6 +14,7 @@ void MyEpaperDisplay::setup() {
 void MyEpaperDisplay::update() {
   // Roep ESPHome's draw routine aan
   this->gfx.fillScreen(TFT_WHITE);
+  this->gfx.setTextColor(TFT_BLACK);
   this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
   this->gfx.display();     // Pas daarna tonen
 
@@ -29,6 +30,10 @@ void MyEpaperDisplay::update() {
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
   // Zwart of wit
+
+  //extra logging
+  ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
+  //einde exta logging
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.drawPixel(x, y, col);
 }
