@@ -27,10 +27,10 @@ void MyEpaperDisplay::update() {
 
   //Dit werkt, laat de tekst op het display zien
   this->gfx.fillScreen(TFT_WHITE);
-  this->gfx.setTextColor(TFT_BLACK);
-  this->gfx.setCursor(10, 10);
-  this->gfx.setTextSize(2);
-  this->gfx.print("Hello EPD");
+ // this->gfx.setTextColor(TFT_BLACK);
+  //this->gfx.setCursor(10, 10);
+  //this->gfx.setTextSize(2);
+  //this->gfx.print("Hello EPD");
   this->do_update_();
   this->gfx.display();  // heel belangrijk!
 }
