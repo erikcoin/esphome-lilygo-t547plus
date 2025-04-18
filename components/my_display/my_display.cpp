@@ -68,4 +68,4 @@ int MyEpaperDisplay::get_height_internal() {
 #include "esphome/core/component.h"
 #include "esphome/components/display/display.h"
 
-REGISTER_DISPLAY(my_display22::MyEpaperDisplay, "my_display");
+REGISTER_DISPLAY(MyEpaperDisplay, "my_display");
