@@ -10,8 +10,10 @@ void MyEpaperDisplay::setup() {
   gfx.setRotation(0);
   // Forceer volledige refresh
   gfx.clear();              // wist interne framebuffer (optioneel)
+  gfx.fillScreen(TFT_BLACK); // teken volledig wit
+  gfx.display();
   gfx.fillScreen(TFT_WHITE); // teken volledig wit
-  gfx.display(true);
+  gfx.display();
 }
 
 void MyEpaperDisplay::update() {
