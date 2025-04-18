@@ -1,4 +1,5 @@
 #include "my_display.h"
+#include "esphome/components/display/display.h"
 
 //namespace my_display22 {
 
@@ -65,7 +66,6 @@ int MyEpaperDisplay::get_height_internal() {
 //}  // namespace my_display2
 
 
-#include "esphome/core/component.h"
-#include "esphome/components/display/display.h"
+
 
 REGISTER_DISPLAY(MyEpaperDisplay, "my_display");
