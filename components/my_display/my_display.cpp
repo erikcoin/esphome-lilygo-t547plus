@@ -65,8 +65,3 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 //}  // namespace my_display2
-
-
-
-
-REGISTER_DISPLAY(MyEpaperDisplay, "my_display");
