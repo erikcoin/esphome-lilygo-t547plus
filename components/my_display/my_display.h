@@ -4,9 +4,10 @@
 #include <M5GFX.h>
 
 //namespace my_display22 {
-
-class MyEpaperDisplay : public esphome::display::DisplayBuffer {
- public:
+//deze werkt:
+//class MyEpaperDisplay : public esphome::display::DisplayBuffer {
+class MyEpaperDisplay : public esphome::Component, public esphome::display::DisplayBuffer {
+public:
   MyEpaperDisplay();
 
   void setup() override;
