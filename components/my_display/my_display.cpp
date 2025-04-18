@@ -63,3 +63,9 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 }  // namespace my_display2
+
+
+#include "esphome/core/component.h"
+#include "esphome/components/display/display.h"
+
+REGISTER_DISPLAY(my_display22::MyEpaperDisplay, "my_display");
