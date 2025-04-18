@@ -32,7 +32,7 @@ void MyEpaperDisplay::update() {
   this->gfx.setTextSize(2);
   this->gfx.print("Hello EPD");
   this->gfx.display();  // heel belangrijk!
-  this->do_update_();
+  //this->do_update_();
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
