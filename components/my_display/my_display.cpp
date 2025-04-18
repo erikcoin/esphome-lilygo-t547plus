@@ -6,12 +6,12 @@ MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
 
-  this->gfx.begin();
-  this->gfx.setRotation(0);
+  gfx.begin();
+  gfx.setRotation(0);
   // Forceer volledige refresh
-  this->gfx.clear();              // wist interne framebuffer (optioneel)
-  this->gfx.fillScreen(TFT_WHITE); // teken volledig wit
-  this->gfx.display(true);
+  gfx.clear();              // wist interne framebuffer (optioneel)
+  gfx.fillScreen(TFT_WHITE); // teken volledig wit
+  gfx.display(true);
 }
 
 void MyEpaperDisplay::update() {
