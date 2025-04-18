@@ -5,10 +5,13 @@ namespace my_display22 {
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  gfx.begin();
-  gfx.setRotation(0);
-  gfx.setTextColor(0x0000);  // zwart
-  gfx.fillScreen(0xFFFF);    // wit
+
+  this->gfx.begin();
+  this->gfx.setRotation(0);
+  // Forceer volledige refresh
+  this->gfx.clear();              // wist interne framebuffer (optioneel)
+  this->gfx.fillScreen(TFT_WHITE); // teken volledig wit
+  this->gfx.display(true);
 }
 
 void MyEpaperDisplay::update() {
