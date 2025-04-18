@@ -3,7 +3,7 @@
 #include <epdiy.h>
 #include <M5GFX.h>
 
-//namespace my_display22 {
+namespace my_display22 {
 //deze werkt:
 //class MyEpaperDisplay : public esphome::display::DisplayBuffer {
 class MyEpaperDisplay : public esphome::display::DisplayBuffer {
@@ -24,4 +24,4 @@ public:
   M5GFX gfx;
 };
 
-//}  // namespace my_display2
+}  // namespace my_display2
