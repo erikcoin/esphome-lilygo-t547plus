@@ -17,5 +17,5 @@ async def to_code(config):
     await display.register_display(var, config)
 
     cg.add_build_flag("-DBOARD_HAS_PSRAM")
-    cg.add_library("epdiy", repository="https://github.com/erikcoin/epdiy", version="None")
+    #cg.add_library("epdiy", repository="https://github.com/erikcoin/epdiy", version="None")
     cg.add_library("m5gfx", repository="https://github.com/erikcoin/M5GFX", version="None")
