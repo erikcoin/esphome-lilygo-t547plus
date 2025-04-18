@@ -11,6 +11,10 @@ CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
+   
     var = cg.new_Pvariable(config[CONF_ID])
     await display.register_display(var, config)
     
+    cg.add(var.set_greyscale(config[CONF_GREYSCALE]))
+
+    cg.add_build_flag("-DBOARD_HAS_PSRAM")
