@@ -1,5 +1,11 @@
 #pragma once
 #include "esphome.h"
+#include "esphome/core/component.h"
+#include "esphome/core/hal.h"
+#include "esphome/core/version.h"
+#include "esphome/components/display/display_buffer.h"
+
+//#include "epd_driver.h"
 #include <epdiy.h>
 #include <M5GFX.h>
 
