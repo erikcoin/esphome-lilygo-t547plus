@@ -1,7 +1,7 @@
 #include "my_display.h"
 //#include "esphome/core/component.h"
 //#include "esphome/components/display/display.h"
-
+namespace esphome {
 namespace my_display22 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
@@ -31,8 +31,8 @@ void MyEpaperDisplay::update() {
   this->gfx.setCursor(10, 10);
   this->gfx.setTextSize(2);
   this->gfx.print("Hello EPD");
+  this->do_update_();
   this->gfx.display();  // heel belangrijk!
-  //this->do_update_();
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
@@ -65,3 +65,4 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 }  // namespace my_display2
+} //namespace esphome
