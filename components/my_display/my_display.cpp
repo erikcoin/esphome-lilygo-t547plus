@@ -14,7 +14,7 @@ void MyEpaperDisplay::setup() {
   //gfx.clear();              // wist interne framebuffer (optioneel)
   //gfx.fillScreen(TFT_BLACK); // teken volledig wit
   //gfx.display();
-  gfx.fillScreen(TFT_WHITE); // teken volledig wit
+  gfx.fillScreen(TFT_BLACK); // teken volledig wit
   gfx.display();
 }
 
