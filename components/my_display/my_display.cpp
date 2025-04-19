@@ -8,7 +8,7 @@ namespace my_display22 {
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  ESP_LOGD("my_display", "setup upgevoerd");
+  ESP_LOGD("my_display", "setup wordt upgevoerd");
   gfx.begin();
   gfx.setRotation(0);
   // Forceer volledige refresh
@@ -25,7 +25,7 @@ void MyEpaperDisplay::update() {
 //  this->gfx.setTextColor(TFT_BLACK);
 //  this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
 //  this->gfx.display();     // Pas daarna tonen
-
+ESP_LOGD("my_display", "Update wordt uitgevoerd");
   //Dit werkt, laat de tekst op het display zien
  // this->gfx.fillScreen(TFT_WHITE);
  // this->gfx.setTextColor(TFT_BLACK);
@@ -41,6 +41,7 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
 
   //extra logging
   ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
+  ESP_LOGD("my_display", "draw_absolute_pixel wordt uitgevoerd");
   //einde exta logging
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.drawPixel(x, y, col);
