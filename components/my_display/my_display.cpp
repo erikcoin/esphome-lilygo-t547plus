@@ -11,21 +11,20 @@ void MyEpaperDisplay::setup() {
   ESP_LOGD("my_display", "setup wordt upgevoerd");
   gfx.begin();
   gfx.setRotation(0);
-  // Forceer volledige refresh
+  // Init canvas met juiste grootte en 1-bit kleur
+  canvas.setColorDepth(1); // 1-bit zwart/wit
+  canvas.createSprite(960, 540);
+  canvas.fillScreen(1); // Wit
   //gfx.clear();              // wist interne framebuffer (optioneel)
-  //gfx.fillScreen(TFT_BLACK); // teken volledig wit
-  //gfx.display();
   gfx.fillScreen(TFT_BLACK); // teken volledig wit
   gfx.display();
 }
 
 void MyEpaperDisplay::update() {
-  // Roep ESPHome's draw routine aan
- // this->gfx.fillScreen(TFT_WHITE);
-//  this->gfx.setTextColor(TFT_BLACK);
-//  this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
-//  this->gfx.display();     // Pas daarna tonen
 ESP_LOGD("my_display", "Update wordt uitgevoerd");
+   // Canvas wit maken voor nieuwe frame
+  canvas.fillScreen(1);  // 1 = wit in 1-bit
+ 
   //Dit werkt, laat de tekst op het display zien
  // this->gfx.fillScreen(TFT_WHITE);
  // this->gfx.setTextColor(TFT_BLACK);
@@ -33,6 +32,7 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   //this->gfx.setTextSize(2);
   //this->gfx.print("Hello EPD");
   this->do_update_();
+  gfx.drawBitmap(0, 0, canvas.getBuffer(), 960, 540, 1);
   this->gfx.display();  // heel belangrijk!
 }
 
@@ -43,14 +43,17 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
   ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
   ESP_LOGD("my_display", "draw_absolute_pixel wordt uitgevoerd");
   //einde exta logging
-  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-  gfx.drawPixel(x, y, col);
+  //uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  //gfx.drawPixel(x, y, col);
+  bool on = color.is_on(); // zwart = true
+  canvas.drawPixel(x, y, on ? 0 : 1); // 0 = zwart, 1 = wit (voor 1-bit canvas)
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
   ESP_LOGD("my_display", "prodedure fill aangeroepen");
-  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-  gfx.fillScreen(col);
+  canvas.fillScreen(color.is_on() ? 0 : 1); // 0 = zwart, 1 = wit
+  // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+ // gfx.fillScreen(col);
 }
 
 // === Verplichte overrides ===
