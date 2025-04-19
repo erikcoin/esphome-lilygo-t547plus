@@ -29,6 +29,7 @@ public:
 
  protected:
   M5GFX gfx;
+  M5Canvas canvas;  // ← de nieuwe framebuffer
 };
 
 }  // namespace my_display22
