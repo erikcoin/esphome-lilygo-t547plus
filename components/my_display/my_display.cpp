@@ -32,7 +32,7 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   //this->gfx.setTextSize(2);
   //this->gfx.print("Hello EPD");
   this->do_update_();
-  gfx.drawBitmap(0, 0, canvas.getBuffer(), 960, 540, 1);
+  gfx.drawBitmap(0, 0, 960, 540, canvas.getBuffer());
   this->gfx.display();  // heel belangrijk!
 }
 
