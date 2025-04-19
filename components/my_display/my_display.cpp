@@ -12,11 +12,13 @@ void MyEpaperDisplay::setup() {
   gfx.begin();
   gfx.setRotation(0);
   // Init canvas met juiste grootte en 1-bit kleur
-  canvas.setColorDepth(1); // 1-bit zwart/wit
-  canvas.createSprite(960, 540);
-  canvas.fillScreen(1); // Wit
+  canvas.setColorDepth(1);  // 1-bit zwart/wit. Of 4 voor grayscale
+  canvas.setFont(&fonts::Font0);  // optioneel, fallback
+  canvas.createSprite(get_width_internal(), get_height_internal());
+  canvas.setTextColor(TFT_BLACK, TFT_WHITE);
+  canvas.fillScreen(TFT_WHITE);
   //gfx.clear();              // wist interne framebuffer (optioneel)
-  gfx.fillScreen(TFT_BLACK); // teken volledig wit
+  //gfx.fillScreen(TFT_BLACK); // teken volledig wit
   gfx.display();
 }
 
@@ -31,8 +33,12 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   //this->gfx.setCursor(10, 10);
   //this->gfx.setTextSize(2);
   //this->gfx.print("Hello EPD");
-  this->do_update_();
-  gfx.pushImage(0, 0, 960, 540, (uint16_t*)canvas.getBuffer());
+  this->do_update_(); // roept draw_absolute_pixel_internal(x, y, color) aan
+    // Push het canvas naar het scherm
+  gfx.startWrite();  // optioneel
+  gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
+  gfx.endWrite();
+  
   this->gfx.display();  // heel belangrijk!
 }
 
