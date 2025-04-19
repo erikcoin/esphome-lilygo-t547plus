@@ -26,7 +26,7 @@ void MyEpaperDisplay::update() {
 //  this->gfx.display();     // Pas daarna tonen
 
   //Dit werkt, laat de tekst op het display zien
-  this->gfx.fillScreen(TFT_WHITE);
+ // this->gfx.fillScreen(TFT_WHITE);
  // this->gfx.setTextColor(TFT_BLACK);
   //this->gfx.setCursor(10, 10);
   //this->gfx.setTextSize(2);
