@@ -1,13 +1,14 @@
 #include "my_display.h"
-//#include "esphome/core/component.h"
-//#include "esphome/components/display/display.h"
+#include "esphome/core/log.h"
+#include "esphome/core/component.h"
+#include "esphome/components/display/display.h"
 namespace esphome {
 namespace my_display22 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-
+  ESP_LOGD("my_display", "setup upgevoerd");
   gfx.begin();
   gfx.setRotation(0);
   // Forceer volledige refresh
@@ -39,13 +40,14 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
   // Zwart of wit
 
   //extra logging
- // ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
+  ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
   //einde exta logging
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.drawPixel(x, y, col);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
+  ESP_LOGD("my_display", "prodedure fill aangeroepen");
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.fillScreen(col);
 }
