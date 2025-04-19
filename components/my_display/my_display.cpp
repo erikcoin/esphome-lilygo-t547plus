@@ -4,7 +4,7 @@
 namespace esphome {
 namespace my_display22 {
 
-MyEpaperDisplay::MyEpaperDisplay() {}
+//MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
 
