@@ -1,7 +1,10 @@
 import esphome.codegen as cg
 #import esphome.components.display as display
 from esphome.components import display
-from esphome.const import CONF_ID
+from esphome.const import (
+    CONF_ID,
+    CONF_LAMBDA,
+)
 import esphome.config_validation as cv
 
 my_display_ns = cg.esphome_ns.namespace("my_display22")
