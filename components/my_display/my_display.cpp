@@ -35,7 +35,8 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   this->do_update_(); // roept draw_absolute_pixel_internal(x, y, color) aan
     // Push het canvas naar het scherm
   gfx.startWrite();  // optioneel
-  gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
+  canvas.pushSprite(0, 0);       // Canvas pushen naar scherm
+  //gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
   gfx.endWrite();
   
   this->gfx.display();  // heel belangrijk!
