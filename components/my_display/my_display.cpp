@@ -11,42 +11,28 @@ void MyEpaperDisplay::setup() {
   ESP_LOGD("my_display", "setup wordt upgevoerd");
   gfx.begin();
   gfx.setRotation(0);
-  // Init canvas met juiste grootte en 1-bit kleur
-  //canvas.setColorDepth(1);  // 1-bit zwart/wit. Of 4 voor grayscale
-  //canvas.createSprite(get_width_internal(), get_height_internal());
-  //canvas.setFont(&fonts::Font0);  // optioneel, fallback
-  
- // canvas.setTextColor(TFT_BLACK, TFT_WHITE);
- // canvas.fillScreen(TFT_WHITE);
-  // Push canvas naar display
-//  gfx.startWrite();
-//  canvas.pushSprite(0, 0);  // Nu wordt de canvas-inhoud ook echt weergegeven
-//  gfx.endWrite();
-
-  //gfx.display();  // Ververs scherm met huidige framebuffer
-  //vanaf hier werkt het zonder canvas
+  // Forceer volledige refresh
   //gfx.clear();              // wist interne framebuffer (optioneel)
-  gfx.fillScreen(TFT_WHITE); // teken volledig wit
+  //gfx.fillScreen(TFT_BLACK); // teken volledig wit
+  //gfx.display();
+  gfx.fillScreen(TFT_BLACK); // teken volledig wit
   gfx.display();
 }
 
 void MyEpaperDisplay::update() {
+  // Roep ESPHome's draw routine aan
+ // this->gfx.fillScreen(TFT_WHITE);
+//  this->gfx.setTextColor(TFT_BLACK);
+//  this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
+//  this->gfx.display();     // Pas daarna tonen
 ESP_LOGD("my_display", "Update wordt uitgevoerd");
-   // Canvas wit maken voor nieuwe frame
-  //canvas.fillScreen(TFT_WHITE);  // 1 = wit in 1-bit
   //Dit werkt, laat de tekst op het display zien
-  // this->gfx.fillScreen(TFT_WHITE);
-  // this->gfx.setTextColor(TFT_BLACK);
+ // this->gfx.fillScreen(TFT_WHITE);
+ // this->gfx.setTextColor(TFT_BLACK);
   //this->gfx.setCursor(10, 10);
   //this->gfx.setTextSize(2);
   //this->gfx.print("Hello EPD");
-  this->do_update_(); // roept draw_absolute_pixel_internal(x, y, color) aan
-    // Push het canvas naar het scherm
-  //gfx.startWrite();  // optioneel
-  //canvas.pushSprite(0, 0);       // Canvas pushen naar scherm
-  //gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
-  //gfx.endWrite();
-  
+  this->do_update_();
   this->gfx.display();  // heel belangrijk!
 }
 
@@ -59,14 +45,11 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
   //einde exta logging
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.drawPixel(x, y, col);
- // bool on = color.is_on(); // zwart = true
- // canvas.drawPixel(x, y, on ? 0 : 1); // 0 = zwart, 1 = wit (voor 1-bit canvas)
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
   ESP_LOGD("my_display", "prodedure fill aangeroepen");
-//  canvas.fillScreen(color.is_on() ? 0 : 1); // 0 = zwart, 1 = wit
-   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.fillScreen(col);
 }
 
