@@ -33,7 +33,7 @@ void MyEpaperDisplay::setup() {
 void MyEpaperDisplay::update() {
 ESP_LOGD("my_display", "Update wordt uitgevoerd");
    // Canvas wit maken voor nieuwe frame
-  canvas.fillScreen(TFT_WHITE);  // 1 = wit in 1-bit
+  //canvas.fillScreen(TFT_WHITE);  // 1 = wit in 1-bit
   //Dit werkt, laat de tekst op het display zien
   // this->gfx.fillScreen(TFT_WHITE);
   // this->gfx.setTextColor(TFT_BLACK);
@@ -43,7 +43,7 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   this->do_update_(); // roept draw_absolute_pixel_internal(x, y, color) aan
     // Push het canvas naar het scherm
   gfx.startWrite();  // optioneel
-  canvas.pushSprite(0, 0);       // Canvas pushen naar scherm
+  //canvas.pushSprite(0, 0);       // Canvas pushen naar scherm
   //gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
   gfx.endWrite();
   
