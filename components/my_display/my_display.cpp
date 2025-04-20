@@ -20,20 +20,9 @@ void MyEpaperDisplay::setup() {
 }
 
 void MyEpaperDisplay::update() {
-  // Roep ESPHome's draw routine aan
- // this->gfx.fillScreen(TFT_WHITE);
-  this->gfx.setTextColor(TFT_BLACK);
-//  this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
-//  this->gfx.display();     // Pas daarna tonen
-ESP_LOGD("my_display", "Update wordt uitgevoerd");
-  //Dit werkt, laat de tekst op het display zien
   this->gfx.fillScreen(TFT_WHITE);
-  this->gfx.setTextColor(TFT_BLACK);
-  this->gfx.setCursor(10, 10);
-  this->gfx.setTextSize(2);
-  this->gfx.print("Hello EPD");
-  this->do_update_();
-  this->gfx.display();  // heel belangrijk!
+  this->do_update_();      // Laat ESPHome tekenen via lambda
+  this->gfx.display();     // Toon het resultaat
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
