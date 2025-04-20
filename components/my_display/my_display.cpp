@@ -26,7 +26,7 @@ void MyEpaperDisplay::setup() {
   //gfx.display();  // Ververs scherm met huidige framebuffer
   //vanaf hier werkt het zonder canvas
   //gfx.clear();              // wist interne framebuffer (optioneel)
-  gfx.fillScreen(WHITE); // teken volledig wit
+  gfx.fillScreen(TFT_WHITE); // teken volledig wit
   gfx.display();
 }
 
@@ -42,10 +42,10 @@ ESP_LOGD("my_display", "Update wordt uitgevoerd");
   //this->gfx.print("Hello EPD");
   this->do_update_(); // roept draw_absolute_pixel_internal(x, y, color) aan
     // Push het canvas naar het scherm
-  gfx.startWrite();  // optioneel
+  //gfx.startWrite();  // optioneel
   //canvas.pushSprite(0, 0);       // Canvas pushen naar scherm
   //gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
-  gfx.endWrite();
+  //gfx.endWrite();
   
   this->gfx.display();  // heel belangrijk!
 }
