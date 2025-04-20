@@ -59,8 +59,8 @@ void MyEpaperDisplay::fill(esphome::Color color) {
 
 // === Verplichte overrides ===
 
-esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
-  return esphome::display::DisplayType::DISPLAY_TYPE_BINARY;
+display::DisplayType MyEpaperDisplay::get_display_type() {
+  return display::DisplayType::DISPLAY_TYPE_BINARY;
 }
 
 int MyEpaperDisplay::get_width_internal() {
