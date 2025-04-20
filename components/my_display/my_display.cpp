@@ -25,11 +25,10 @@ void MyEpaperDisplay::setup() {
 void MyEpaperDisplay::update() {
 ESP_LOGD("my_display", "Update wordt uitgevoerd");
    // Canvas wit maken voor nieuwe frame
-  canvas.fillScreen(1);  // 1 = wit in 1-bit
- 
+  canvas.fillScreen(TFT_WHITE);  // 1 = wit in 1-bit
   //Dit werkt, laat de tekst op het display zien
- // this->gfx.fillScreen(TFT_WHITE);
- // this->gfx.setTextColor(TFT_BLACK);
+  // this->gfx.fillScreen(TFT_WHITE);
+  // this->gfx.setTextColor(TFT_BLACK);
   //this->gfx.setCursor(10, 10);
   //this->gfx.setTextSize(2);
   //this->gfx.print("Hello EPD");
