@@ -65,9 +65,9 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
 
 void MyEpaperDisplay::fill(esphome::Color color) {
   ESP_LOGD("my_display", "prodedure fill aangeroepen");
-  canvas.fillScreen(color.is_on() ? 0 : 1); // 0 = zwart, 1 = wit
-  // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
- // gfx.fillScreen(col);
+//  canvas.fillScreen(color.is_on() ? 0 : 1); // 0 = zwart, 1 = wit
+   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  gfx.fillScreen(col);
 }
 
 // === Verplichte overrides ===
