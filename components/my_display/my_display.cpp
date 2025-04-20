@@ -15,7 +15,7 @@ void MyEpaperDisplay::setup() {
   gfx.clear();              // wist interne framebuffer (optioneel)
   //gfx.fillScreen(TFT_BLACK); // teken volledig wit
   //gfx.display();
-  gfx.fillScreen(TFT_BLACK); // teken volledig wit
+  gfx.fillScreen(0xFFFF); // teken volledig wit
   gfx.display();
 }
 
@@ -43,13 +43,13 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
   ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
   ESP_LOGD("my_display", "draw_absolute_pixel wordt uitgevoerd");
   //einde exta logging
-  uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.drawPixel(x, y, col);
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
   ESP_LOGD("my_display", "prodedure fill aangeroepen");
-  uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.fillScreen(col);
 }
 
