@@ -14,7 +14,7 @@ namespace my_display22 {
 
 //deze werkt:
 //class MyEpaperDisplay : public esphome::display::DisplayBuffer {
-class MyEpaperDisplay : public display::DisplayBuffer, public PollingComponent {
+class MyEpaperDisplay : public display::DisplayBuffer {
 public:
   MyEpaperDisplay();
 
