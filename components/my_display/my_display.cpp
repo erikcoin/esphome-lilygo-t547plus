@@ -8,15 +8,25 @@ namespace my_display22 {
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  //ESP_LOGD("my_display", "setup wordt upgevoerd");
+  ESP_LOGD("my_display", "setup wordt uitgevoerd");
+
   gfx.begin();
   gfx.setRotation(0);
-  // Forceer volledige refresh
-  gfx.clear();              // wist interne framebuffer (optioneel)
-  //gfx.fillScreen(TFT_BLACK); // teken volledig wit
-  //gfx.display();
-  gfx.fillScreen(0xFFFF); // teken volledig wit
-  gfx.display();
+  gfx.setEpdMode(epd_mode_t::epd_quality);  // optioneel, maar helpt tegen ghosting
+
+  // Init canvas
+  canvas.setColorDepth(1);  // 1-bit voor e-paper
+  canvas.createSprite(get_width_internal(), get_height_internal());
+  canvas.setFont(&fonts::Font0);  // optioneel
+  canvas.setTextColor(TFT_BLACK, TFT_WHITE);
+  canvas.fillScreen(TFT_WHITE);  // Wit canvas maken
+
+  // Push canvas naar display
+  gfx.startWrite();
+  canvas.pushSprite(0, 0);  // Nu wordt de canvas-inhoud ook echt weergegeven
+  gfx.endWrite();
+
+  gfx.display();  // Ververs scherm met huidige framebuffer
 }
 
 void MyEpaperDisplay::update() {
