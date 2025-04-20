@@ -36,7 +36,7 @@ void MyEpaperDisplay::update() {
   gfx.endWrite();
 
   gfx.display();    // stuur buffer naar scherm
-  gfx.hibernate();  // voorkom ghosting
+  //gfx.hibernate();  // voorkom ghosting
   
 }
 
