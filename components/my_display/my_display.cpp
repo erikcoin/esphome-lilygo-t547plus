@@ -57,10 +57,10 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color 
   ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
   ESP_LOGD("my_display", "draw_absolute_pixel wordt uitgevoerd");
   //einde exta logging
-  //uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-  //gfx.drawPixel(x, y, col);
-  bool on = color.is_on(); // zwart = true
-  canvas.drawPixel(x, y, on ? 0 : 1); // 0 = zwart, 1 = wit (voor 1-bit canvas)
+  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+  gfx.drawPixel(x, y, col);
+ // bool on = color.is_on(); // zwart = true
+ // canvas.drawPixel(x, y, on ? 0 : 1); // 0 = zwart, 1 = wit (voor 1-bit canvas)
 }
 
 void MyEpaperDisplay::fill(esphome::Color color) {
