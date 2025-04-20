@@ -8,46 +8,20 @@ namespace my_display22 {
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  ESP_LOGD("my_display", "setup wordt uitgevoerd");
-
   gfx.begin();
   gfx.setRotation(0);
-  gfx.setEpdMode(epd_mode_t::epd_quality);  // optioneel, maar helpt tegen ghosting
-
-  // Init canvas
-  canvas.setColorDepth(1);  // 1-bit voor e-paper
-  canvas.setFont(&fonts::Font0);  // optioneel
-  canvas.setTextColor(TFT_BLACK, TFT_WHITE);
-  canvas.createSprite(get_width_internal(), get_height_internal());
-  canvas.fillScreen(TFT_WHITE);  // Wit canvas maken
   gfx.fillScreen(TFT_WHITE);
-  gfx.display();  // Ververs scherm met huidige framebuffer
+  gfx.display();
 }
 
 void MyEpaperDisplay::update() {
-  //this->gfx.fillScreen(TFT_WHITE);
-  //this->do_update_();      // Laat ESPHome tekenen via lambda
-  //this->gfx.display();     // Toon het resultaat
-  canvas.fillScreen(TFT_WHITE);  // wis canvas
-  this->do_update_();            // ESPHome lambda tekent pixels
-
-  gfx.startWrite();
-  gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
-  gfx.endWrite();
-
-  gfx.display();    // stuur buffer naar scherm
-  //gfx.hibernate();  // voorkom ghosting
-  
+  gfx.fillScreen(TFT_WHITE);     // wis scherm
+  this->do_update_();            // ESPHome lambda
+  gfx.display();                 // laat zien
 }
 
-void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  // Zwart of wit
-
-  //extra logging
-  ESP_LOGD("my_display", "Pixel at (%d, %d): %s", x, y, color.is_on() ? "on" : "off");
-  ESP_LOGD("my_display", "draw_absolute_pixel wordt uitgevoerd");
-  //einde exta logging
-  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, Color color) {
+  uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
   gfx.drawPixel(x, y, col);
 }
 
