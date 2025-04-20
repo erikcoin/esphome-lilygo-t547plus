@@ -9,11 +9,12 @@
 #include <epdiy.h>
 #include <M5GFX.h>
 
-//namespace esphome {
+namespace esphome {
 namespace my_display22 {
+
 //deze werkt:
-class MyEpaperDisplay : public esphome::display::DisplayBuffer {
-//class MyEpaperDisplay : public display::DisplayBuffer {
+//class MyEpaperDisplay : public esphome::display::DisplayBuffer {
+class MyEpaperDisplay : public esphome::display::DisplayBuffer, public PollingComponent {
 public:
   MyEpaperDisplay();
 
@@ -29,8 +30,8 @@ public:
 
  protected:
   M5GFX gfx;
-  //M5Canvas canvas;  // ← de nieuwe framebuffer
+  m5gfx::LGFX_Sprite canvas;
 };
 
 }  // namespace my_display22
-//} //namespace esphome
+} //namespace esphome
