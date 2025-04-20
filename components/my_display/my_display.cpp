@@ -2,7 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/component.h"
 #include "esphome/components/display/display.h"
-namespace esphome {
+//namespace esphome {
 namespace my_display22 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
