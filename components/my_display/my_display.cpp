@@ -2,7 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/component.h"
 #include "esphome/components/display/display.h"
-//namespace esphome {
+namespace esphome {
 namespace my_display22 {
 
 MyEpaperDisplay::MyEpaperDisplay() {}
@@ -16,23 +16,28 @@ void MyEpaperDisplay::setup() {
 
   // Init canvas
   canvas.setColorDepth(1);  // 1-bit voor e-paper
-  canvas.createSprite(get_width_internal(), get_height_internal());
   canvas.setFont(&fonts::Font0);  // optioneel
   canvas.setTextColor(TFT_BLACK, TFT_WHITE);
+  canvas.createSprite(get_width_internal(), get_height_internal());
   canvas.fillScreen(TFT_WHITE);  // Wit canvas maken
-
-  // Push canvas naar display
-  gfx.startWrite();
-  canvas.pushSprite(0, 0);  // Nu wordt de canvas-inhoud ook echt weergegeven
-  gfx.endWrite();
-
+  gfx.fillScreen(TFT_WHITE);
   gfx.display();  // Ververs scherm met huidige framebuffer
 }
 
 void MyEpaperDisplay::update() {
-  this->gfx.fillScreen(TFT_WHITE);
-  this->do_update_();      // Laat ESPHome tekenen via lambda
-  this->gfx.display();     // Toon het resultaat
+  //this->gfx.fillScreen(TFT_WHITE);
+  //this->do_update_();      // Laat ESPHome tekenen via lambda
+  //this->gfx.display();     // Toon het resultaat
+  canvas.fillScreen(TFT_WHITE);  // wis canvas
+  this->do_update_();            // ESPHome lambda tekent pixels
+
+  gfx.startWrite();
+  gfx.pushImage(0, 0, canvas.width(), canvas.height(), (uint16_t *) canvas.getBuffer());
+  gfx.endWrite();
+
+  gfx.display();    // stuur buffer naar scherm
+  gfx.hibernate();  // voorkom ghosting
+  
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
@@ -55,7 +60,7 @@ void MyEpaperDisplay::fill(esphome::Color color) {
 // === Verplichte overrides ===
 
 esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
-  return esphome::display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
+  return esphome::display::DisplayType::DISPLAY_TYPE_BINARY;
 }
 
 int MyEpaperDisplay::get_width_internal() {
@@ -67,4 +72,4 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 }  // namespace my_display22
-//} //namespace esphome
+} //namespace esphome
