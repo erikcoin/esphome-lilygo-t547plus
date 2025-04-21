@@ -10,7 +10,7 @@ namespace my_display {
 class MyEpaperDisplay : public display::DisplayBuffer {
  public:
   M5GFX gfx;
-  M5Canvas canvas(&gfx);
+  M5Canvas canvas;
   void setup() override;
   void update() override;
   void dump_config() override {}
