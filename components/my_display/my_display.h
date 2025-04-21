@@ -5,7 +5,7 @@
 #include "esphome/core/version.h"
 #include "esphome/components/display/display_buffer.h"
 
-#include "m5gfx.h"
+#include "M5GFX.h"
 
 #ifdef USE_ESP32_FRAMEWORK_ARDUINO
 
