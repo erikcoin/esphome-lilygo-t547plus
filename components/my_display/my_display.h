@@ -6,7 +6,8 @@
 
 namespace esphome {
 namespace my_display {
-
+int32_t x;
+int32_t y;
 class MyEpaperDisplay : public display::DisplayBuffer {
  public:
   M5GFX gfx;
