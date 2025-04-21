@@ -21,7 +21,7 @@ public:
   void setup() override;
   void update() override;
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
-  void fill(esphome::Color color) override;
+  void fill(Color color) override;
 
   // Verplichte implementaties voor pure virtuals
   display::DisplayType get_display_type() override;
