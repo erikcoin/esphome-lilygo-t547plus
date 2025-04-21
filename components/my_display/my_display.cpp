@@ -8,6 +8,8 @@ namespace my_display22 {
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
+  bool ok = gfx.begin();
+  ESP_LOGD("my_display", "gfx.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
   gfx.begin();
   gfx.setRotation(0);
   gfx.fillScreen(TFT_WHITE);
@@ -15,9 +17,16 @@ void MyEpaperDisplay::setup() {
 }
 
 void MyEpaperDisplay::update() {
+  ESP_LOGD("my_display", "TEST: update wordt aangeroepen");
+
+  gfx.fillScreen(TFT_WHITE);
+  gfx.setTextColor(TFT_BLACK);
+  gfx.setCursor(20, 20);
+  gfx.print("TEST");
+  gfx.display();
   //gfx.fillScreen(TFT_WHITE);     // wis scherm
   //this->do_update_();            // ESPHome lambda
-  gfx.display();                 // laat zien
+  //gfx.display();                 // laat zien
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
