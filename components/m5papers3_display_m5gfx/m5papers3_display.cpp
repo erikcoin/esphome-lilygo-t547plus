@@ -15,11 +15,12 @@ void M5PaperS3DisplayM5GFX::setup() {
   M5.begin();
   ESP_LOGD(TAG, "M5.begin() finished.");
   delay(1000);  // 👈 essentieel bij sommige e-paper boards
+  M5.Display.clearDisplay();
   auto &gfx = M5.Display;
   gfx.setRotation(this->rotation_);
   ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
   // Optioneel ook: setEpdMode al hier
-  gfx.setEpdMode(epd_mode_t::epd_quality);
+  gfx.setEpdMode(epd_mode_t::epd_fastest);
   gfx.fillScreen(WHITE);
   gfx.display();    // Forceer een volledige witte refresh
   gfx.waitDisplay(); // 👈 wacht écht tot klaar
