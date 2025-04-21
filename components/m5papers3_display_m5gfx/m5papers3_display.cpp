@@ -14,23 +14,27 @@ void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGCONFIG(TAG, "Setting up M5Paper S3 display using M5GFX...");
   M5.begin();
   ESP_LOGD(TAG, "M5.begin() finished.");
-
+  delay(1000);  // 👈 essentieel bij sommige e-paper boards
   auto &gfx = M5.Display;
   gfx.setRotation(this->rotation_);
   ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
-
+  // Optioneel ook: setEpdMode al hier
+  gfx.setEpdMode(epd_mode_t::epd_quality);
+  gfx.fillScreen(WHITE);
+  gfx.display();    // Forceer een volledige witte refresh
+  gfx.waitDisplay(); // 👈 wacht écht tot klaar
+  
   this->canvas_ = lgfx::LGFX_Sprite(&gfx);
-
   int w = gfx.width();
   int h = gfx.height();
-  this->canvas_.createSprite(w, h);
+  this->canvas_.createSprite(gfx.width(), gfx.height());
   ESP_LOGD(TAG, "M5GFX Sprite created with size: %d x %d", w, h);
 
   this->canvas_.setColorDepth(8);
   ESP_LOGD(TAG, "Sprite color depth set to %d", this->canvas_.getColorDepth());
 
   uint32_t white_color = get_native_m5gfx_color_(Color::WHITE);
-  gfx.fillScreen(white_color);
+  //gfx.fillScreen(white_color);
   this->canvas_.fillSprite(white_color);
 
   M5.Display.fillScreen(M5.Display.color888(255,255,255));
@@ -55,6 +59,13 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 // --- PollingComponent / Display Override ---
 // update() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::update() {
+
+    static bool first_time = true;
+  if (first_time) {
+    ESP_LOGD(TAG, "Delaying first update for EPD...");
+    delay(1000);  // 👈 éénmalige delay bij eerste update
+    first_time = false;
+    
   ESP_LOGD(TAG, "Running M5GFX display update...");
 
   if (this->writer_ != nullptr) {
