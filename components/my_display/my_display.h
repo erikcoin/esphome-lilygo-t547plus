@@ -6,7 +6,7 @@
 #include "esphome/components/display/display_buffer.h"
 
 //#include "epd_driver.h"
-#include <epdiy.h>
+//#include <epdiy.h>
 #include <M5GFX.h>
 
 namespace esphome {
