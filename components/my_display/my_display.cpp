@@ -9,12 +9,12 @@ static const char *const TAG = "my_display";
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  bool ok = M5.begin();
-  ESP_LOGD("my_display", "gfx.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
+  bool ok = gfx_.begin();
+  ESP_LOGD("my_display", "gfx_.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
 
-  M5.setRotation(0);
-  M5.fillScreen(TFT_WHITE);
-  M5.display();
+  gfx_.setRotation(0);
+  gfx_.fillScreen(TFT_WHITE);
+  gfx_.display();
 
   delay(1000); // Wacht een seconde om het scherm te stabiliseren
 
