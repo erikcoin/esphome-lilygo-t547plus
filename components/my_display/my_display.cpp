@@ -22,7 +22,7 @@ void MyEpaperDisplay::update() {
   gfx.fillScreen(TFT_WHITE);
   gfx.setTextColor(TFT_BLACK);
   gfx.setCursor(20, 20);
-  gfx.print("TEST");
+  gfx.print("DIT IS EEN TEST OM TEI ZIEN OF IE HET GOED OET");
   gfx.display();
   //gfx.fillScreen(TFT_WHITE);     // wis scherm
   //this->do_update_();            // ESPHome lambda
