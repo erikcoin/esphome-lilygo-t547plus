@@ -33,6 +33,11 @@ void M5PaperS3DisplayM5GFX::setup() {
   gfx.fillScreen(white_color);
   this->canvas_.fillSprite(white_color);
 
+  M5.Display.fillScreen(M5.Display.color888(255,255,255));
+  M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
+  M5.Display.display();
+  M5.Display.waitDisplay();
+  
   ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
 }
 
@@ -52,21 +57,20 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 void M5PaperS3DisplayM5GFX::update() {
   ESP_LOGD(TAG, "Running M5GFX display update...");
 
-  // Debug check
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "Calling display lambda...");
-    this->writer_(*this);  // Voert de lambda uit
+    this->writer_(*this);
     ESP_LOGD(TAG, "Display lambda done.");
-  } else {
-    ESP_LOGW(TAG, "No display writer set (lambda is null?)");
   }
 
   ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
   this->canvas_.pushSprite(0, 0);
 
   ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
+  M5.Display.setEpdMode(epd_mode_t::epd_quality);  // expliciet modus
   M5.Display.display();
-  ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh done).");
+  M5.Display.waitDisplay();  // wacht op EPD-complete refresh
+  ESP_LOGD(TAG, "M5GFX display update finished.");
 }
   
 
