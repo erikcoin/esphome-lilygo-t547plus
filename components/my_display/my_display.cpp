@@ -34,7 +34,7 @@ void MyEpaperDisplay::fill(esphome::Color color) {
 // === Verplichte overrides ===
 
 esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
-  return esphome::display::DisplayType::DISPLAY_TYPE_GREYSCALE;
+  return esphome::display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
 }
 
 int MyEpaperDisplay::get_width_internal() {
