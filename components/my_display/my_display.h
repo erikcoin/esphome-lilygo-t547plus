@@ -9,7 +9,6 @@
 //#include <epdiy.h>
 #include <M5GFX.h>
 
-namespace esphome {
 namespace my_display22 {
 
 //deze werkt:
@@ -30,8 +29,8 @@ public:
 
  protected:
   M5GFX gfx;
-  m5gfx::LGFX_Sprite canvas;
+  // m5gfx::LGFX_Sprite canvas;
 };
 
 }  // namespace my_display22
-} //namespace esphome
+
