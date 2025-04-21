@@ -25,7 +25,7 @@ public:
   // Verplichte implementaties voor pure virtuals
   esphome::display::DisplayType get_display_type() override {
     return esphome::display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
-
+  }
   int get_width_internal() override;
   int get_height_internal() override;
 
