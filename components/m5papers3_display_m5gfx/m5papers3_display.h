@@ -36,7 +36,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
   void set_writer(std::function<void(display::Display &)> &&writer) { this->writer_ = writer; }
-void draw_absolute_pixel_internal(int x, int y, Color color) override;
+void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) override;
 
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
  // void draw_absolute_pixel_internal(int x, int y, Color color) override;
