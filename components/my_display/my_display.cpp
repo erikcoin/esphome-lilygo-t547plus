@@ -12,9 +12,9 @@ void MyEpaperDisplay::setup() {
   bool ok = gfx.begin();
   ESP_LOGD("my_display", "gfx.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
   //gfx.begin();
-  this.>gfx.setRotation(0);
-  this.>gfx.fillScreen(TFT_WHITE);
-  this.>gfx.display();
+  this->gfx.setRotation(0);
+  this->gfx.fillScreen(TFT_WHITE);
+  this->gfx.display();
   ESP_LOGD("my_display", "gfx.display() resultaat: %s", ok ? "OK" : "MISLUKT");
 }
 
