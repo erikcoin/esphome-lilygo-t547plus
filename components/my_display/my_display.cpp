@@ -58,4 +58,4 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 }  // namespace my_display22
-//} //namespace esphome
+} //namespace esphome
