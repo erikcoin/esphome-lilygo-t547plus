@@ -38,7 +38,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   void set_writer(std::function<void(display::Display &)> &&writer) { this->writer_ = writer; }
 
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
-  void draw_absolute_pixel_internal(int x, int y, Color color) override;
+ // void draw_absolute_pixel_internal(int x, int y, Color color) override;
 
   // Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
   uint32_t get_native_m5gfx_color_(Color color);
