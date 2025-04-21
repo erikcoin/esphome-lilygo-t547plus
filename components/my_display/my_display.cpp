@@ -16,7 +16,7 @@ void MyEpaperDisplay::setup() {
   gfx_.fillScreen(TFT_WHITE);
   gfx_.display();
 
-  delay(1000); // Wacht een seconde om het scherm te stabiliseren
+  //delay(1000); // Wacht een seconde om het scherm te stabiliseren
 
   gfx.fillScreen(TFT_WHITE); // Voer een volledige refresh uit
   gfx.display();
