@@ -75,10 +75,10 @@ void M5PaperS3DisplayM5GFX::update() {
     ESP_LOGD(TAG, "Display lambda done.");
   }
   M5.Display.startWrite();
-  M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
+  M5.Display.fillRect(20, 480, 280, 60, TFT_WHITE);
   M5.Display.endWrite();
   M5.Display.startWrite();
-  M5.Display.fillRect(20, 480, 280, 60, TFT_WHITE);
+  M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
   M5.Display.endWrite();
   ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
   this->canvas_.pushSprite(0, 0);
