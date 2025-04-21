@@ -18,8 +18,8 @@ void MyEpaperDisplay::setup() {
 
   //delay(1000); // Wacht een seconde om het scherm te stabiliseren
 
-  gfx.fillScreen(TFT_WHITE); // Voer een volledige refresh uit
-  gfx.display();
+  gfx_.fillScreen(TFT_WHITE); // Voer een volledige refresh uit
+  gfx_.display();
 }
 
 void MyEpaperDisplay::update() {
