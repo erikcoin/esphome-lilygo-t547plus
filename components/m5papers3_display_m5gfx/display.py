@@ -32,7 +32,7 @@ async def to_code(config):
     # Voeg M5GFX en M5Unified libraries toe
     # M5Unified is nodig voor M5.begin() die M5.Display configureert
     cg.add_library("m5stack/M5Unified", None)
-    cg.add_library("m5stack/M5GFX", None)
+   # cg.add_library("m5stack/M5GFX", None)
 
     if CONF_LAMBDA in config:
         lambda_ = await cg.process_lambda(
