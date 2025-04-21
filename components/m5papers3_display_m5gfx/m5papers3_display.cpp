@@ -64,11 +64,7 @@ void M5PaperS3DisplayM5GFX::update() {
   ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh triggered).");
 }
 
-  ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
-  this->canvas_.pushSprite(0, 0);
-
-  ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh status unknown).");
-}
+  
 
 // --- Display Overrides ---
 // set_rotation() blijft zoals in de vorige correctie
