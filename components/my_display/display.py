@@ -6,8 +6,10 @@ from esphome.const import CONF_ID
 my_display_ns = cg.esphome_ns.namespace('my_display')
 MyEpaperDisplay = my_display_ns.class_('MyEpaperDisplay', cg.PollingComponent, display.DisplayBuffer)
 
-CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({}).extend(
-    cv.polling_component_schema("5s")  # kan ook "0s" zijn als je geen update-cyclus wil
+CONFIG_SCHEMA = cv.Schema({
+    cv.GenerateID(): cv.declare_id(MyEpaperDisplay),
+}).extend(display.BASIC_DISPLAY_SCHEMA).extend(
+    cv.polling_component_schema("5s")
 )
 
 async def to_code(config):
