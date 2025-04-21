@@ -8,45 +8,47 @@
 #include <M5Unified.h> // Voor M5.begin() en M5.Display object
 #include <M5GFX.h>     // Voor LGFX en M5GFX types
 
+// !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
+namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
+
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-// Gebruik de M5GFX sprite class
-using M5Sprite = M5GFX::LGFX_Sprite; // Alias voor leesbaarheid
-
-class M5PaperS3DisplayM5GFX : public PollingComponent, public display::Display {
+// !! Verwijder PollingComponent uit de inheritance list !!
+class M5PaperS3DisplayM5GFX : public display::Display {
  public:
+  // Standaard Component methodes (setup, dump_config, get_setup_priority blijven hetzelfde)
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::HARDWARE; }
 
-  void update() override; // Van PollingComponent
+  // PollingComponent methode (update komt via display::Display)
+  void update() override;
 
-  // Display overrides
+  // Display methodes (fill, get_width/height_internal, get_display_type blijven hetzelfde)
   void fill(Color color) override;
   int get_width_internal() override;
   int get_height_internal() override;
   display::DisplayType get_display_type() override {
-    // Blijft grayscale, ook al gebruikt M5GFX intern mogelijk RGB formats
     return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
   }
 
-  // Configuratie setters
+  // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
   void set_writer(std::function<void(display::Display &)> &&writer) { this->writer_ = writer; }
 
- protected:
+ protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
 
-  // Helper: Converteer ESPHome Color naar M5GFX kleur formaat (bv. uint16_t of uint32_t)
-  // Laten we uint32_t gebruiken (bv. voor color888).
+  // Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
   uint32_t get_native_m5gfx_color_(Color color);
 
-  int rotation_{0}; // ESPHome rotatie (0, 90, 180, 270)
+  // Member variabelen (rotation, writer blijven hetzelfde)
+  int rotation_{0};
   std::function<void(display::Display &)> writer_{nullptr};
 
-  // M5GFX Sprite (canvas) om op te tekenen
-  M5Sprite canvas_;
+  // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
+  lgfx::LGFX_Sprite canvas_;
 };
 
 } // namespace m5papers3_display_m5gfx
