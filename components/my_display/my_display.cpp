@@ -1,52 +1,31 @@
 #include "my_display.h"
 #include "esphome/core/log.h"
-#include "esphome/core/component.h"
-#include "esphome/components/display/display.h"
 
 namespace esphome {
 namespace my_display22 {
 
+static const char *const TAG = "my_display";
+
 MyEpaperDisplay::MyEpaperDisplay() {}
 
 void MyEpaperDisplay::setup() {
-  bool ok = gfx.begin();
-  ESP_LOGD("my_display", "gfx.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
-  //gfx.begin();
-  this->gfx.setRotation(0);
-  this->gfx.fillScreen(TFT_WHITE);
-  this->gfx.display();
-  ESP_LOGD("my_display", "gfx.display() resultaat: %s", ok ? "OK" : "MISLUKT");
+  bool ok = this->gfx_.begin();
+  ESP_LOGD(TAG, "gfx.begin() resultaat: %s", ok ? "OK" : "MISLUKT");
+  this->gfx_.setRotation(0);
+  this->gfx_.fillScreen(TFT_WHITE);
+  this->gfx_.display();
 }
 
 void MyEpaperDisplay::update() {
-  ESP_LOGD("my_display", "TEST: update wordt aangeroepen");
-
-  //gfx.fillScreen(TFT_WHITE);
-  //gfx.setTextColor(TFT_BLACK);
-  //gfx.setCursor(20, 20);
-  //gfx.print("DIT IS EEN TEST OM TEI ZIEN OF IE HET GOED OET");
-  //gfx.display();
-  //gfx.fillScreen(TFT_WHITE);     // wis scherm
-  //this->do_update_();            // ESPHome lambda
-  //gfx.display();                 // laat zien
+  // Geen verdere acties tijdens update
 }
 
-void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
-  ESP_LOGD("my_display", "TEST: draw_absolute_pixel_internal wordt aangeroepen");
-  uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
-//  gfx.drawPixel(x, y, col);
+void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, Color color) {
+  // Geen implementatie nodig voor deze test
 }
 
-//void MyEpaperDisplay::fill(esphome::Color color) {
-//  ESP_LOGD("my_display", "prodedure fill aangeroepen");
-//  uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-//  gfx.fillScreen(col);
-//}
-
-// === Verplichte overrides ===
-
-esphome::display::DisplayType MyEpaperDisplay::get_display_type() {
-  return esphome::display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
+display::DisplayType MyEpaperDisplay::get_display_type() {
+  return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
 }
 
 int MyEpaperDisplay::get_width_internal() {
@@ -58,4 +37,4 @@ int MyEpaperDisplay::get_height_internal() {
 }
 
 }  // namespace my_display22
-} //namespace esphome
+}  // namespace esphome
