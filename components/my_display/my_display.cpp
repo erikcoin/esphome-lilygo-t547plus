@@ -5,13 +5,13 @@ namespace my_display {
 
 void MyEpaperDisplay::setup() {
   gfx.begin();
-  gfx.setEpdMode(epd_mode_t::epd_quality);  // of epd_fast
+  gfx.setEpdMode(epd_mode_t::epd_quality);
   gfx.fillScreen(TFT_WHITE);
-  gfx.display();  // push naar scherm
+  gfx.display();
 }
 
 void MyEpaperDisplay::update() {
-  // Niks doen, enkel voor compatibiliteit
+  // geen rendering via lambda nodig hier
 }
 
 }  // namespace my_display
