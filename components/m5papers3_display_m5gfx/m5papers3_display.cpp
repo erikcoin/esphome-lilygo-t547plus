@@ -51,19 +51,23 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 // update() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::update() {
   ESP_LOGD(TAG, "Running M5GFX display update...");
+
+  // Debug check
   if (this->writer_ != nullptr) {
-    this->writer_(*this);  // Lambda van ESPHome
+    ESP_LOGD(TAG, "Calling display lambda...");
+    this->writer_(*this);  // Voert de lambda uit
+    ESP_LOGD(TAG, "Display lambda done.");
+  } else {
+    ESP_LOGW(TAG, "No display writer set (lambda is null?)");
   }
 
   ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
   this->canvas_.pushSprite(0, 0);
 
-  // ❗️Nodig voor EPD refresh:
-  M5.Display.display();  // <- ECHTE e-paper refresh
-
-  ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh triggered).");
+  ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
+  M5.Display.display();
+  ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh done).");
 }
-
   
 
 // --- Display Overrides ---
