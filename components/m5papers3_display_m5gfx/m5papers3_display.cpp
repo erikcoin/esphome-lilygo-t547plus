@@ -52,8 +52,17 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 void M5PaperS3DisplayM5GFX::update() {
   ESP_LOGD(TAG, "Running M5GFX display update...");
   if (this->writer_ != nullptr) {
-    this->writer_(*this);
+    this->writer_(*this);  // Lambda van ESPHome
   }
+
+  ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
+  this->canvas_.pushSprite(0, 0);
+
+  // ❗️Nodig voor EPD refresh:
+  M5.Display.display();  // <- ECHTE e-paper refresh
+
+  ESP_LOGD(TAG, "M5GFX display update finished (EPD refresh triggered).");
+}
 
   ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
   this->canvas_.pushSprite(0, 0);
