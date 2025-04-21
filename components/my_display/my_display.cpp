@@ -15,8 +15,8 @@ void MyEpaperDisplay::setup() {
 }
 
 void MyEpaperDisplay::update() {
-  gfx.fillScreen(TFT_WHITE);     // wis scherm
-  this->do_update_();            // ESPHome lambda
+  //gfx.fillScreen(TFT_WHITE);     // wis scherm
+  //this->do_update_();            // ESPHome lambda
   gfx.display();                 // laat zien
 }
 
