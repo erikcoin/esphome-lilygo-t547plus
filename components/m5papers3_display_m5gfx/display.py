@@ -26,7 +26,7 @@ CONFIG_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    await cg.register_component(var, config)
+    #await cg.register_component(var, config)
     await display.register_display(var, config)
 
     # Voeg M5GFX en M5Unified libraries toe
