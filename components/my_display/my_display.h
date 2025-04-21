@@ -24,6 +24,8 @@ public:
 
   // Verplichte implementaties voor pure virtuals
   //display::DisplayType get_display_type() override;
+  esphome::display::DisplayType get_display_type() override;
+
   int get_width_internal() override;
   int get_height_internal() override;
 
