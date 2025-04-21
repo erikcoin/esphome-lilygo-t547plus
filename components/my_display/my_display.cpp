@@ -30,6 +30,7 @@ void MyEpaperDisplay::update() {
 }
 
 void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
+  ESP_LOGD("my_display", "TEST: draw_absolute_pixel_internal wordt aangeroepen");
   uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
   gfx.drawPixel(x, y, col);
 }
