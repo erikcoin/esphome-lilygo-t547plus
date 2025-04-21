@@ -14,7 +14,7 @@ from esphome.const import (
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 # Definieer onze C++ class
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.Component, display.Display
+    "M5PaperS3DisplayM5GFX",  display.Display
 )
 
 CONFIG_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
