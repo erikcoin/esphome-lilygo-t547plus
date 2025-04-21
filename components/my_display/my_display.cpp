@@ -25,7 +25,7 @@ void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, Color color) {
   gfx.drawPixel(x, y, col);
 }
 
-void MyEpaperDisplay::fill(esphome::Color color) {
+void MyEpaperDisplay::fill(Color color) {
   ESP_LOGD("my_display", "prodedure fill aangeroepen");
   uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
   gfx.fillScreen(col);
