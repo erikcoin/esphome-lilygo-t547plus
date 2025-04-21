@@ -1,27 +1,25 @@
 #pragma once
 
-#include "esphome/core/component.h"
-#include "esphome/components/display/display_buffer.h"
+#include "esphome.h"
 #include <M5GFX.h>
 
 namespace esphome {
-namespace my_display22 {
+namespace my_display {
 
-class MyEpaperDisplay : public display::DisplayBuffer {
+class MyEpaperDisplay : public PollingComponent, public display::DisplayBuffer {
  public:
-  MyEpaperDisplay();
+  M5GFX gfx;
 
   void setup() override;
   void update() override;
-  void draw_absolute_pixel_internal(int x, int y, Color color) override;
+  void dump_config() override {}
 
-  esphome::display::DisplayType get_display_type() override;
-  int get_width_internal() override;
-  int get_height_internal() override;
+  int get_width() override { return 960; }  // of juiste resolutie
+  int get_height() override { return 540; }
 
  protected:
-  M5GFX gfx_;
+  void draw_absolute_pixel_internal(int x, int y, Color color) override {}
 };
 
-}  // namespace my_display22
+}  // namespace my_display
 }  // namespace esphome
