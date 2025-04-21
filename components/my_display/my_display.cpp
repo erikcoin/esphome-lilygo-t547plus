@@ -20,7 +20,7 @@ void MyEpaperDisplay::update() {
   gfx.display();                 // laat zien
 }
 
-void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, Color color) {
+void MyEpaperDisplay::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
   uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
   gfx.drawPixel(x, y, col);
 }
