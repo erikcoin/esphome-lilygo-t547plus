@@ -24,7 +24,7 @@ class MyEpaperDisplay : public display::DisplayBuffer {
   }
 
   display::DisplayType get_display_type() override {
-    return display::DisplayType::DISPLAY_TYPE_COLOR;
+    return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
   }
 
   int get_width_internal() override { return get_width(); }
