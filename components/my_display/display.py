@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.components.display as display
-from esphome import automation, config_validation as cv
+from esphome import config_validation as cv
 from esphome.const import CONF_ID
 
 CODEOWNERS = [""]
@@ -9,7 +9,7 @@ my_display_ns = cg.esphome_ns.namespace("my_display")
 MyDisplay = my_display_ns.class_("MyDisplay", cg.PollingComponent, display.DisplayBuffer)
 
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend({
-    cv.GenerateID(): cg.declare_id(MyDisplay),  # Gebruik cg.declare_id direct
+    cv.GenerateID(): cg.declare_id(MyDisplay),  # Gebruik de juiste manier om een ID te declareren
 }).extend(display.MAKE_DISPLAY_COMPONENT_SCHEMA())
 
 async def to_code(config):
