@@ -82,7 +82,7 @@ void M5PaperS3DisplayM5GFX::update() {
     ESP_LOGD(TAG, "Display lambda done.");
   }
   M5.Display.startWrite();
-  M5.Display.fill(Color::WHITE);
+  M5.Display.fillScreen(Color::WHITE);
   M5.Display.fillRect(20, 100, 280, 60, Color::WHITE);
   //M5.Display.endWrite();
   //M5.Display.startWrite();
