@@ -32,7 +32,7 @@ while (!M5.Display.isReadable()) {
   gfx.display();    // Forceer een volledige witte refresh
   gfx.waitDisplay(); // 👈 wacht écht tot klaar
   
-  this->canvas_ = lgfx::LGFX_Sprite(&gfx);
+  //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
   int w = gfx.width();
   int h = gfx.height();
   //this->canvas_.createSprite(gfx.width(), gfx.height());
@@ -132,14 +132,14 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
   uint32_t native_color = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(native_color);
+ // this->canvas_.fillSprite(native_color);
 }
 
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    uint32_t native_color = get_native_m5gfx_color_(color);
-   this->canvas_.drawPixel(x, y, native_color);
+ //  this->canvas_.drawPixel(x, y, native_color);
 }
 
 // --- Helper Functie ---
