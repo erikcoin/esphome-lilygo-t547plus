@@ -13,8 +13,13 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGCONFIG(TAG, "Setting up M5Paper S3 display using M5GFX...");
   M5.begin();
-  ESP_LOGD(TAG, "M5.begin() finished.");
-  delay(1000);  // 👈 essentieel bij sommige e-paper boards
+ESP_LOGD(TAG, "M5.begin() finished.");
+
+while (!M5.Display.isEPDReady()) {
+  ESP_LOGD(TAG, "Waiting for EPD to be ready...");
+  delay(100);
+}
+
   M5.Display.clearDisplay();
   auto &gfx = M5.Display;
   gfx.setRotation(this->rotation_);
