@@ -15,7 +15,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   M5.begin();
 ESP_LOGD(TAG, "M5.begin() finished.");
 
-while (!M5.Display.isEPDReady()) {
+while (!M5.Display.isReadable()) {
   ESP_LOGD(TAG, "Waiting for EPD to be ready...");
   delay(100);
 }
