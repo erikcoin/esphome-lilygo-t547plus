@@ -75,7 +75,7 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
-
+  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "Calling display lambda...");
     this->writer_(*this);
