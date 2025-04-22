@@ -13,11 +13,11 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGCONFIG(TAG, "Setting up M5Paper S3 display using M5GFX...");
   auto cfg = M5.config();
-  gfx.setEpdMode(epd_mode_t::epd_fastest);
+  
   M5.begin(cfg);
   //M5.begin();
 ESP_LOGD(TAG, "M5.begin() finished.");
-gfx.setEpdMode(epd_mode_t::epd_fastest);
+M5.Display.setEpdMode(epd_mode_t::epd_fastest);
 while (!M5.Display.isReadable()) {
   ESP_LOGD(TAG, "Waiting for EPD to be ready...");
   delay(100);
