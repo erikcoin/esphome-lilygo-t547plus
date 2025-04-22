@@ -35,15 +35,15 @@ while (!M5.Display.isReadable()) {
   this->canvas_ = lgfx::LGFX_Sprite(&gfx);
   int w = gfx.width();
   int h = gfx.height();
-  this->canvas_.createSprite(gfx.width(), gfx.height());
-  ESP_LOGD(TAG, "M5GFX Sprite created with size: %d x %d", w, h);
+  //this->canvas_.createSprite(gfx.width(), gfx.height());
+  //ESP_LOGD(TAG, "M5GFX Sprite created with size: %d x %d", w, h);
 
-  this->canvas_.setColorDepth(8);
-  ESP_LOGD(TAG, "Sprite color depth set to %d", this->canvas_.getColorDepth());
+  //this->canvas_.setColorDepth(8);
+ // ESP_LOGD(TAG, "Sprite color depth set to %d", this->canvas_.getColorDepth());
 
   uint32_t white_color = get_native_m5gfx_color_(Color::WHITE);
-  //gfx.fillScreen(white_color);
-  this->canvas_.fillSprite(white_color);
+  gfx.fillScreen(white_color);
+  //this->canvas_.fillSprite(white_color);
 
   M5.Display.fillScreen(M5.Display.color888(255,255,255));
   M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
