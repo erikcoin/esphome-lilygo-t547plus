@@ -29,7 +29,7 @@ while (!M5.Display.isReadable()) {
   ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
   // Optioneel ook: setEpdMode al hier
   
-  gfx.fillScreen(TFT_wHITE);
+  gfx.fillScreen(TFT_WHITE);
   gfx.display();    // Forceer een volledige witte refresh
   gfx.waitDisplay(); // 👈 wacht écht tot klaar
   
