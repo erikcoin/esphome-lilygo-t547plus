@@ -46,9 +46,9 @@ while (!M5.Display.isReadable()) {
   //gfx.fillScreen(white_color);
   //this->canvas_.fillSprite(white_color);
 
-  M5.Display.fillScreen(M5.Display.color888(255,255,255));
-  M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
-  M5.Display.display();
+  //M5.Display.fillScreen(M5.Display.color888(255,255,255));
+  //M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
+  //M5.Display.display();
   M5.Display.waitDisplay();
   
   ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
