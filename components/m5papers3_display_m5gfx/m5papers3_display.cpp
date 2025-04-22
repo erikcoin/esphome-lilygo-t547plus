@@ -83,7 +83,7 @@ void M5PaperS3DisplayM5GFX::update() {
   }
   M5.Display.startWrite();
   M5.Display.fillScreen(WHITE);
-  M5.Display.fillRect(20, 580, 280, 60, WHITE);
+  M5.Display.fillRect(20, 100, 280, 60, WHITE);
   //M5.Display.endWrite();
   //M5.Display.startWrite();
   M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
