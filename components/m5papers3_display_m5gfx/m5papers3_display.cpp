@@ -12,7 +12,9 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGCONFIG(TAG, "Setting up M5Paper S3 display using M5GFX...");
-  M5.begin();
+  auto cfg = M5.config();
+  M5.begin(cfg);
+  //M5.begin();
 ESP_LOGD(TAG, "M5.begin() finished.");
 
 while (!M5.Display.isReadable()) {
