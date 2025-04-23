@@ -76,28 +76,28 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
-  M5.Display.clearDisplay();
+////  M5.Display.clearDisplay();
   //if (this->writer_ != nullptr) {
  //   ESP_LOGD(TAG, "Calling display lambda...");
  //   this->writer_(*this);
  //   ESP_LOGD(TAG, "Display lambda done.");
  // }
-  M5.Display.startWrite();
-  //M5.Display.fillScreen(TFT_BLACK);
-  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
-  M5.Display.endWrite();
-  M5.Display.startWrite();
+////  M5.Display.startWrite();
+////  //M5.Display.fillScreen(TFT_BLACK);
+////  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
+////  M5.Display.endWrite();
+////  M5.Display.startWrite();
   //M5.Display.fillScreen(TFT_WHITE);
-  M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
-  M5.Display.endWrite();
+////M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
+////  M5.Display.endWrite();
   //ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
   //this->canvas_.pushSprite(0, 0);
 
-  ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
-  M5.Display.setEpdMode(epd_mode_t::epd_fastest);  // expliciet modus
-  M5.Display.display();
-  M5.Display.waitDisplay();  // wacht op EPD-complete refresh
-  ESP_LOGD(TAG, "M5GFX display update finished.");
+////  ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
+////  M5.Display.setEpdMode(epd_mode_t::epd_fastest);  // expliciet modus
+////  M5.Display.display();
+////  M5.Display.waitDisplay();  // wacht op EPD-complete refresh
+///  ESP_LOGD(TAG, "M5GFX display update finished.");
 }
   
 
