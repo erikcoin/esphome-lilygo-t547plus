@@ -76,12 +76,14 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
+  M5.Display.startWrite();
 ////  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "Calling display lambda...");
     this->writer_(*this);
     ESP_LOGD(TAG, "Display lambda done.");
   }
+  M5.Display.endWrite();
 ////  M5.Display.startWrite();
 ////  //M5.Display.fillScreen(TFT_BLACK);
 ////  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
