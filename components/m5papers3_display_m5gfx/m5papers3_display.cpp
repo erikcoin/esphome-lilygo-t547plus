@@ -11,7 +11,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 // setup() en dump_config() blijven zoals in de vorige correctie
 
 void M5PaperS3DisplayM5GFX::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up M5Paper S3 display using M5GFX...");
+  ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
   auto cfg = M5.config();
   
   M5.begin(cfg);
