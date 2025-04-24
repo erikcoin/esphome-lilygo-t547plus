@@ -32,9 +32,12 @@ void M5PaperS3DisplayM5GFX::setup() {
 
   // Canvas setup
   this->canvas_ = lgfx::LGFX_Sprite(&gfx);
-  this->canvas_.createSprite(gfx.width(), gfx.height());
   this->canvas_.setColorDepth(8);
-  this->canvas_.fillSprite(TFT_WHITE);
+  this->canvas_.createSprite(M5.Display.width(), M5.Display.height());
+  this->canvas_.fillSprite(255);
+  this->canvas_.pushSprite(0, 0); // init push
+  M5.Display.display();
+  M5.Display.waitDisplay();
   ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
 
   ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
@@ -102,35 +105,33 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
   return M5.Display.height();
 }
 
-// fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
-  uint32_t native_color = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(native_color);
+  uint8_t gray = color.r;  // of iets simpelers
+  this->canvas_.fillSprite(gray);
 }
 
 // --- Protected Display Overrides ---
-// draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    ESP_LOGD(TAG, "draw_pixel: (%d, %d)", x, y);
-   uint32_t native_color = get_native_m5gfx_color_(color);
-   this->canvas_.drawPixel(x, y, native_color);
+  uint8_t gray = color.r;  // neem gewoon de rode component als grijswaarde
+  this->canvas_.drawPixel(x, y, gray);
 }
 
 // --- Helper Functie ---
-uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
+///uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
     // !! Gebruik color.r, color.g, color.b (uint8_t) en converteer naar float !!
-    float r_f = color.r / 255.0f;
-    float g_f = color.g / 255.0f;
-    float b_f = color.b / 255.0f;
+///    float r_f = color.r / 255.0f;
+///    float g_f = color.g / 255.0f;
+///    float b_f = color.b / 255.0f;
 
     // Luminantie formule (gewogen gemiddelde)
-    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
+///    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
     // Schaal naar 0-255
-    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
+///    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
 
     // Converteer 8-bit gray naar M5GFX kleur (RGB888 formaat)
-    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
-}
+//    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
+//}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
