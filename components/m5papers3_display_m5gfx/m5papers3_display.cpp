@@ -21,11 +21,11 @@ canvas.createSprite(300, 300);
 canvas.fillSprite(TFT_WHITE);
 canvas.pushSprite(0, 0);
 
-canvas.setFont(&fonts::Font4);
-canvas.setTextSize(2.0);
-canvas.drawString("HalloHallo",50,50);
-canvas.drawLine(100,100,200,100,TFT_BLACK);
-canvas.pushSprite(0, 0);
+canvas_.setFont(&fonts::Font4);
+canvas_.setTextSize(2.0);
+canvas_.drawString("HalloHallo",50,50);
+canvas_.drawLine(100,100,200,100,TFT_BLACK);
+canvas_.pushSprite(0, 0);
 }
   
   
