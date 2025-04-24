@@ -16,10 +16,10 @@ void M5PaperS3DisplayM5GFX::setup() {
   auto cfg = M5.config();
 M5.begin(cfg);
 
-canvas.createSprite(300, 300);
+canvas_.createSprite(300, 300);
 
-canvas.fillSprite(TFT_WHITE);
-canvas.pushSprite(0, 0);
+canvas_.fillSprite(TFT_WHITE);
+canvas_.pushSprite(0, 0);
 
 canvas_.setFont(&fonts::Font4);
 canvas_.setTextSize(2.0);
