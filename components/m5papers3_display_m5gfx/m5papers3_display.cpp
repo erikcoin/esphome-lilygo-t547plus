@@ -32,6 +32,14 @@ while (!M5.Display.isReadable()) {
   gfx.fillScreen(TFT_WHITE);
   gfx.display();    // Forceer een volledige witte refresh
   gfx.waitDisplay(); // 👈 wacht écht tot klaar
+
+  // Setup canvas
+  this->canvas_ = lgfx::LGFX_Sprite(&gfx);
+  this->canvas_.setColorDepth(8);  // Grayscale: 8-bit is prima
+  this->canvas_.createSprite(gfx.width(), gfx.height());
+  this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
+
+  ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
   
   //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
  // int w = gfx.width();
@@ -49,7 +57,8 @@ while (!M5.Display.isReadable()) {
   //M5.Display.fillScreen(M5.Display.color888(255,255,255));
   //M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
   //M5.Display.display();
-  M5.Display.waitDisplay();
+  
+  //M5.Display.waitDisplay();
   
   ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
 }
@@ -79,11 +88,14 @@ void M5PaperS3DisplayM5GFX::update() {
   
 ////  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
-    ESP_LOGD(TAG, "Calling display lambda...");
-    this->writer_(*this);
-    ESP_LOGD(TAG, "Display lambda done.");
+    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
+    this->writer_(*this);                 // lambda tekent op canvas
+    ESP_LOGD(TAG, "Lambda done, pushing canvas...");
+    this->canvas_.pushSprite(0, 0);       // push naar EPD
+    M5.Display.display();                 // e-paper refresh
+    M5.Display.waitDisplay();
   }
-  gfx->display();
+  //gfx->display();
 ////  M5.Display.startWrite();
 ////  //M5.Display.fillScreen(TFT_BLACK);
 ////  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
@@ -135,14 +147,14 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
   uint32_t native_color = get_native_m5gfx_color_(color);
- // this->canvas_.fillSprite(native_color);
+  this->canvas_.fillSprite(native_color);
 }
 
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    uint32_t native_color = get_native_m5gfx_color_(color);
- //  this->canvas_.drawPixel(x, y, native_color);
+   this->canvas_.drawPixel(x, y, native_color);
 }
 
 // --- Helper Functie ---
