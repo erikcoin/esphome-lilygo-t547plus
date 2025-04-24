@@ -87,6 +87,8 @@ void M5PaperS3DisplayM5GFX::update() {
   ESP_LOGD(TAG, "Running M5GFX display update...");
   this->canvas_.drawPixel(10, 10, TFT_BLACK);
 this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
+  this->canvas_.pushSprite(0, 0);
+M5.Display.display();
 ////  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
     this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
