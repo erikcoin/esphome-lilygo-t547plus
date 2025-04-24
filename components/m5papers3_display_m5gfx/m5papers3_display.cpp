@@ -61,10 +61,12 @@ void M5PaperS3DisplayM5GFX::update() {
   this->canvas_.drawFastHLine(10, 10, 200, TFT_BLACK);
   this->canvas_.drawFastVLine(10, 10, 200, TFT_DARKGREY);
   this->canvas_.drawCircle(120, 120, 30, TFT_RED);
+  this->canvas_.drawPixel(50, 50, 0); // zwart
+this->canvas_.drawPixel(60, 60, 15); // bijna wit (bij 4-bit grayscale)
 
   ESP_LOGD(TAG, "Drawing done, pushing to display...");
   this->canvas_.pushSprite(0, 0);
-
+  M5.Display.setEpdMode(epd_mode_t::epd_fastest);
   M5.Display.display();
   M5.Display.waitDisplay();
   ESP_LOGD(TAG, "Update done.");
