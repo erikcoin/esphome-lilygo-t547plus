@@ -55,33 +55,21 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 // --- PollingComponent / Display Override ---
 // update() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::update() {
-  static bool first_time = true;
-  if (first_time) {
-    ESP_LOGD(TAG, "Delaying first update for EPD...");
-    delay(1000);
-    first_time = false;
-  }
+  ESP_LOGD(TAG, "Minimal test update() started");
 
-  ESP_LOGD(TAG, "Running M5GFX display update...");
-  this->canvas_.fillSprite(TFT_WHITE);  // Clear canvas
+  this->canvas_.fillSprite(TFT_WHITE);
+  this->canvas_.drawFastHLine(10, 10, 200, TFT_BLACK);
+  this->canvas_.drawFastVLine(10, 10, 200, TFT_DARKGREY);
+  this->canvas_.drawCircle(120, 120, 30, TFT_RED);
 
-  // Teken een testlijn of debugpixel als extra check
-  this->canvas_.drawPixel(10, 10, TFT_BLACK);
-  this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
-
-  if (this->writer_ != nullptr) {
-    ESP_LOGD(TAG, "Calling display lambda...");
-    this->writer_(*this);
-    ESP_LOGD(TAG, "Display lambda done.");
-  }
-
+  ESP_LOGD(TAG, "Drawing done, pushing to display...");
   this->canvas_.pushSprite(0, 0);
+
   M5.Display.display();
   M5.Display.waitDisplay();
-
-  ESP_LOGD(TAG, "Canvas pushed and display refreshed.");
+  ESP_LOGD(TAG, "Update done.");
 }
-  
+
 
 // --- Display Overrides ---
 // set_rotation() blijft zoals in de vorige correctie
