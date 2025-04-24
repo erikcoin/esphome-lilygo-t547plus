@@ -1,4 +1,4 @@
-#include "m5papers3_display.h" // Zorg dat de .h bestandsnaam klopt
+#include "m5papers3_display.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
@@ -7,42 +7,31 @@ namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
 
-// --- Component Overrides ---
-// setup() en dump_config() blijven zoals in de vorige correctie
-
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
   auto cfg = M5.config();
   M5.begin(cfg);
-
-  ESP_LOGD(TAG, "M5.begin() finished.");
   M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+
   while (!M5.Display.isReadable()) {
     ESP_LOGD(TAG, "Waiting for EPD to be ready...");
     delay(100);
   }
 
-  auto &gfx = M5.Display;
-  gfx.setRotation(this->rotation_);
-  ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
+  M5.Display.setRotation(this->rotation_);
+  ESP_LOGD(TAG, "Rotation set to: %d", this->rotation_);
 
-  gfx.fillScreen(TFT_WHITE);
-  gfx.display();
-  gfx.waitDisplay();
-
-  // Canvas setup
-  this->canvas_ = lgfx::LGFX_Sprite(&gfx);
-  this->canvas_.setColorDepth(8);
+  this->canvas_.setColorDepth(8);  // 8-bit grayscale
+  this->canvas_.setPsram(true);    // PSRAM gebruiken indien beschikbaar
   this->canvas_.createSprite(M5.Display.width(), M5.Display.height());
-  this->canvas_.fillSprite(255);
-  this->canvas_.pushSprite(0, 0); // init push
+  this->canvas_.fillSprite(255);  // volledig wit canvas
+
+  this->canvas_.pushSprite(0, 0); // initieel tonen
   M5.Display.display();
   M5.Display.waitDisplay();
-  ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
 
   ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
 }
-
 
 void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
@@ -50,34 +39,29 @@ void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-  // Roep gewoon de interne versie aan
-  this->draw_absolute_pixel_internal(x, y, color);
-}
-
-// --- PollingComponent / Display Override ---
-// update() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::update() {
-  ESP_LOGD(TAG, "Minimal test update() started");
+  static bool first_time = true;
+  if (first_time) {
+    ESP_LOGD(TAG, "Delaying first update for EPD...");
+    delay(1000);
+    first_time = false;
+  }
 
-  this->canvas_.fillSprite(TFT_WHITE);
-  this->canvas_.drawFastHLine(10, 10, 200, TFT_BLACK);
-  this->canvas_.drawFastVLine(10, 10, 200, TFT_DARKGREY);
-  this->canvas_.drawCircle(120, 120, 30, TFT_RED);
-  this->canvas_.drawPixel(50, 50, 0); // zwart
-this->canvas_.drawPixel(60, 60, 15); // bijna wit (bij 4-bit grayscale)
+  this->canvas_.fillSprite(255);  // wit canvas
 
-  ESP_LOGD(TAG, "Drawing done, pushing to display...");
-  this->canvas_.pushSprite(0, 0);
-  M5.Display.setEpdMode(epd_mode_t::epd_fastest);
-  M5.Display.display();
-  M5.Display.waitDisplay();
-  ESP_LOGD(TAG, "Update done.");
+  if (this->writer_ != nullptr) {
+    ESP_LOGD(TAG, "Calling display lambda...");
+    this->writer_(*this);
+    ESP_LOGD(TAG, "Display lambda done.");
+  }
+
+  this->canvas_.pushSprite(0, 0);  // canvas naar scherm
+  M5.Display.display();           // e-paper refresh
+  M5.Display.waitDisplay();       // wachten tot klaar
+
+  ESP_LOGD(TAG, "Canvas pushed to screen.");
 }
 
-
-// --- Display Overrides ---
-// set_rotation() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
   int m5gfx_rotation = 0;
   switch (rotation) {
@@ -87,17 +71,9 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
     default: m5gfx_rotation = 0; break;
   }
   this->rotation_ = m5gfx_rotation;
-  // Meteen toepassen als setup al geweest is? Optioneel.
-  // if (this->is_ready()) { // is_ready() is wel een geldige check
-  //   M5.Display.setRotation(this->rotation_);
-  // }
 }
 
-
-// get_width/height_internal(): Verwijder de !this->is_setup_ check
 int M5PaperS3DisplayM5GFX::get_width_internal() {
-  // Vertrouw erop dat M5.Display geldig is wanneer dit wordt aangeroepen na setup()
-  // Een check op M5.getBoard() is minder nuttig hier, M5.Display.width() is directer.
   return M5.Display.width();
 }
 
@@ -106,32 +82,18 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 }
 
 void M5PaperS3DisplayM5GFX::fill(Color color) {
-  uint8_t gray = color.r;  // of iets simpelers
+  uint8_t gray = color.r;  // simpele grayscale (r = g = b bij ESPHome Color)
   this->canvas_.fillSprite(gray);
 }
 
-// --- Protected Display Overrides ---
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
-   ESP_LOGD(TAG, "draw_pixel: (%d, %d)", x, y);
-  uint8_t gray = color.r;  // neem gewoon de rode component als grijswaarde
+  uint8_t gray = color.r;
   this->canvas_.drawPixel(x, y, gray);
 }
 
-// --- Helper Functie ---
-///uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
-    // !! Gebruik color.r, color.g, color.b (uint8_t) en converteer naar float !!
-///    float r_f = color.r / 255.0f;
-///    float g_f = color.g / 255.0f;
-///    float b_f = color.b / 255.0f;
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+  this->draw_absolute_pixel_internal(x, y, color);
+}
 
-    // Luminantie formule (gewogen gemiddelde)
-///    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
-    // Schaal naar 0-255
-///    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
-
-    // Converteer 8-bit gray naar M5GFX kleur (RGB888 formaat)
-//    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
-//}
-
-} // namespace m5papers3_display_m5gfx
-} // namespace esphome
+}  // namespace m5papers3_display_m5gfx
+}  // namespace esphome
