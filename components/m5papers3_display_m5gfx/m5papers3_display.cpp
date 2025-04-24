@@ -85,7 +85,8 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
-  
+  this->canvas_.drawPixel(10, 10, TFT_BLACK);
+this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
 ////  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
     this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
@@ -153,6 +154,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
+   ESP_LOGD(TAG, "draw_pixel: (%d, %d)", x, y);
    uint32_t native_color = get_native_m5gfx_color_(color);
    this->canvas_.drawPixel(x, y, native_color);
 }
