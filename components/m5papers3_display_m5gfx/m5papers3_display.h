@@ -36,6 +36,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   std::function<void(display::Display &)> writer_{nullptr};
 
   lgfx::LGFX_Sprite canvas_{&M5.Display};
+  uint8_t get_native_m5gfx_color_(esphome::Color color);
 };
 
 }  // namespace m5papers3_display_m5gfx
