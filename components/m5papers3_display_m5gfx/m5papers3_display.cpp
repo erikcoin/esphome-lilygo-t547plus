@@ -61,7 +61,7 @@ canvas_.pushSprite(0, 0);
 //  this->canvas_.createSprite(gfx.width(), gfx.height());
 //  this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
 
-  ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
+ // ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
   
   //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
  // int w = gfx.width();
@@ -82,7 +82,7 @@ canvas_.pushSprite(0, 0);
   
   //M5.Display.waitDisplay();
   
-  ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
+ // ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
 }
 
 void M5PaperS3DisplayM5GFX::dump_config() {
