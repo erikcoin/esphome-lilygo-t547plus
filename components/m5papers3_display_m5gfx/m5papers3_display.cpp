@@ -83,7 +83,7 @@ canvas_.pushSprite(0, 0);
   //M5.Display.waitDisplay();
   
  // ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
-}
+//}
 
 void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
