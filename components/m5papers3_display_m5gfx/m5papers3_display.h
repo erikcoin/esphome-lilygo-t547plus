@@ -50,6 +50,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
 
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
 //  lgfx::LGFX_Sprite canvas_;
+M5GFX gfx;
 };
 
 } // namespace m5papers3_display_m5gfx
