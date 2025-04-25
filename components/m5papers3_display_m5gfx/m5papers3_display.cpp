@@ -21,7 +21,7 @@ ESP_LOGD(TAG, "M5.begin() finished.");
 M5.Display.setEpdMode(epd_mode_t::epd_fastest);
 while (!M5.Display.isReadable()) {
   ESP_LOGD(TAG, "Waiting for EPD to be ready...");
-  delay(100);
+  esphome::delay(100u);
 }
   M5.Display.clearDisplay();
   auto &gfx = M5.Display;
@@ -155,7 +155,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
   uint32_t native_color = get_native_m5gfx_color_(color);
-  this->M5.Display.fillScreen(native_color);
+  M5.Display.fillScreen(native_color);
 }
 
 // --- Protected Display Overrides ---
