@@ -26,11 +26,11 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   void update() override;
 
   // Display methodes (fill, get_width/height_internal, get_display_type blijven hetzelfde)
-  void fill(Color color) override;
+  void fill(esphome::Color color) override;
   int get_width_internal() override;
   int get_height_internal() override;
-  display::DisplayType get_display_type() override {
-    return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
+  esphome::display::DisplayType get_display_type() override {
+    return esphome::display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
   }
 
   // Configuratie setters (blijven hetzelfde)
@@ -42,11 +42,11 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color) ;
   // Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
-  uint32_t get_native_m5gfx_color_(Color color);
+  uint32_t get_native_m5gfx_color_(esphome::Color color);
 
   // Member variabelen (rotation, writer blijven hetzelfde)
   int rotation_{0};
-  std::function<void(display::Display &)> writer_{nullptr};
+  std::function<void(esphome::display::Display &)> writer_{nullptr};
 
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
 //  lgfx::LGFX_Sprite canvas_;
