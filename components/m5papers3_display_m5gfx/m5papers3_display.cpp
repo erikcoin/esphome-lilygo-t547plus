@@ -85,8 +85,8 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
-  this->canvas_.drawPixel(10, 10, TFT_BLACK);
-this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
+  this->canvas_.drawPixel(100, 100, TFT_BLACK);
+///this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
   this->canvas_.pushSprite(0, 0);
 M5.Display.display();
 ////  M5.Display.clearDisplay();
