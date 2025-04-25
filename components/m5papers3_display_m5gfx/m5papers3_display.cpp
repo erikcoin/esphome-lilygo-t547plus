@@ -81,7 +81,7 @@ void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
   if (first_time) {
     ESP_LOGD(TAG, "Delaying first update for EPD...");
-    delay(1000);  // 👈 éénmalige delay bij eerste update
+    esphome::delay(1000);  // 👈 éénmalige delay bij eerste update
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
