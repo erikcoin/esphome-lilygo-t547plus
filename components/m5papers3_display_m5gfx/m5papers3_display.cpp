@@ -11,7 +11,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 // setup() en dump_config() blijven zoals in de vorige correctie
 
 void M5PaperS3DisplayM5GFX::setup() {
-  ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
+ // ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
   auto cfg = M5.config();
   
   M5.begin(cfg);
@@ -37,7 +37,8 @@ while (!M5.Display.isReadable()) {
   //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
   this->canvas_ = M5Canvas(&gfx);
   this->canvas_.setColorDepth(4);  // Grayscale: 8-bit is prima
-  this->canvas_.createSprite(gfx.width(), gfx.height());
+  bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
+  ESP_LOGD(TAG, "Canvas createSprite success: %s", ok ? "yes" : "no");
   this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
 
   ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
