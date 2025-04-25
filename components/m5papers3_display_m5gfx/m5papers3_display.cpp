@@ -93,7 +93,7 @@ void M5PaperS3DisplayM5GFX::update() {
 ////  M5.Display.clearDisplay();
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "maak wit...");
-    this->canvas_.fillSprite(WHITE);  // begin met wit scherm
+    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
     ESP_LOGD(TAG, "wit gemaakt nu pushing canvas...");
     this->canvas_.pushSprite(0, 0);       // push naar EPD
     ESP_LOGD(TAG, "start writer...");
