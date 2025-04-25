@@ -3,8 +3,8 @@
 #include "esphome/core/application.h"
 
 
-using namespace esphome;
-//namespace esphome {
+//using namespace esphome;
+namespace esphome {
 namespace m5papers3_display_m5gfx {
 using DisplayWriter = std::function<void(esphome::display::Display&)>;
 static const char *const TAG = "m5papers3.display_m5gfx";
