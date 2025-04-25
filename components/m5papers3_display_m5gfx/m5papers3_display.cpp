@@ -88,7 +88,7 @@ void M5PaperS3DisplayM5GFX::update() {
 //  this->canvas_.drawPixel(10, 10, TFT_BLACK);
 //this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
 //  this->canvas_.pushSprite(0, 0);
-M5.Display.display();
+//M5.Display.display();
 ////  M5.Display.clearDisplay();
 //  if (this->writer_ != nullptr) {
 //    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
@@ -97,8 +97,8 @@ M5.Display.display();
 //    this->canvas_.pushSprite(0, 0);       // push naar EPD
 //    M5.Display.display();                 // e-paper refresh
 //    M5.Display.waitDisplay();
-M5.Display.fillScreen(TFT_WHITE);
-M5.Display.setTextColor(TFT_BLACK);
+//M5.Display.fillScreen(TFT_WHITE);
+//M5.Display.setTextColor(TFT_BLACK);
 this->do_update_();
 M5.Display.display();
   
