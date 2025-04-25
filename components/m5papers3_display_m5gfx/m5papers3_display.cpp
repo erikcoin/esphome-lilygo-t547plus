@@ -41,7 +41,7 @@ while (!M5.Display.isReadable()) {
   this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
 
   ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
-  
+  ESP_LOGD(TAG, "gfx ptr: %p | M5.Display ptr: %p", &gfx, &M5.Display);
   //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
  // int w = gfx.width();
   //int h = gfx.height();
@@ -78,7 +78,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 
 // update() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::update() {
-ESP_LOGD(TAG, "gfx ptr: %p | M5.Display ptr: %p", &gfx, &M5.Display);
+
 
     static bool first_time = true;
   if (first_time) {
