@@ -1,7 +1,7 @@
 #include "m5papers3_display.h" // Zorg dat de .h bestandsnaam klopt
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
-
+using namespace esphome;
 //namespace esphome {
 namespace m5papers3_display_m5gfx {
 
