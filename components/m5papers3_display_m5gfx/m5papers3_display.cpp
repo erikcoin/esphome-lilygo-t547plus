@@ -179,8 +179,10 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    ESP_LOGD(TAG, "draw_pixel: (%d, %d)", x, y);
-   uint32_t native_color = get_native_m5gfx_color_(color);
-   this->canvas_.drawPixel(x, y, native_color);
+    uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+   gfx.drawPixel(x, y, col);
+   //uint32_t native_color = get_native_m5gfx_color_(color);
+   //this->canvas_.drawPixel(x, y, native_color);
 }
 
 // --- Helper Functie ---
