@@ -71,9 +71,7 @@ void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
-void M5PaperS3DisplayM5GFX::set_writer(DisplayWriter writer) {
-  this->writer_ = writer;
-}
+
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
   // Roep gewoon de interne versie aan
   this->draw_absolute_pixel_internal(x, y, color);
