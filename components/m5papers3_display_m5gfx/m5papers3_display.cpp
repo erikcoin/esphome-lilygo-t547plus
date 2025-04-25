@@ -8,36 +8,51 @@ namespace m5papers3_display_m5gfx {
 static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
-  ESP_LOGI(TAG, "Init display");
+  ESP_LOGI(TAG, "Setting up M5Paper S3 display");
 
   M5.begin();
-  M5.Display.setEpdMode(epd_mode_t::epd_fastest);  // of epd_quality
+  M5.Display.setEpdMode(epd_mode_t::epd_fastest);
   M5.Display.setRotation(0);
   M5.Display.clearDisplay(TFT_WHITE);
   M5.Display.display();
   M5.Display.waitDisplay();
 
-  canvas_.setColorDepth(1);
-  canvas_.createSprite(M5.Display.width(), M5.Display.height());
+  // Controleer canvas initialisatie
+  ESP_LOGI(TAG, "Creating canvas...");
+  if (!canvas_.createSprite(M5.Display.width(), M5.Display.height())) {
+    ESP_LOGE(TAG, "Failed to create canvas sprite!");
+    return;  // Stop bij een mislukte canvas-creatie
+  }
+  ESP_LOGI(TAG, "Canvas created with size: %d x %d", M5.Display.width(), M5.Display.height());
+
+  canvas_.setColorDepth(1);  // Grayscale
   canvas_.setFont(&fonts::Font0);
   canvas_.setTextSize(1);
   canvas_.setTextColor(TFT_BLACK);
   canvas_.setTextDatum(top_left);
 
-  ESP_LOGI(TAG, "Display initialized");
+  ESP_LOGI(TAG, "Display initialized and canvas set up.");
 }
 
 void M5PaperS3DisplayM5GFX::update() {
-  ESP_LOGD(TAG, "Update started");
+  ESP_LOGD(TAG, "Updating display...");
 
-  canvas_.fillSprite(TFT_WHITE);                  // maak canvas wit
-  canvas_.drawString("TEST123", 10, 10);          // tekst tekenen
-  canvas_.drawLine(0, 0, 100, 100, TFT_BLACK);    // extra zichtbaarheid
-  canvas_.pushSprite(0, 0);                       // toon canvas op scherm
-  M5.Display.display();                           // forceer e-paper refresh
-  M5.Display.waitDisplay();                       // wacht tot klaar
+  // Canvas reset en teken de tekst
+  canvas_.fillSprite(TFT_WHITE);  // Maak het canvas wit
+  canvas_.drawString("TEST123", 10, 10);  // Teken tekst
 
-  ESP_LOGD(TAG, "Update done");
+  // Debug voor pixel drawing
+  canvas_.drawLine(0, 0, 100, 100, TFT_BLACK);  // Voeg een lijn toe voor visuele controle
+
+  // Push canvas naar display
+  ESP_LOGD(TAG, "Pushing canvas to display...");
+  if (!canvas_.pushSprite(0, 0)) {
+    ESP_LOGE(TAG, "Failed to push sprite to display!");
+  }
+  M5.Display.display();
+  M5.Display.waitDisplay();
+
+  ESP_LOGD(TAG, "Update completed.");
 }
 
 
