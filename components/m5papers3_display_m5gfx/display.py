@@ -1,14 +1,16 @@
 # my_components/m5papers3_display_m5gfx/display.py
 import esphome.codegen as cg
+import esphome.components.display as display
 import esphome.config_validation as cv
-from esphome.components import display
+#from esphome.components import display
+from esphome import automation
 from esphome.const import (
     CONF_ID,
     CONF_LAMBDA,
     CONF_ROTATION,
     CONF_UPDATE_INTERVAL,
 )
-
+AUTO_LOAD = ["display"]
 # Namespace voor onze C++ code
 # Gebruik een andere namespace om conflicten te vermijden als je beide hebt
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
