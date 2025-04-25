@@ -20,7 +20,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   // Standaard Component methodes (setup, dump_config, get_setup_priority blijven hetzelfde)
   void setup() override;
   void dump_config() override;
-  float get_setup_priority() const override { return setup_priority::HARDWARE; }
+  float get_setup_priority() const override { return esphome::setup_priority::HARDWARE; }
 
   // PollingComponent methode (update komt via display::Display)
   void update() override;
