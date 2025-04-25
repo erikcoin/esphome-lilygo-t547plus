@@ -35,7 +35,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
 
   // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
-  void set_writer(std::function<void(display::Display &)> &&writer) { this->writer_ = writer; }
+  void set_writer(std::function<void(esphome::display::Display &)> &&writer) { this->writer_ = writer; }
  
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
