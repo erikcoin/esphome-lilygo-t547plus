@@ -12,28 +12,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
-  
-  auto cfg = M5.config();
-M5.begin(cfg);
 
-canvas_.createSprite(300, 300);
-
-canvas_.fillSprite(TFT_WHITE);
-canvas_.pushSprite(0, 0);
-
-canvas_.setFont(&fonts::Font4);
-canvas_.setTextSize(2.0);
-canvas_.drawString("HalloHallo",50,50);
-canvas_.drawLine(100,100,200,100,TFT_BLACK);
-canvas_.pushSprite(0, 0);
-}
-  
-  
-  
-  
-  
-  
-//  
   auto cfg = M5.config();
   
   M5.begin(cfg);
@@ -44,7 +23,6 @@ while (!M5.Display.isReadable()) {
   ESP_LOGD(TAG, "Waiting for EPD to be ready...");
   delay(100);
 }
-
   M5.Display.clearDisplay();
   auto &gfx = M5.Display;
   gfx.setRotation(this->rotation_);
@@ -107,18 +85,23 @@ void M5PaperS3DisplayM5GFX::update() {
     first_time = false;
   }
   ESP_LOGD(TAG, "Running M5GFX display update...");
-  this->canvas_.drawPixel(10, 10, TFT_BLACK);
-this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
-  this->canvas_.pushSprite(0, 0);
+//  this->canvas_.drawPixel(10, 10, TFT_BLACK);
+//this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
+//  this->canvas_.pushSprite(0, 0);
 M5.Display.display();
 ////  M5.Display.clearDisplay();
-  if (this->writer_ != nullptr) {
-    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
-    this->writer_(*this);                 // lambda tekent op canvas
-    ESP_LOGD(TAG, "Lambda done, pushing canvas...");
-    this->canvas_.pushSprite(0, 0);       // push naar EPD
-    M5.Display.display();                 // e-paper refresh
-    M5.Display.waitDisplay();
+//  if (this->writer_ != nullptr) {
+//    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
+//    this->writer_(*this);                 // lambda tekent op canvas
+//    ESP_LOGD(TAG, "Lambda done, pushing canvas...");
+//    this->canvas_.pushSprite(0, 0);       // push naar EPD
+//    M5.Display.display();                 // e-paper refresh
+//    M5.Display.waitDisplay();
+ this->gfx.fillScreen(TFT_WHITE);
+   this->gfx.setTextColor(TFT_BLACK);
+   this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
+   this->gfx.display();     // Pas daarna tonen
+  
   }
   //gfx->display();
 ////  M5.Display.startWrite();
