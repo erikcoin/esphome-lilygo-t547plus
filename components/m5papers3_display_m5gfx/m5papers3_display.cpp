@@ -193,4 +193,4 @@ uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(esphome::Color color) {
 }
 
 } // namespace m5papers3_display_m5gfx
-//} // namespace esphome
+} // namespace esphome
