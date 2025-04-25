@@ -1,6 +1,8 @@
 #include "m5papers3_display.h" // Zorg dat de .h bestandsnaam klopt
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
+
+using DisplayWriter = std::function<void(esphome::display::Display&)>;
 using namespace esphome;
 //namespace esphome {
 namespace m5papers3_display_m5gfx {
@@ -69,6 +71,9 @@ void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
+void M5PaperS3DisplayM5GFX::set_writer(DisplayWriter writer) {
+  this->writer_ = writer;
+}
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
   // Roep gewoon de interne versie aan
   this->draw_absolute_pixel_internal(x, y, color);
@@ -99,6 +104,9 @@ void M5PaperS3DisplayM5GFX::update() {
 //    M5.Display.waitDisplay();
 //M5.Display.fillScreen(TFT_WHITE);
 //M5.Display.setTextColor(TFT_BLACK);
+  if (this->writer_) {
+    // Hier kan de writer worden aangeroepen
+    this->writer_(*this);
 this->do_update_();
 M5.Display.display();
   
