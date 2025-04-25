@@ -49,7 +49,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   std::function<void(display::Display &)> writer_{nullptr};
 
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
-  lgfx::LGFX_Sprite canvas_;
+  M5Canvas canvas(&M5.Display);
+//lgfx::LGFX_Sprite canvas_;
 };
 
 } // namespace m5papers3_display_m5gfx
