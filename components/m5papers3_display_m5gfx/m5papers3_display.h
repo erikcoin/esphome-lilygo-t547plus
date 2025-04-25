@@ -7,7 +7,7 @@
 // Includes voor M5GFX en M5Unified
 #include <M5Unified.h> // Voor M5.begin() en M5.Display object
 #include <M5GFX.h>     // Voor LGFX en M5GFX types
-
+using DisplayWriter = std::function<void(esphome::display::Display &)>;
 // !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
 //namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
 
@@ -21,7 +21,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override { return esphome::setup_priority::HARDWARE; }
-
+  
   // PollingComponent methode (update komt via display::Display)
   void update() override;
 
@@ -36,8 +36,8 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
   //void set_writer(std::function<void(esphome::display::Display &)> &&writer) { this->writer_ = writer; }
- void set_writer(DisplayWriter writer) override { this->writer_ = writer; }
-
+// void set_writer(DisplayWriter writer) override { this->writer_ = writer; }
+void set_writer(DisplayWriter writer) { this->writer_ = std::move(writer); }
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
@@ -52,6 +52,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
 //  lgfx::LGFX_Sprite canvas_;
 M5GFX gfx;
+DisplayWriter writer_{};
 };
 
 } // namespace m5papers3_display_m5gfx
