@@ -38,7 +38,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   void set_rotation(int rotation);
   //void set_writer(std::function<void(esphome::display::Display &)> &&writer) { this->writer_ = writer; }
 // void set_writer(DisplayWriter writer) override { this->writer_ = writer; }
-void set_writer(DisplayWriter writer)// { this->writer_ = std::move(writer); }
+void set_writer(DisplayWriter writer);// { this->writer_ = std::move(writer); }
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
