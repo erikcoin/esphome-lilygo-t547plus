@@ -100,7 +100,7 @@ void M5PaperS3DisplayM5GFX::update() {
   }
     this->do_update_();
   //this->M5.Display.display();
-  gfx->display();
+  //gfx->display();
 ////  M5.Display.startWrite();
 ////  //M5.Display.fillScreen(TFT_BLACK);
 ////  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
