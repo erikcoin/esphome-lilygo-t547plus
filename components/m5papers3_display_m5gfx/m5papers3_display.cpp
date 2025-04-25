@@ -102,7 +102,7 @@ M5.Display.display();
    this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
    this->M5.Display.display();     // Pas daarna tonen
   
-  }
+  
   //gfx->display();
 ////  M5.Display.startWrite();
 ////  //M5.Display.fillScreen(TFT_BLACK);
