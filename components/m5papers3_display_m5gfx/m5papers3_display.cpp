@@ -155,7 +155,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
   uint32_t native_color = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(native_color);
+  this->M5.Display.fillScreen(native_color);
 }
 
 // --- Protected Display Overrides ---
