@@ -92,16 +92,15 @@ void M5PaperS3DisplayM5GFX::update() {
 ///this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
 //  this->canvas_.pushSprite(0, 0);
 //M5.Display.display();
-////  M5.Display.clearDisplay();
+    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "maak wit...");
     this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
     ESP_LOGD(TAG, "start writer...");
-    this->writer_(*this);                 // lambda tekent op canvas
+    //this->writer_(*this);                 // lambda tekent op canvas
     this->canvas_.drawString("TEST123", 10, 10);
     ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
     this->canvas_.pushSprite(0, 0);       // push naar EPD
-    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     M5.Display.display();                 // e-paper refresh
     M5.Display.waitDisplay();
   }
