@@ -35,7 +35,7 @@ while (!M5.Display.isReadable()) {
 
   // Setup canvas
   this->canvas_ = lgfx::LGFX_Sprite(&gfx);
-  this->canvas_.setColorDepth(8);  // Grayscale: 8-bit is prima
+  this->canvas_.setColorDepth(4);  // Grayscale: 8-bit is prima
   this->canvas_.createSprite(gfx.width(), gfx.height());
   this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
 
