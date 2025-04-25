@@ -9,7 +9,7 @@
 #include <M5GFX.h>     // Voor LGFX en M5GFX types
 
 // !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
-namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
+//namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
