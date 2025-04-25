@@ -10,7 +10,7 @@
 // !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
 //namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
 
-//namespace esphome {
+namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 // !! Verwijder PollingComponent uit de inheritance list !!
@@ -57,4 +57,4 @@ DisplayWriter writer_{};
 };
 
 } // namespace m5papers3_display_m5gfx
-//} // namespace esphome
+} // namespace esphome
