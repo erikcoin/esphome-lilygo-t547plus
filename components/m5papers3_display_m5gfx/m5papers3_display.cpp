@@ -34,26 +34,26 @@ canvas_.pushSprite(0, 0);
   
   
 //  
-//  auto cfg = M5.config();
+  auto cfg = M5.config();
   
-//  M5.begin(cfg);
-  //M5.begin();
-//ESP_LOGD(TAG, "M5.begin() finished.");
-//M5.Display.setEpdMode(epd_mode_t::epd_fastest);
-//while (!M5.Display.isReadable()) {
-//  ESP_LOGD(TAG, "Waiting for EPD to be ready...");
-//  delay(100);
-//}
+  M5.begin(cfg);
+M5.begin();
+ESP_LOGD(TAG, "M5.begin() finished.");
+M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+while (!M5.Display.isReadable()) {
+  ESP_LOGD(TAG, "Waiting for EPD to be ready...");
+  delay(100);
+}
 
-//  M5.Display.clearDisplay();
-//  auto &gfx = M5.Display;
-//  gfx.setRotation(this->rotation_);
-//  ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
+  M5.Display.clearDisplay();
+  auto &gfx = M5.Display;
+  gfx.setRotation(this->rotation_);
+  ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
   // Optioneel ook: setEpdMode al hier
   
-//  gfx.fillScreen(TFT_WHITE);
-//  gfx.display();    // Forceer een volledige witte refresh
-//  gfx.waitDisplay(); // 👈 wacht écht tot klaar
+  gfx.fillScreen(TFT_WHITE);
+  gfx.display();    // Forceer een volledige witte refresh
+  gfx.waitDisplay(); // 👈 wacht écht tot klaar
 
   // Setup canvas
 //  this->canvas_ = lgfx::LGFX_Sprite(&gfx);
@@ -83,7 +83,7 @@ canvas_.pushSprite(0, 0);
   //M5.Display.waitDisplay();
   
  // ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
-//}
+}
 
 void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
