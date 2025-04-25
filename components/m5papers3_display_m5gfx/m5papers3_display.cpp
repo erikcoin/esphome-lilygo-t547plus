@@ -7,63 +7,39 @@ namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
 
-// --- Component Overrides ---
-// setup() en dump_config() blijven zoals in de vorige correctie
-
 void M5PaperS3DisplayM5GFX::setup() {
- // ESP_LOGD(TAG, "Setting up M5Paper S3 display using M5GFX...");
-  auto cfg = M5.config();
-  
-  M5.begin(cfg);
-  //M5.begin();
-ESP_LOGD(TAG, "M5.begin() finished.");
-M5.Display.setEpdMode(epd_mode_t::epd_fastest);
-while (!M5.Display.isReadable()) {
-  ESP_LOGD(TAG, "Waiting for EPD to be ready...");
-  delay(100);
+  ESP_LOGI(TAG, "Init display");
+
+  M5.begin();
+  M5.Display.setEpdMode(epd_mode_t::epd_fastest);  // of epd_quality
+  M5.Display.setRotation(0);
+  M5.Display.clearDisplay(TFT_WHITE);
+  M5.Display.display();
+  M5.Display.waitDisplay();
+
+  canvas_.setColorDepth(1);
+  canvas_.createSprite(M5.Display.width(), M5.Display.height());
+  canvas_.setFont(&fonts::Font0);
+  canvas_.setTextSize(1);
+  canvas_.setTextColor(TFT_BLACK);
+  canvas_.setTextDatum(top_left);
+
+  ESP_LOGI(TAG, "Display initialized");
 }
 
-  M5.Display.clearDisplay();
-  auto &gfx = M5.Display;
-  gfx.setRotation(this->rotation_);
-  ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
-  // Optioneel ook: setEpdMode al hier
-  
-  gfx.fillScreen(TFT_WHITE);
-  gfx.display();    // Forceer een volledige witte refresh
-  gfx.waitDisplay(); // 👈 wacht écht tot klaar
+void M5PaperS3DisplayM5GFX::update() {
+  ESP_LOGD(TAG, "Update started");
 
-  // Setup canvas
-  //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
-  this->canvas_ = M5Canvas(&gfx);
-  this->canvas_.setColorDepth(4);  // Grayscale: 8-bit is prima
-  bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
-  ESP_LOGD(TAG, "Canvas createSprite success: %s", ok ? "yes" : "no");
-  this->canvas_.fillSprite(TFT_WHITE);  // Initieel wit
+  canvas_.fillSprite(TFT_WHITE);                  // maak canvas wit
+  canvas_.drawString("TEST123", 10, 10);          // tekst tekenen
+  canvas_.drawLine(0, 0, 100, 100, TFT_BLACK);    // extra zichtbaarheid
+  canvas_.pushSprite(0, 0);                       // toon canvas op scherm
+  M5.Display.display();                           // forceer e-paper refresh
+  M5.Display.waitDisplay();                       // wacht tot klaar
 
-  ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
-  ESP_LOGD(TAG, "gfx ptr: %p | M5.Display ptr: %p", &gfx, &M5.Display);
-  //this->canvas_ = lgfx::LGFX_Sprite(&gfx);
- // int w = gfx.width();
-  //int h = gfx.height();
-  //this->canvas_.createSprite(gfx.width(), gfx.height());
-  //ESP_LOGD(TAG, "M5GFX Sprite created with size: %d x %d", w, h);
-
-  //this->canvas_.setColorDepth(8);
-  //ESP_LOGD(TAG, "Sprite color depth set to %d", this->canvas_.getColorDepth());
-
-  //uint32_t white_color = get_native_m5gfx_color_(Color::WHITE);
-  //gfx.fillScreen(white_color);
-  //this->canvas_.fillSprite(white_color);
-
-  //M5.Display.fillScreen(M5.Display.color888(255,255,255));
-  //M5.Display.drawPixel(20, 20, M5.Display.color888(0, 0, 0));
-  //M5.Display.display();
-  
-  //M5.Display.waitDisplay();
-  
-  ESP_LOGCONFIG(TAG, "M5Paper S3 M5GFX Display setup complete.");
+  ESP_LOGD(TAG, "Update done");
 }
+
 
 void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
@@ -77,56 +53,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 }
 
 
-// update() blijft zoals in de vorige correctie
-void M5PaperS3DisplayM5GFX::update() {
 
-
-    static bool first_time = true;
-  if (first_time) {
-    ESP_LOGD(TAG, "Delaying first update for EPD...");
-    delay(1000);  // 👈 éénmalige delay bij eerste update
-    first_time = false;
-  }
-  ESP_LOGD(TAG, "Running M5GFX display update...");
- // this->canvas_.drawPixel(100, 100, TFT_BLACK);
-///this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
-//  this->canvas_.pushSprite(0, 0);
-//M5.Display.display();
-    ESP_LOGD(TAG, "writer_ is %s", this->writer_ == nullptr ? "null" : "non-null");
-    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
-  if (this->writer_ != nullptr) {
-    ESP_LOGD(TAG, "maak wit...");
-    this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
-    this->canvas_.setTextColor(TFT_BLACK);
-    ESP_LOGD(TAG, "start writer...");
-    this->writer_(*this);                 // lambda tekent op canvas
-    //this->canvas_.drawString("TEST123", 10, 10);
-    ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
-    this->canvas_.pushSprite(0, 0);       // push naar EPD
-    M5.Display.display();                 // e-paper refresh
-    M5.Display.waitDisplay();
-  }
-    //this->do_update_();
-  //this->M5.Display.display();
-  //gfx->display();
-////  M5.Display.startWrite();
-////  //M5.Display.fillScreen(TFT_BLACK);
-////  M5.Display.fillRect(20, 100, 280, 60, LIGHTGREY);
-////  M5.Display.endWrite();
-////  M5.Display.startWrite();
-  //M5.Display.fillScreen(TFT_WHITE);
-////M5.Display.fillRect(20, 480, 280, 60, TFT_BLACK);
-////  M5.Display.endWrite();
-  //ESP_LOGD(TAG, "Pushing M5GFX sprite to display...");
-  //this->canvas_.pushSprite(0, 0);
-
-////  ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
-////  M5.Display.setEpdMode(epd_mode_t::epd_fastest);  // expliciet modus
-////  M5.Display.display();
-////  M5.Display.waitDisplay();  // wacht op EPD-complete refresh
-///  ESP_LOGD(TAG, "M5GFX display update finished.");
-}
-  
 
 // --- Display Overrides ---
 // set_rotation() blijft zoals in de vorige correctie
