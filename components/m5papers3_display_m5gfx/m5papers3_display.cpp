@@ -35,24 +35,31 @@ void M5PaperS3DisplayM5GFX::setup() {
 }
 
 void M5PaperS3DisplayM5GFX::update() {
-  ESP_LOGD(TAG, "Updating display...");
+    static bool first_time = true;
+    if (first_time) {
+        ESP_LOGD(TAG, "Delaying first update for EPD...");
+        delay(1000);  // 👈 éénmalige vertraging bij de eerste update
+        first_time = false;
+    }
+    ESP_LOGD(TAG, "Running M5GFX display update...");
 
-  // Canvas reset en teken de tekst
-  canvas_.fillSprite(TFT_WHITE);  // Maak het canvas wit
-  canvas_.drawString("TEST123", 10, 10);  // Teken tekst
-
-  // Debug voor pixel drawing
-  canvas_.drawLine(0, 0, 100, 100, TFT_BLACK);  // Voeg een lijn toe voor visuele controle
-
-  // Push canvas naar display
-  ESP_LOGD(TAG, "Pushing canvas to display...");
-  if (!canvas_.pushSprite(0, 0)) {
-    ESP_LOGE(TAG, "Failed to push sprite to display!");
-  }
-  M5.Display.display();
-  M5.Display.waitDisplay();
-
-  ESP_LOGD(TAG, "Update completed.");
+    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+    if (this->writer_ != nullptr) {
+        ESP_LOGD(TAG, "Maak wit...");
+        this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
+        this->canvas_.setTextColor(TFT_BLACK);
+        ESP_LOGD(TAG, "Start writer...");
+        // Schrijf naar canvas met behulp van de lambda
+        this->writer_(*this);  
+        ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
+        
+        // Push canvas naar display
+        this->canvas_.pushSprite(0, 0);
+        
+        // Forceer een volledige e-paper update
+        M5.Display.display();                 
+        M5.Display.waitDisplay();
+    }
 }
 
 
