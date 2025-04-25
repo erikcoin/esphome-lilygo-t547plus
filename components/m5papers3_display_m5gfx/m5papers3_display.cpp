@@ -2,7 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
-namespace esphome {
+//namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
@@ -185,4 +185,4 @@ uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
 }
 
 } // namespace m5papers3_display_m5gfx
-} // namespace esphome
+//} // namespace esphome
