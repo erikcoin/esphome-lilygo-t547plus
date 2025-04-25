@@ -2,11 +2,11 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
-using DisplayWriter = std::function<void(esphome::display::Display&)>;
+
 using namespace esphome;
 //namespace esphome {
 namespace m5papers3_display_m5gfx {
-
+using DisplayWriter = std::function<void(esphome::display::Display&)>;
 static const char *const TAG = "m5papers3.display_m5gfx";
 
 // --- Component Overrides ---
@@ -71,7 +71,9 @@ void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
-
+void M5PaperS3DisplayM5GFX::set_writer(DisplayWriter writer) {
+  this->writer_ = std::move(writer);  // Verplaats de writer naar de interne variabele
+}
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
   // Roep gewoon de interne versie aan
   this->draw_absolute_pixel_internal(x, y, color);
