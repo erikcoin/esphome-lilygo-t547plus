@@ -9,7 +9,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
     // Controleer het vrije geheugen
-    ESP_LOGD(TAG, "Free heap: %d bytes", M5.FreeHeap());
+    ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
 
     auto cfg = M5.config();
     M5.begin(cfg);
