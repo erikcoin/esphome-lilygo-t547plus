@@ -8,30 +8,40 @@ namespace m5papers3_display_m5gfx {
 static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
-  ESP_LOGI(TAG, "Setting up M5Paper S3 display");
+    // Controleer het vrije geheugen
+    ESP_LOGD(TAG, "Free heap: %d bytes", M5.FreeHeap());
 
-  M5.begin();
-  M5.Display.setEpdMode(epd_mode_t::epd_fastest);
-  M5.Display.setRotation(0);
-  M5.Display.clearDisplay(TFT_WHITE);
-  M5.Display.display();
-  M5.Display.waitDisplay();
+    auto cfg = M5.config();
+    M5.begin(cfg);
 
-  // Controleer canvas initialisatie
-  ESP_LOGI(TAG, "Creating canvas...");
-  if (!canvas_.createSprite(M5.Display.width(), M5.Display.height())) {
-    ESP_LOGE(TAG, "Failed to create canvas sprite!");
-    return;  // Stop bij een mislukte canvas-creatie
-  }
-  ESP_LOGI(TAG, "Canvas created with size: %d x %d", M5.Display.width(), M5.Display.height());
+    ESP_LOGD(TAG, "M5.begin() finished.");
+    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+    while (!M5.Display.isReadable()) {
+        ESP_LOGD(TAG, "Waiting for EPD to be ready...");
+        delay(100);
+    }
 
-  canvas_.setColorDepth(1);  // Grayscale
-  canvas_.setFont(&fonts::Font0);
-  canvas_.setTextSize(1);
-  canvas_.setTextColor(TFT_BLACK);
-  canvas_.setTextDatum(top_left);
+    M5.Display.clearDisplay();
+    auto &gfx = M5.Display;
+    gfx.setRotation(this->rotation_);
+    ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
+    
+    gfx.fillScreen(TFT_WHITE);
+    gfx.display();
+    gfx.waitDisplay();
 
-  ESP_LOGI(TAG, "Display initialized and canvas set up.");
+    // Setup canvas
+    ESP_LOGD(TAG, "Creating canvas...");
+    this->canvas_ = M5Canvas(&gfx);
+    this->canvas_.setColorDepth(4);  // Grayscale: 8-bit is prima
+
+    bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
+    if (!ok) {
+        ESP_LOGE(TAG, "Failed to create canvas sprite!");
+        // Optioneel: probeer opnieuw of log het geheugen verder
+    } else {
+        ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
+    }
 }
 
 void M5PaperS3DisplayM5GFX::update() {
@@ -61,6 +71,7 @@ void M5PaperS3DisplayM5GFX::update() {
         M5.Display.waitDisplay();
     }
 }
+
 
 
 void M5PaperS3DisplayM5GFX::dump_config() {
