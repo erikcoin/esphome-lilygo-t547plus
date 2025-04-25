@@ -92,6 +92,7 @@ void M5PaperS3DisplayM5GFX::update() {
 ///this->canvas_.drawFastHLine(20, 20, 100, TFT_DARKGREY);
 //  this->canvas_.pushSprite(0, 0);
 //M5.Display.display();
+    ESP_LOGD(TAG, "writer_ is %s", this->writer_ == nullptr ? "null" : "non-null");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
   if (this->writer_ != nullptr) {
     ESP_LOGD(TAG, "maak wit...");
