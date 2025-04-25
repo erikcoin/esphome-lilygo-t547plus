@@ -15,7 +15,7 @@
 namespace m5papers3_display_m5gfx {
 
 // !! Verwijder PollingComponent uit de inheritance list !!
-class M5PaperS3DisplayM5GFX : public display::Display {
+class M5PaperS3DisplayM5GFX : public esphome::display::Display {
  public:
   // Standaard Component methodes (setup, dump_config, get_setup_priority blijven hetzelfde)
   void setup() override;
