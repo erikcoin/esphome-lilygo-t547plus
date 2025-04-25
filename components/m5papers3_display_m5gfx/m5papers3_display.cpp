@@ -98,6 +98,8 @@ void M5PaperS3DisplayM5GFX::update() {
     M5.Display.display();                 // e-paper refresh
     M5.Display.waitDisplay();
   }
+    this->do_update_();
+  this->display();
   //gfx->display();
 ////  M5.Display.startWrite();
 ////  //M5.Display.fillScreen(TFT_BLACK);
