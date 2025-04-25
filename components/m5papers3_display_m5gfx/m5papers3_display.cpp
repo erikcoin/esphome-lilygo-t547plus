@@ -97,10 +97,10 @@ M5.Display.display();
 //    this->canvas_.pushSprite(0, 0);       // push naar EPD
 //    M5.Display.display();                 // e-paper refresh
 //    M5.Display.waitDisplay();
- this->gfx.fillScreen(TFT_WHITE);
-   this->gfx.setTextColor(TFT_BLACK);
+ this->M5.Display.fillScreen(TFT_WHITE);
+   this->M5.Display.setTextColor(TFT_BLACK);
    this->do_update_();      // Laat ESPHome tekenen wat jij in YAML schrijft
-   this->gfx.display();     // Pas daarna tonen
+   this->M5.Display.display();     // Pas daarna tonen
   
   }
   //gfx->display();
