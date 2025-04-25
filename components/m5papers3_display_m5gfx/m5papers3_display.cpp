@@ -98,7 +98,7 @@ void M5PaperS3DisplayM5GFX::update() {
     M5.Display.display();                 // e-paper refresh
     M5.Display.waitDisplay();
   }
-    this->do_update_();
+    //this->do_update_();
   //this->M5.Display.display();
   //gfx->display();
 ////  M5.Display.startWrite();
