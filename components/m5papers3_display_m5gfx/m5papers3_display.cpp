@@ -56,8 +56,8 @@ void M5PaperS3DisplayM5GFX::update() {
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Maak wit...");
-        this->canvas_.fillSprite(TFT_BLACK);
-        this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
+       // this->canvas_.fillSprite(TFT_BLACK);
+     //   this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
         this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
         // Schrijf naar canvas met behulp van de lambda
@@ -128,8 +128,9 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
-   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,color);
+   
    uint32_t native_color = get_native_m5gfx_color_(color);
+   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
    this->canvas_.drawPixel(x, y, native_color);
 }
 
