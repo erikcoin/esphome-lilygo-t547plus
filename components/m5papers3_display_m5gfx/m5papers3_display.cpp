@@ -149,7 +149,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
  // return gray;
 //}
 // --- Helper Functie ---
-uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
+uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(esphome::Color color) {
     // !! Gebruik color.r, color.g, color.b (uint8_t) en converteer naar float !!
     float r_f = color.r / 255.0f;
     float g_f = color.g / 255.0f;
