@@ -123,7 +123,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
     ESP_LOGD(TAG, "Canvas fill aangeroepen");
   //uint32_t native_color = get_native_m5gfx_color_(color);
     uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(native_color);
+  this->canvas_.fillSprite(gray);
 }
 
 // --- Protected Display Overrides ---
