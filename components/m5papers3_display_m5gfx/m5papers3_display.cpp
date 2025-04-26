@@ -63,13 +63,13 @@ void M5PaperS3DisplayM5GFX::update() {
         // Schrijf naar canvas met behulp van de lambda
         this->writer_(*this);  
         ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
-        delay(5000);
+        //delay(5000);
         // Push canvas naar display
         this->canvas_.pushSprite(0, 0);
-        delay(5000);
+       // delay(5000);
         // Forceer een volledige e-paper update
-        M5.Display.display();                 
-        M5.Display.waitDisplay();
+      //  M5.Display.display();                 
+     //   M5.Display.waitDisplay();
     }
 }
 
