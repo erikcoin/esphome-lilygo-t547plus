@@ -66,6 +66,7 @@ void M5PaperS3DisplayM5GFX::update() {
         //delay(5000);
         // Push canvas naar display
         this->canvas_.pushSprite(0, 0);
+        this->do_update_();
        // delay(5000);
         // Forceer een volledige e-paper update
       //  M5.Display.display();                 
@@ -137,7 +138,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
     
    uint32_t native_color = get_native_m5gfx_color_(color);
    ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
-   this->M5.Display.drawPixel(x, y, native_color);
+   this->drawPixel(x, y, native_color);
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
