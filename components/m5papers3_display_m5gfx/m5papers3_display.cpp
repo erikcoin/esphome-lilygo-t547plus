@@ -33,7 +33,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     // Setup canvas
     ESP_LOGD(TAG, "Creating canvas...");
     this->canvas_ = M5Canvas(&gfx);
-    this->canvas_.setColorDepth(1);  // Grayscale: 8-bit is prima
+    this->canvas_.setColorDepth(4);  // Grayscale: 8-bit is prima
 
     bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
     if (!ok) {
@@ -128,10 +128,14 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
-   
-   uint32_t native_color = get_native_m5gfx_color_(color);
-   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
-   this->canvas_.drawPixel(x, y, native_color);
+   if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal())
+    return;
+  uint8_t gray = this->get_native_m5gfx_color_(color);
+  this->canvas_.drawPixel(x, y, gray);
+    
+  // uint32_t native_color = get_native_m5gfx_color_(color);
+//   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
+//   this->canvas_.drawPixel(x, y, native_color);
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
