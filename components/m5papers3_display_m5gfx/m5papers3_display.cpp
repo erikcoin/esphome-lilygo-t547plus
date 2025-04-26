@@ -121,8 +121,8 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     ESP_LOGD(TAG, "Canvas fill aangeroepen");
-  //uint32_t native_color = get_native_m5gfx_color_(color);
-    uint8_t gray = get_native_m5gfx_color_(color);
+  uint32_t native_color = get_native_m5gfx_color_(color);
+ //   uint8_t gray = get_native_m5gfx_color_(color);
   this->canvas_.fillSprite(gray);
 }
 
@@ -131,13 +131,13 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal())
     return;
-  uint8_t gray = this->get_native_m5gfx_color_(color);
-    ESP_LOGD(TAG,"DE KLEUR IS:(%d)", gray);
-  this->canvas_.drawPixel(x, y, gray);
+ // uint8_t gray = this->get_native_m5gfx_color_(color);
+ //   ESP_LOGD(TAG,"DE KLEUR IS:(%d)", gray);
+//  this->canvas_.drawPixel(x, y, gray);
     
-  // uint32_t native_color = get_native_m5gfx_color_(color);
-//   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
-//   this->canvas_.drawPixel(x, y, native_color);
+   uint32_t native_color = get_native_m5gfx_color_(color);
+   ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
+   this->canvas_.drawPixel(x, y, native_color);
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
