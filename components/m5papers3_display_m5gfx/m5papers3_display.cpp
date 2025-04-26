@@ -123,7 +123,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
     ESP_LOGD(TAG, "Canvas fill aangeroepen");
   uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(gray);
+  this->canvas_.fillSprite(native_color);
 }
 
 // --- Protected Display Overrides ---
@@ -141,35 +141,35 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
-uint8_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
-  // brightness() geeft float tussen 0.0 en 1.0
- // float brightness = color.brightness();
-  float brightness = (0.299f * color.r + 0.587f * color.g + 0.114f * color.b) / 255.0f;
-  uint8_t gray = static_cast<uint8_t>(brightness * 15.0f);  // voor 16 grijsniveaus
-  return gray;
-}
+//uint8_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
+//  // brightness() geeft float tussen 0.0 en 1.0
+// // float brightness = color.brightness();
+//  float brightness = (0.299f * color.r + 0.587f * color.g + 0.114f * color.b) / 255.0f;
+//  uint8_t gray = static_cast<uint8_t>(brightness * 15.0f);  // voor 16 grijsniveaus
+ // return gray;
+//}
 // --- Helper Functie ---
-//uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
+uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
     // !! Gebruik color.r, color.g, color.b (uint8_t) en converteer naar float !!
-//    float r_f = color.r / 255.0f;
-//    float g_f = color.g / 255.0f;
-//    float b_f = color.b / 255.0f;
+    float r_f = color.r / 255.0f;
+    float g_f = color.g / 255.0f;
+    float b_f = color.b / 255.0f;
 
     // Luminantie formule (gewogen gemiddelde)
-//    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
+    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
     // Schaal naar 0-255
-//    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
+    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
 
     // Converteer 8-bit gray naar M5GFX kleur (RGB888 formaat)
     
 
- //   ESP_LOGD(TAG, "Input Color: R=%u G=%u B=%u", color.r, color.g, color.b);
-//    ESP_LOGD(TAG, "Float Color: R=%.3f G=%.3f B=%.3f", r_f, g_f, b_f);
- //   ESP_LOGD(TAG, "Grayscale (float): %.3f", gray_f);
-//    ESP_LOGD(TAG, "Grayscale (8-bit): %u", gray_8bit);
+    ESP_LOGD(TAG, "Input Color: R=%u G=%u B=%u", color.r, color.g, color.b);
+    ESP_LOGD(TAG, "Float Color: R=%.3f G=%.3f B=%.3f", r_f, g_f, b_f);
+    ESP_LOGD(TAG, "Grayscale (float): %.3f", gray_f);
+    ESP_LOGD(TAG, "Grayscale (8-bit): %u", gray_8bit);
    // ESP_LOGD(TAG, "M5GFX RGB888 color: 0x%06X", native_color);
-//    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
-//}
+    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
+}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
