@@ -132,6 +132,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal())
     return;
   uint8_t gray = this->get_native_m5gfx_color_(color);
+    ESP_LOGD(TAG,"DE KLEUR IS:(%d)", gray)
   this->canvas_.drawPixel(x, y, gray);
     
   // uint32_t native_color = get_native_m5gfx_color_(color);
