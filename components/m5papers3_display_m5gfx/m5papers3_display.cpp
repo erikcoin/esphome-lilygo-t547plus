@@ -146,6 +146,13 @@ uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
     uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
 
     // Converteer 8-bit gray naar M5GFX kleur (RGB888 formaat)
+    
+
+    ESP_LOGD("my_display", "Input Color: R=%u G=%u B=%u", r, g, b);
+    ESP_LOGD("my_display", "Float Color: R=%.3f G=%.3f B=%.3f", r_f, g_f, b_f);
+    ESP_LOGD("my_display", "Grayscale (float): %.3f", gray_f);
+    ESP_LOGD("my_display", "Grayscale (8-bit): %u", gray_8bit);
+    ESP_LOGD("my_display", "M5GFX RGB888 color: 0x%06X", native_color);
     return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
 }
 
