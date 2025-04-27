@@ -54,7 +54,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
 
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
   M5GFX gfx;
-  M5Canvas canvas_;
+ // M5Canvas canvas_;
   lgfx::LGFX_Sprite canvas_;
 };
 
