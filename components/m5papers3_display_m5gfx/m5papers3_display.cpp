@@ -64,11 +64,11 @@ void M5PaperS3DisplayM5GFX::update() {
        // this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
         // Schrijf naar scherm met behulp van de lambda
-        this->writer_(*this);  
+        //this->writer_(*this);  
       //  ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
         //delay(5000);
         // Push canvas naar display
-        //this->do_update_();
+        this->do_update_();
         this->canvas_.pushSprite(0, 0);
         
        // delay(5000);
