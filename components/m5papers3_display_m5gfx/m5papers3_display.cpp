@@ -42,7 +42,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
-    canvas_.fillSprite(WHITE);  // Fill white at start
+    //canvas_.fillSprite(WHITE);  // Fill white at start
 }
 
 void M5PaperS3DisplayM5GFX::update() {
