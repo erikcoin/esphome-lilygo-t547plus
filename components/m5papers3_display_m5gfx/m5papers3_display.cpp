@@ -127,7 +127,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     
-    uint16_t col = esphome::color.is_on() ? 0x0000 : 0xFFFF;
+    uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
     ESP_LOGD(TAG, "Canvas fill aangeroepen: %d",col);
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
