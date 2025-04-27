@@ -43,7 +43,10 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
-    canvas_.fillSprite(WHITE);  // Fill white at start
+    this->canvas_.setPaletteColor(0, TFT_WHITE);  // Color for 0
+    this->canvas_.setPaletteColor(1, TFT_BLACK);  // Color for 1
+    this->canvas_.fillSprite(0);  // Fill white at start
+    this->canvas_.pushSprite(0, 0);  // Push to display
 }
 
 void M5PaperS3DisplayM5GFX::update() {
@@ -65,11 +68,11 @@ void M5PaperS3DisplayM5GFX::update() {
        // this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
         // Schrijf naar scherm met behulp van de lambda
-       // this->writer_(*this);  
+         this->writer_(*this);  
         ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
         //delay(5000);
         // Push canvas naar display
-        this->do_update_();
+       //// this->do_update_();
         ESP_LOGD(TAG, "do_update  done, pushing canvas...");
         this->canvas_.pushSprite(0, 0);
         ESP_LOGD(TAG, "pushsprite  done, pushing canvas...");
