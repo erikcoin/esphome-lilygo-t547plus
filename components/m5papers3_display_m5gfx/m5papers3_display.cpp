@@ -164,7 +164,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     
    //uint32_t native_color = get_native_m5gfx_color_(color);
-  ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,col);
+//  ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,col);
 //voor schrijven naar scherm doe deze:
  //   M5.Display.drawPixel(x, y, col);
  //voor schrijven naar canvas doe deze:
