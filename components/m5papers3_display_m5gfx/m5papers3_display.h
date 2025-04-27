@@ -10,7 +10,7 @@
 #include <M5GFX.h>     // Voor LGFX en M5GFX types
 
 // !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
-//namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
+namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
@@ -55,7 +55,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
   M5GFX gfx;
  // M5Canvas canvas_;
-  LGFX_Sprite canvas_;
+  lgfx::LGFX_Sprite canvas_;
 };
 
 } // namespace m5papers3_display_m5gfx
