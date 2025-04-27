@@ -44,9 +44,13 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
     this->canvas_.setPaletteColor(0, TFT_WHITE);  // Color for 0
+    ESP_LOGD(TAG, "setPaletteColor0");
     this->canvas_.setPaletteColor(1, TFT_BLACK);  // Color for 1
+    ESP_LOGD(TAG, "setPaletteColor1");
     this->canvas_.fillSprite(0);  // Fill white at start
+    ESP_LOGD(TAG, "fillSprite");
     this->canvas_.pushSprite(0, 0);  // Push to display
+    ESP_LOGD(TAG, "Canvas pushed");
 }
 
 void M5PaperS3DisplayM5GFX::update() {
