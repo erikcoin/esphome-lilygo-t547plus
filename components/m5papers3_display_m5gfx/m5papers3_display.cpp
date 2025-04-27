@@ -126,6 +126,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
 //  this->canvas_.fillSprite(native_color);
+    M5.Display.fillScreen(col);
 }
 
 // --- Protected Display Overrides ---
