@@ -122,9 +122,10 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 // fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     ESP_LOGD(TAG, "Canvas fill aangeroepen");
-  uint32_t native_color = get_native_m5gfx_color_(color);
+    uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
+ // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(native_color);
+//  this->canvas_.fillSprite(native_color);
 }
 
 // --- Protected Display Overrides ---
@@ -135,8 +136,9 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, esphome::
  // uint8_t gray = this->get_native_m5gfx_color_(color);
  //   ESP_LOGD(TAG,"DE KLEUR IS:(%d)", gray);
 //  this->canvas_.drawPixel(x, y, gray);
+    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     
-   uint32_t native_color = get_native_m5gfx_color_(color);
+   //uint32_t native_color = get_native_m5gfx_color_(color);
    ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
    this->draw_pixel_at(x, y, color);
 }
