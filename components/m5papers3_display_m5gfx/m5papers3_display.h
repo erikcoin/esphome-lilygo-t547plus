@@ -43,9 +43,10 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
  protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
-  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) ;
-  // Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
-  uint32_t get_native_m5gfx_color_(Color color);
+//  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) ;
+  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) override;
+// Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
+//  uint32_t get_native_m5gfx_color_(Color color);
 //  uint8_t get_native_m5gfx_color_(Color color);
   // Member variabelen (rotation, writer blijven hetzelfde)
   int rotation_{0};
