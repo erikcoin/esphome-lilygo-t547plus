@@ -34,23 +34,23 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Creating canvas...");
     //this->canvas_ = M5Canvas(&gfx);
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);  // Pass parent at creation    this->canvas_.setPsram(true);  // 💾 Force use PSRAM
-    this->canvas_.setColorDepth(1);  // Grayscale: 8-bit is prima
+    this->canvas_->setColorDepth(1);  // Grayscale: 8-bit is prima
 
-    bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
+    bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
         // Optioneel: probeer opnieuw of log het geheugen verder
     } else {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
-    this->canvas_.setPaletteColor(0, TFT_WHITE);  // Color for 0
-    ESP_LOGD(TAG, "setPaletteColor0");
-    this->canvas_.setPaletteColor(1, TFT_BLACK);  // Color for 1
-    ESP_LOGD(TAG, "setPaletteColor1");
-    this->canvas_.fillSprite(0);  // Fill white at start
-    ESP_LOGD(TAG, "fillSprite");
-    this->canvas_.pushSprite(0, 0);  // Push to display
-    ESP_LOGD(TAG, "Canvas pushed");
+   /// this->canvas_.setPaletteColor(0, TFT_WHITE);  // Color for 0
+   // ESP_LOGD(TAG, "setPaletteColor0");
+   // this->canvas_.setPaletteColor(1, TFT_BLACK);  // Color for 1
+  //  ESP_LOGD(TAG, "setPaletteColor1");
+  //  this->canvas_.fillSprite(0);  // Fill white at start
+  //  ESP_LOGD(TAG, "fillSprite");
+  //  this->canvas_.pushSprite(0, 0);  // Push to display
+   // ESP_LOGD(TAG, "Canvas pushed");
 }
 
 void M5PaperS3DisplayM5GFX::update() {
@@ -67,7 +67,7 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "Maak wit...");
        // this->canvas_.fillSprite(TFT_BLACK);
        // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-        this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
+        this->canvas_->fillSprite(TFT_WHITE);  // begin met wit scherm
         //this->canvas_.pushSprite(0, 0);
        // this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
@@ -78,7 +78,7 @@ void M5PaperS3DisplayM5GFX::update() {
         // Push canvas naar display
        //// this->do_update_();
         ESP_LOGD(TAG, "do_update  done, pushing canvas...");
-        this->canvas_.pushSprite(0, 0);
+        this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "pushsprite  done, pushing canvas...");
        // delay(5000);
         // Forceer een volledige e-paper update
@@ -140,7 +140,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
     ESP_LOGD(TAG, "Canvas fill aangeroepen: %d",col);
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(col);
+  this->canvas_->fillSprite(col);
     //M5.Display.fillScreen(col);
 }
 
