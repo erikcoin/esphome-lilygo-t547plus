@@ -33,8 +33,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     // Setup canvas
     ESP_LOGD(TAG, "Creating canvas...");
     //this->canvas_ = M5Canvas(&gfx);
-    //this->canvas_.setParent(&gfx);
-    this->canvas_.setPsram(true);  // 💾 Force use PSRAM
+    this->canvas_ = new lgfx::LGFX_Sprite(&gfx);  // Pass parent at creation    this->canvas_.setPsram(true);  // 💾 Force use PSRAM
     this->canvas_.setColorDepth(1);  // Grayscale: 8-bit is prima
 
     bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
