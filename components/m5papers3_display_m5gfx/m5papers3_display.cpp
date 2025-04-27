@@ -59,7 +59,7 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "Maak wit...");
        // this->canvas_.fillSprite(TFT_BLACK);
        // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-        this->canvas_.fillSprite(0xFFFF);  // begin met wit scherm
+        this->canvas_.fillSprite(0x0000);  // begin met wit scherm
        // this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
         // Schrijf naar scherm met behulp van de lambda
