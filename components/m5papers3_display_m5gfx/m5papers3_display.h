@@ -25,7 +25,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
 
   // PollingComponent methode (update komt via display::Display)
   void update() override;
-
+  ~M5PaperS3DisplayM5GFX();
   // Display methodes (fill, get_width/height_internal, get_display_type blijven hetzelfde)
   void fill(Color color) override;
   int get_width_internal() override;
