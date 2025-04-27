@@ -36,7 +36,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
 
   // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
-  void set_writer(std::function<void(display::Display &)> &&writer) { 
+  void set_writer(std::function<void(display::Display &)> writer) { 
    ESP_LOGD("display", "set_writer() called");
    this->writer_ = writer; }
  
