@@ -33,6 +33,9 @@ void M5PaperS3DisplayM5GFX::setup() {
     // Setup canvas
     ESP_LOGD(TAG, "Creating canvas...");
     //this->canvas_ = M5Canvas(&gfx);
+    if (this->canvas_ != nullptr) {
+      delete this->canvas_;
+    }
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);  // Pass parent at creation    this->canvas_.setPsram(true);  // 💾 Force use PSRAM
     this->canvas_->setColorDepth(1);  // Grayscale: 8-bit is prima
 
@@ -87,7 +90,13 @@ void M5PaperS3DisplayM5GFX::update() {
     }
 }
 
-
+M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
+  if (this->canvas_ != nullptr) {
+    delete this->canvas_;
+    this->canvas_ = nullptr;
+    ESP_LOGD(TAG, "Canvas deleted safely.");
+  }
+}
 
 void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
