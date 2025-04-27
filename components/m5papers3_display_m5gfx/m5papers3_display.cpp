@@ -32,7 +32,8 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     // Setup canvas
     ESP_LOGD(TAG, "Creating canvas...");
-    this->canvas_ = M5Canvas(&gfx);
+    //this->canvas_ = M5Canvas(&gfx);
+    this->canvas_.setParent(&gfx);
     this->canvas_.setColorDepth(1);  // Grayscale: 8-bit is prima
 
     bool ok = this->canvas_.createSprite(gfx.width(), gfx.height());
@@ -42,7 +43,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
-    //canvas_.fillSprite(WHITE);  // Fill white at start
+    canvas_.fillSprite(WHITE);  // Fill white at start
 }
 
 void M5PaperS3DisplayM5GFX::update() {
