@@ -127,8 +127,8 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
     uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
-//  this->canvas_.fillSprite(native_color);
-    M5.Display.fillScreen(col);
+  this->canvas_.fillSprite(col);
+    //M5.Display.fillScreen(col);
 }
 
 // --- Protected Display Overrides ---
@@ -146,7 +146,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color col
 //voor schrijven naar scherm doe deze:
  //   M5.Display.drawPixel(x, y, col);
  //voor schrijven naar canvas doe deze:
-    canvas.drawPixel(x, y, col);
+    canvas_.drawPixel(x, y, col);
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
