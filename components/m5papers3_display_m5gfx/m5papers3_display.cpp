@@ -69,8 +69,9 @@ void M5PaperS3DisplayM5GFX::update() {
         //delay(5000);
         // Push canvas naar display
         this->do_update_();
+        ESP_LOGD(TAG, "do_update  done, pushing canvas...");
         this->canvas_.pushSprite(0, 0);
-        
+        ESP_LOGD(TAG, "pushsprite  done, pushing canvas...");
        // delay(5000);
         // Forceer een volledige e-paper update
        // M5.Display.display();                 
