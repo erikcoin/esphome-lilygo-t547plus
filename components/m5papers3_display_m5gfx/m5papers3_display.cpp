@@ -82,7 +82,7 @@ void M5PaperS3DisplayM5GFX::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
   // Roep gewoon de interne versie aan
   this->draw_absolute_pixel_internal(x, y, color);
 }
@@ -138,7 +138,7 @@ void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, esphome::
     
    uint32_t native_color = get_native_m5gfx_color_(color);
    ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,native_color);
-   this->draw_pixel_at(x, y, native_color);
+   this->draw_pixel_at(x, y, color);
 }
 
 // Zet esphome kleur om naar 4-bit grijswaarde (0-15)
