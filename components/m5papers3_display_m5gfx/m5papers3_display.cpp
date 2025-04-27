@@ -128,7 +128,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     
     //uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+    uint16_t col = color.is_on() ? TFT_WHITE : TFT_BLACK;
     ESP_LOGD(TAG, "Canvas fill aangeroepen: %d",col);
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
