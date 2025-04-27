@@ -130,7 +130,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
     uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
  // uint32_t native_color = get_native_m5gfx_color_(color);
  //   uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_.fillSprite(col);
+  //this->canvas_.fillSprite(col);
     //M5.Display.fillScreen(col);
 }
 
