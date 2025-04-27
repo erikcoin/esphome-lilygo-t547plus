@@ -71,8 +71,8 @@ void M5PaperS3DisplayM5GFX::update() {
         
        // delay(5000);
         // Forceer een volledige e-paper update
-        M5.Display.display();                 
-        M5.Display.waitDisplay();
+       // M5.Display.display();                 
+      //  M5.Display.waitDisplay();
     }
 }
 
