@@ -130,7 +130,7 @@ void M5PaperS3DisplayM5GFX::fill(Color color) {
 
 // --- Protected Display Overrides ---
 // draw_absolute_pixel_internal() blijft zoals in de vorige correctie
-void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, esphome::Color color) {
+void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal())
     return;
  // uint8_t gray = this->get_native_m5gfx_color_(color);
