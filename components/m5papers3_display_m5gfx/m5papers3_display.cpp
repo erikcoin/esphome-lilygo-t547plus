@@ -59,12 +59,12 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "Maak wit...");
        // this->canvas_.fillSprite(TFT_BLACK);
        // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-        this->canvas_.fillSprite(TFT_BLACK);  // begin met wit scherm
+        this->canvas_.fillSprite(TFT_WHITE);  // begin met wit scherm
         this->canvas_.pushSprite(0, 0);
        // this->canvas_.setTextColor(TFT_BLACK);
         ESP_LOGD(TAG, "Start writer...");
         // Schrijf naar scherm met behulp van de lambda
-        this->writer_(*this);  
+       // this->writer_(*this);  
         ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
         //delay(5000);
         // Push canvas naar display
