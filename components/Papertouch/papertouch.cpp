@@ -1,4 +1,4 @@
-#include "touch_component.h"
+#include "papertouch.h"
 
 namespace esphome {
 namespace papertouch {
