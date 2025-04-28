@@ -11,7 +11,10 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
     auto cfg = M5.config();
     M5.begin(cfg);
-
+    // Stel een timer in voor periodieke touch-checks
+    App.register_timer(100, [this]() {
+        this->update_touch();
+    });
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     while (!M5.Display.isReadable()) {
