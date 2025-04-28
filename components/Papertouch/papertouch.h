@@ -6,7 +6,7 @@
 namespace esphome {
 namespace papertouch {
 
-class PaperTouch : public touchscreen::Touchscreen, public Component {
+class PaperTouch : public touchscreen::Touchscreen {
  public:
   void setup() override;
   void loop() override;
