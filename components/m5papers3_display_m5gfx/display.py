@@ -39,8 +39,8 @@ async def to_code(config):
    # cg.add_library("m5stack/M5Unified", None)
    # cg.add_library("m5stack/M5GFX", None)
     if CONF_TOUCH_SENSOR in config:
-    touch_sensor = await cg.get_variable(config[CONF_TOUCH_SENSOR])
-    cg.add(var.set_touch_sensor(touch_sensor))
+        touch_sensor = await cg.get_variable(config[CONF_TOUCH_SENSOR])
+        cg.add(var.set_touch_sensor(touch_sensor))
     
     if CONF_LAMBDA in config:
         lambda_ = await cg.process_lambda(
