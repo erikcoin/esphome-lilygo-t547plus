@@ -1,40 +1,30 @@
 #include "papertouch.h"
 #include "esphome/core/log.h"
-#include "M5Unified.h"
 
 namespace esphome {
 namespace papertouch {
 
 static const char *const TAG = "papertouch";
 
-void PaperTouch::setup() {
-  ESP_LOGI(TAG, "Setting up PaperTouch...");
+void Papertouch::setup() {
+  ESP_LOGI(TAG, "Papertouch setup");
 
-  // Init M5.Touch
   if (!M5.Touch.isEnabled()) {
-    ESP_LOGW(TAG, "M5.Touch not enabled or GT911 not found!");
-  } else {
-    ESP_LOGI(TAG, "M5.Touch initialized successfully.");
+    ESP_LOGI(TAG, "Enabling M5.Touch");
+    M5.Touch.begin();
   }
 }
 
-void PaperTouch::loop() {
-  M5.update();
-}
+void Papertouch::update_touches() {
+  if (M5.Touch.isEnabled() && M5.Touch.isPressed()) {
+    auto point = M5.Touch.getTouchPoint();
+    touchscreen::TouchPoint touch_point;
+    touch_point.x = point.x;
+    touch_point.y = point.y;
+    touch_point.id = 0;  // Je kan meer doen als je multitouch wilt
+    this->touch_points_.push_back(touch_point);
 
-void PaperTouch::update_touches() {
-  this->touches_.clear();
-
-  if (!M5.Touch.isEnabled()) {
-    return;
-  }
-
-  uint16_t x, y;
-  if (M5.Touch.getTouch(&x, &y)) {
-    touchscreen::TouchPoint point;
-    point.x = x;
-    point.y = y;
-    this->touches_.push_back(point);
+    ESP_LOGD(TAG, "Touch at x=%d, y=%d", point.x, point.y);
   }
 }
 
