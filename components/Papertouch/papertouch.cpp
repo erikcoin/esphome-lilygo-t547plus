@@ -29,16 +29,21 @@ void PaperTouch::update_touches() {
     return;
   }
 
-  uint16_t x, y;
-  if (M5.Touch.getCount() > 0) {  // Assuming getCount() works
-    if (M5.Touch.getTouch(0, &x, &y)) {  // Retrieve touch point at index 0
+  // Check if there are any active touch points
+  int touch_count = M5.Touch.getCount();
+  if (touch_count > 0) {
+    uint16_t x, y;
+
+    // Use getPoint() to get the touch coordinates for the first touch
+    if (M5.Touch.getPoint(&x, &y)) {
       touchscreen::TouchPoint point;
       point.x = x;
       point.y = y;
-      this->touches_[0] = point;  // Replace push_back with setting map element
+      this->touches_.push_back(point);  // Store the touch point
     }
   }
 }
+
 
 }  // namespace papertouch
 }  // namespace esphome
