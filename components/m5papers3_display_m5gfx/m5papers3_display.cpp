@@ -82,7 +82,7 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
         point->y = tp[0].y;
         return true;
     }
-    ESP_LOGD(TAG, "No raw touch detected.");
+   // ESP_LOGD(TAG, "No raw touch detected.");
     return false;
 }
 
