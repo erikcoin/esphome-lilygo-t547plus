@@ -29,7 +29,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 // Hier automatisch de touch sensor pakken:
   if (this->touch_coordinates_sensor == nullptr) {
-    this->touch_coordinates_sensor = &id(touch_coordinates);
+//    this->touch_coordinates_sensor = &id(touch_coordinates);
     ESP_LOGD("m5papers3.display_m5gfx", "Touch sensor automatisch gekoppeld.");
   }
     
