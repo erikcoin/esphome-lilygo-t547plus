@@ -26,7 +26,7 @@ public:
         if (M5.Touch.isPressed()) {
             // Get the touch coordinates
             TouchPoint touch = M5.Touch.getPressPoint();
-            ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
+//            ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
             
             // You can implement logic for touch events here
         }
