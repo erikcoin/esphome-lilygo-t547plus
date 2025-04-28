@@ -35,7 +35,7 @@ void PaperTouch::update_touches() {
     uint16_t x, y;
 
     // Use getPoint() to get the touch coordinates for the first touch
-    if (M5.Touch.getPoint(&x, &y)) {
+    if (M5.Touch.getPressPoint(&x, &y)) {
       touchscreen::TouchPoint point;
       point.x = x;
       point.y = y;
