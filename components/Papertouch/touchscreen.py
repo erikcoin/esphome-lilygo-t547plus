@@ -2,6 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
 from esphome.components import display
+from esphome.components import touchscreen
 
 # Gebruik Component in plaats van een namespace
 Papertouch = cg.Component
@@ -19,7 +20,7 @@ async def to_code(config):
 
 
     
-    var = await display.register_display(var, config)
+    var = await touchscreen.register_touchscreen(var, config)
     #var = await cg.register_component(config, Papertouch.new())
     display_var = await cg.get_variable(config["display"])
     cg.add(var.set_display(display_var))
