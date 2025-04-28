@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome import component
+from esphome.components import touchscreen
 from esphome.components import display
 
 papertouch_ns = cg.namespace('papertouch')
