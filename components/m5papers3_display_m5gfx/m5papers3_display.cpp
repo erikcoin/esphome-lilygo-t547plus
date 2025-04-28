@@ -66,7 +66,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
 // ======= Touch gerelateerde functies =======
 
-bool M5PaperS3DisplayM5GFX::get_touch(display::TouchPoint *point) {
+bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     m5::touch_point_t tp[1];  // Gebruik m5::touch_point_t
     int touch = M5.Display.getTouchRaw(tp, 1);
     if (touch > 0) {
