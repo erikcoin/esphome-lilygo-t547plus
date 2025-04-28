@@ -131,6 +131,7 @@ void M5PaperS3DisplayM5GFX::update_touch() {
     this->touch_x_ = tp[0].x;
     this->touch_y_ = tp[0].y;
     handle_touch(tp[0].x, tp[0].y);
+      ESP_LOGD(TAG, "update touch %d %d", touch_x, touch_y);
   } else {
     this->touch_detected_ = false;
   }
