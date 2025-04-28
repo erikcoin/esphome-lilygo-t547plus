@@ -124,14 +124,14 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     this->canvas_->drawPixel(x, y, col);
 }
-bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint* point) {
-  touch_point_t tp[1];
-  if (M5.Display.getTouchRaw(tp, 1) > 0) {
-    point->x = tp[0].x;
-    point->y = tp[0].y;
-    return true;
-  }
-  return false;
+bool M5PaperS3DisplayM5GFX::get_touch(esphome::display::TouchPoint *point) {
+    m5::touch_point_t tp[1];  // Gebruik m5::touch_point_t
+    if (M5.Display.getTouchRaw(tp, 1) > 0) {
+        point->x = tp[0].x;
+        point->y = tp[0].y;
+        return true;
+    }
+    return false;
 }
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
