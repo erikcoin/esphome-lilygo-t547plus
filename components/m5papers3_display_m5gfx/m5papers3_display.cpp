@@ -12,7 +12,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     auto cfg = M5.config();
     M5.begin(cfg);
   // Stel een interval in om elke 100 ms de update_touch() functie aan te roepen
-  this->interval(100, [this]() { 
+  this->set_interval(100, [this]() { 
     this->update_touch();
   });
     ESP_LOGD(TAG, "M5.begin() finished.");
