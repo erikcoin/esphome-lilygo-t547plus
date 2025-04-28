@@ -155,11 +155,10 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   
   ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
 
-  App.register_lambda([coords]() {
-    ESP_LOGD("custom", "Inside lambda: Updating coordinates to %s", coords.c_str());
-    id(touch_coordinates).publish_state(coords);  // Update the text sensor with the touch coordinates
-  });
+  // Directly publish the coordinates to a defined text sensor
+  id(touch_coordinates).publish_state(coords);  // Ensure 'touch_coordinates' is defined in your YAML
 }
+
 
 //void M5PaperS3DisplayM5GFX::update_touch() {
 //    ESP_LOGD(TAG, "Checking for touch...");
