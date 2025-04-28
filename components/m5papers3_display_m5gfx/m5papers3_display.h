@@ -4,6 +4,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
+#include "esphome/components/text_sensor/text_sensor.h"  // Include the text_sensor header
 #include "esphome/components/display/display_buffer.h"
 
 // Includes for M5GFX and M5Unified
