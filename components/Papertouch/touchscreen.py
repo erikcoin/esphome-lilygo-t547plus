@@ -1,13 +1,12 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-import esphome.components.touchscreen as touchscreen
+from esphome.components import touchscreen
+from esphome.const import CONF_ID
 
-m5touch_ns = cg.esphome_ns.namespace('m5touch')
-M5TouchComponent = m5touch_ns.class_('M5TouchComponent', touchscreen.Touchscreen, cg.Component)
+papertouch_ns = cg.esphome_ns.namespace('papertouch')
+PaperTouch = papertouch_ns.class_('PaperTouch', touchscreen.Touchscreen, cg.Component)
 
-CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({}).extend(
-    cv.COMPONENT_SCHEMA
-)
+CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({}).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
