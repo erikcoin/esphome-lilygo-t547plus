@@ -5,28 +5,22 @@
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
 
-// Includes voor M5GFX en M5Unified
-#include <M5Unified.h> // Voor M5.begin() en M5.Display object
-#include <M5GFX.h>     // Voor LGFX en M5GFX types
+// Includes for M5GFX and M5Unified
+#include <M5Unified.h> // For M5.begin() and M5.Display object
+#include <M5GFX.h>     // For LGFX and M5GFX types
 
-// !! BELANGRIJK: LGFX_Sprite zit in de lgfx namespace !!
-namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Breng LGFX_Sprite in de lgfx namespace als het nog niet zo is
+namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Bring LGFX_Sprite to the lgfx namespace if not already
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-// !! Verwijder PollingComponent uit de inheritance list !!
 class M5PaperS3DisplayM5GFX : public display::Display {
  public:
-  // Standaard Component methodes (setup, dump_config, get_setup_priority blijven hetzelfde)
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::HARDWARE; }
-
-  // PollingComponent methode (update komt via display::Display)
   void update() override;
   ~M5PaperS3DisplayM5GFX();
-  // Display methodes (fill, get_width/height_internal, get_display_type blijven hetzelfde)
   void fill(Color color) override;
   int get_width_internal() override;
   int get_height_internal() override;
@@ -34,28 +28,24 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
   }
 
-  // Configuratie setters (blijven hetzelfde)
   void set_rotation(int rotation);
-  void set_writer(std::function<void(display::Display &)> writer) { 
-  // ESP_LOGD("display", "set_writer() called");
-   this->writer_ = writer; }
- 
+  void set_writer(std::function<void(display::Display &)> writer);
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
- protected: // !! Verplaats draw_absolute_pixel_internal naar protected !!
-//  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) ;
-  void draw_absolute_pixel_internal(int x, int y, esphome::Color color) ;
-// Helper: Converteer ESPHome Color naar M5GFX kleur formaat (blijft hetzelfde)
-//  uint32_t get_native_m5gfx_color_(Color color);
-//  uint8_t get_native_m5gfx_color_(Color color);
-  // Member variabelen (rotation, writer blijven hetzelfde)
+  // New methods for touch
+  void handle_touch(uint16_t x, uint16_t y);
+  void update_touch();
+
+ protected:
+  void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
+  M5GFX gfx;
+  lgfx::LGFX_Sprite *canvas_{nullptr};
+
+ private:
   int rotation_{0};
   std::function<void(display::Display &)> writer_{nullptr};
-
-  // !! Gebruik lgfx::LGFX_Sprite voor de canvas !!
-  M5GFX gfx;
- // M5Canvas canvas_;
-  lgfx::LGFX_Sprite *canvas_{nullptr};
+  bool touch_detected_{false};  // Track if a touch is detected
+  uint16_t touch_x_{0}, touch_y_{0};  // Touch coordinates
 };
 
 } // namespace m5papers3_display_m5gfx
