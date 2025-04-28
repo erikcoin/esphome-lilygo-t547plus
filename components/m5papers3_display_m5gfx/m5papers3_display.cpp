@@ -15,6 +15,8 @@ void M5PaperS3DisplayM5GFX::setup() {
   this->set_interval(100, [this]() { 
     this->update_touch();
   });
+    this->touch_coordinates_sensor = App.get_sensor<text_sensor::TextSensor>("touch_coordinates");
+
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     while (!M5.Display.isReadable()) {
@@ -155,8 +157,12 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   
   ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
 
-  // Directly publish the coordinates to a defined text sensor
-  id(touch_coordinates).publish_state(coords);  // Ensure 'touch_coordinates' is defined in your YAML
+  // Use the touch_coordinates_sensor pointer initialized in setup()
+  if (this->touch_coordinates_sensor != nullptr) {
+    this->touch_coordinates_sensor->publish_state(coords);  // Publish the state to the sensor
+  } else {
+    ESP_LOGE("custom", "Touch coordinates sensor is not initialized!");
+  }
 }
 
 
