@@ -1,28 +1,50 @@
 #pragma once
 
 #include "esphome.h"
-#include <M5Unified.h>
+#include "M5Unified.h"
 
-namespace esphome {
+using namespace esphome;
+
 namespace papertouch {
 
 class Papertouch : public Component {
- public:
-  void setup() override {
-    M5.begin();  // Initialize the M5Stack device
-    M5.Touch.begin();  // Initialize the touch screen
-  }
+public:
+    Papertouch() : display(nullptr) {}
 
-  void update() override {
-    if (M5.Touch.isPressed()) {  // Check if the screen is pressed
-      TouchPoint touch = M5.Touch.getPressPoint();  // Get the touch point
-      ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
-      
-      // Do something with the touch coordinates
-      // For example, you could trigger actions or send data to other parts of the system
+    void setup() override {
+        // Ensure the touch screen is initialized
+        M5.begin();  // Initialize the M5 device (including touch)
+        M5.Touch.begin(&M5.Lcd);  // Initialize touch with the screen device
+
+        // Additional setup code here
     }
-  }
+
+    void update() override {
+        if (M5.Touch.isPressed()) {
+            // Get the touch coordinates
+            TouchPoint touch = M5.Touch.getPressPoint();
+            ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
+            
+            // You can implement logic for touch events here
+        }
+    }
+
+    void set_display(LGFX* display) {
+        this->display = display;
+    }
+
+    void set_update_interval(uint32_t interval) {
+        this->update_interval = interval;
+    }
+
+    void set_component_source(const std::string& source) {
+        this->component_source = source;
+    }
+
+private:
+    LGFX* display;
+    uint32_t update_interval;
+    std::string component_source;
 };
 
 }  // namespace papertouch
-}  // namespace esphome
