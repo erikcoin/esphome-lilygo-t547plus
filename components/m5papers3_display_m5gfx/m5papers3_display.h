@@ -4,6 +4,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
+#include "esphome/components/display/display_buffer.h"
 
 // Includes for M5GFX and M5Unified
 #include <M5Unified.h> // For M5.begin() and M5.Display object
