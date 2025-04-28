@@ -164,6 +164,7 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
   ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
   this->touch_coordinates_sensor = touch_coordinates_sensor;
+  ESP_LOGD(TAG, "Setting touch_coordinates_sensor is set");
 }
 
 
