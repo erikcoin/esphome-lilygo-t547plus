@@ -18,6 +18,6 @@ CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     # Register the component in ESPHome
-    #await cg.register_component(var, config)
+    await cg.register_component(var, config)
     # Register the touchscreen in ESPHome (to handle touch events)
     await touchscreen.register_touchscreen(var, config)
