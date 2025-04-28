@@ -155,16 +155,20 @@ void M5PaperS3DisplayM5GFX::update_touch() {
   }
 }
 
-void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
-    std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
-  
-    ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
-
-    // Ensure the sensor is not nullptr before publishing
-    if (this->touch_coordinates_sensor != nullptr) {
-        this->touch_coordinates_sensor->publish_state(coords);
-    }
+void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *sensor) {
+  this->touch_coordinates_sensor = sensor;
 }
+
+void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
+  if (this->touch_coordinates_sensor != nullptr) {
+    std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
+    this->touch_coordinates_sensor->publish_state(coords);
+    ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
+  } else {
+    ESP_LOGW("custom", "Touch coordinates sensor not initialized!");
+  }
+}
+
 
 
 
