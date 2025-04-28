@@ -45,7 +45,7 @@ public:
     }
 
 private:
-    LGFX* display;
+    M5GFX* display;
     uint32_t update_interval;
     std::string component_source;
 };
