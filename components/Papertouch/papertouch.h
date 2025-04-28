@@ -17,13 +17,13 @@ public:
     void setup() override {
         // Ensure the touch screen is initialized
         M5.begin();  // Initialize the M5 device (including touch)
-        M5.Touch.begin(&M5.Lcd);  // Initialize touch with the screen device
+        M5.Display.begin(&M5.Lcd);  // Initialize touch with the screen device
 
         // Additional setup code here
     }
 
     void update() override {
-        if (M5.Touch.isPressed()) {
+        if (M5.Display.isPressed()) {
             // Get the touch coordinates
             TouchPoint touch = M5.Touch.getPressPoint();
 //            ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
