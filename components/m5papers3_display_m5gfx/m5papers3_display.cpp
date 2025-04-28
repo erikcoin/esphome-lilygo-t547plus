@@ -16,9 +16,10 @@ void M5PaperS3DisplayM5GFX::setup() {
     this->update_touch();
   });
         // Initialize the touch_coordinates_sensor if it's not nullptr
-    if (this->touch_coordinates_sensor != nullptr) {
-        this->touch_coordinates_sensor->publish_state("Initializing...");
-    }
+   // if (this->touch_coordinates_sensor != nullptr) {
+    //    this->touch_coordinates_sensor->publish_state("Initializing...");
+    //}
+    this->touch_coordinates_sensor = id(touch_coordinates);  // This links the sensor from YAML
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     while (!M5.Display.isReadable()) {
