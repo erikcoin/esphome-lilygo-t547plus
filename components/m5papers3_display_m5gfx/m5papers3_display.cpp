@@ -66,13 +66,16 @@ void M5PaperS3DisplayM5GFX::update() {
 
 // ======= Touch gerelateerde functies =======
 
-bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
-    m5::touch_point_t tp[1];
-    if (M5.Display.getTouchRaw(tp, 1) > 0) {
+bool M5PaperS3DisplayM5GFX::get_touch(display::TouchPoint *point) {
+    m5::touch_point_t tp[1];  // Gebruik m5::touch_point_t
+    int touch = M5.Display.getTouchRaw(tp, 1);
+    if (touch > 0) {
+        ESP_LOGD(TAG, "Raw touch detected at (%d, %d)", tp[0].x, tp[0].y);
         point->x = tp[0].x;
         point->y = tp[0].y;
         return true;
     }
+    ESP_LOGD(TAG, "No raw touch detected.");
     return false;
 }
 
@@ -124,18 +127,31 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     this->canvas_->drawPixel(x, y, col);
 }
+
+
 void M5PaperS3DisplayM5GFX::update_touch() {
-  m5::touch_point_t tp[1];
-  if (M5.Display.getTouchRaw(tp, 1) > 0) {
-    this->touch_detected_ = true;
-    this->touch_x_ = tp[0].x;
-    this->touch_y_ = tp[0].y;
-    handle_touch(tp[0].x, tp[0].y);
-      ESP_LOGD(TAG, "update touch %d %d", tp[0].x, tp[0].y);
-  } else {
-    this->touch_detected_ = false;
-  }
+    ESP_LOGD(TAG, "Checking for touch...");
+    if (this->get_touch(&touch_point_)) {
+        ESP_LOGD(TAG, "Touch detected at (%d, %d)", touch_point_.x, touch_point_.y);
+        handle_touch(touch_point_.x, touch_point_.y);
+    } else {
+        ESP_LOGD(TAG, "No touch detected.");
+    }
 }
+
+//void M5PaperS3DisplayM5GFX::update_touch() {
+//    ESP_LOGD(TAG, "update touch %d %d", tp[0].x, tp[0].y);
+//  m5::touch_point_t tp[1];
+//  if (M5.Display.getTouchRaw(tp, 1) > 0) {
+//    this->touch_detected_ = true;
+ //   this->touch_x_ = tp[0].x;
+//   this->touch_y_ = tp[0].y;
+ //   handle_touch(tp[0].x, tp[0].y);
+      
+ // } else {
+ //   this->touch_detected_ = false;
+ // }
+//}
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
   this->writer_ = writer;
