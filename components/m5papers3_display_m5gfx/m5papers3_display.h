@@ -40,7 +40,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   void handle_touch(uint16_t x, uint16_t y);
   void update_touch();
   //bool get_touch(esphome::display::TouchPoint* point);
-  bool get_touch(display::TouchPoint *point) override;
+  bool get_touch(TouchPoint *point) override;
  protected:
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
   M5GFX gfx;
