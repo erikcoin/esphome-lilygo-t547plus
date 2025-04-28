@@ -4,7 +4,7 @@
 #include "esphome/components/display/display.h"
 
 #include <M5GFX.h>  // Zorg dat M5GFX beschikbaar is!
-
+#include <M5Unified.h>
 namespace esphome {
 namespace papertouch {
 
