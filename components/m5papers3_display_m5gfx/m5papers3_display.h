@@ -43,6 +43,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   void handle_touch(uint16_t x, uint16_t y);
   void update_touch();
   bool get_touch(TouchPoint *point);  // << GEEN override meer!
+  // Add the declaration of send_coordinates here
+  void send_coordinates(TouchPoint tp);  // Declaration
 
  protected:
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
