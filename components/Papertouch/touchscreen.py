@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome import touchscreen
+from esphome.components import touchscreen
 from esphome.components import display
 
 Papertouch = touchscreen.TouchscreenComponent.namespace.class_('Papertouch', touchscreen.TouchscreenComponent)
