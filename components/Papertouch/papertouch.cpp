@@ -1,19 +1,42 @@
-#include "esphome.h"
+#include "papertouch.h"
+#include "esphome/core/log.h"
 #include "M5Unified.h"
 
-class M5TouchComponent : public Component, public Touchscreen {
- public:
-  void setup() override {
-    ESP_LOGD("m5touch", "Touchscreen setup done via M5Unified");
-    // M5Unified already initialized the touchscreen
+namespace esphome {
+namespace papertouch {
+
+static const char *const TAG = "papertouch";
+
+void PaperTouch::setup() {
+  ESP_LOGI(TAG, "Setting up PaperTouch...");
+
+  // Init M5.Touch
+  if (!M5.Touch.isEnabled()) {
+    ESP_LOGW(TAG, "M5.Touch not enabled or GT911 not found!");
+  } else {
+    ESP_LOGI(TAG, "M5.Touch initialized successfully.");
+  }
+}
+
+void PaperTouch::loop() {
+  M5.update();
+}
+
+void PaperTouch::update_touches() {
+  this->touches_.clear();
+
+  if (!M5.Touch.isEnabled()) {
+    return;
   }
 
-  void update() override {
-    M5.update();  // Always update M5 state
-    auto t = M5.Touch.getDetail();
-    if (t.isTouch()) {
-      // Touch detected, report it to ESPHome
-      this->touch(t.x, t.y);
-    }
+  uint16_t x, y;
+  if (M5.Touch.getTouch(&x, &y)) {
+    touchscreen::TouchPoint point;
+    point.x = x;
+    point.y = y;
+    this->touches_.push_back(point);
   }
-};
+}
+
+}  // namespace papertouch
+}  // namespace esphome
