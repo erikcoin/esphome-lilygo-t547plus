@@ -157,6 +157,7 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 
   char buffer[32];
   snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
+    ESP_LOGD("m5papers3.display_m5gfx", "Publishing coordinates: %s", buffer);
   this->touch_coordinates_sensor->publish_state(buffer);
 }
 
