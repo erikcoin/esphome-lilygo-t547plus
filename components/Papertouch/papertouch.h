@@ -32,7 +32,7 @@ public:
         }
     }
 
-    void set_display(LGFX* display) {
+    void set_display(M5GFX* display) {
         this->display = display;
     }
 
