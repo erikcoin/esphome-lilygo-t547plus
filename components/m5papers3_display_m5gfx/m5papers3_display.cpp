@@ -124,6 +124,20 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     this->canvas_->drawPixel(x, y, col);
 }
+void M5PaperS3DisplayM5GFX::update_touch() {
+  touch_point_t tp[1];
+  if (M5.Display.getTouchRaw(tp, 1) > 0) {
+    this->touch_detected_ = true;
+    this->touch_x_ = tp[0].x;
+    this->touch_y_ = tp[0].y;
+    handle_touch(tp[0].x, tp[0].y);
+  } else {
+    this->touch_detected_ = false;
+  }
+}
 
+void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
+  this->writer_ = writer;
+}
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
