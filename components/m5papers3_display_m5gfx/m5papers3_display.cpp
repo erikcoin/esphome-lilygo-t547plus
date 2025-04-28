@@ -31,7 +31,7 @@ void M5PaperS3DisplayM5GFX::setup() {
       delete this->canvas_;
     }
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
-    this->canvas_->setColorDepth(1);  // Grayscale: 8-bit
+    this->canvas_->setColorDepth(1);
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
@@ -39,7 +39,6 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
 
-    // Initialize touchscreen
     if (!M5.Touch.isEnabled()) {
         ESP_LOGW(TAG, "Touchscreen not enabled or GT911 not found.");
     } else {
@@ -57,31 +56,32 @@ void M5PaperS3DisplayM5GFX::update() {
 
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     if (this->writer_ != nullptr) {
-        this->canvas_->fillSprite(TFT_WHITE);  // Clear the screen
+        this->canvas_->fillSprite(TFT_WHITE);
         this->writer_(*this);
         this->canvas_->pushSprite(0, 0);
     }
 
-    // Update touch
     update_touch();
 }
 
-bool M5PaperS3DisplayM5GFX::get_touch(display::TouchPoint *point) {
-  touch_point_t tp[1];
-  if (M5.Display.getTouchRaw(tp, 1) > 0) {
-    point->x = tp[0].x;
-    point->y = tp[0].y;
-    return true;
-  }
-  return false;
+// ======= Touch gerelateerde functies =======
+
+bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
+    m5::touch_point_t tp[1];
+    if (M5.Display.getTouchRaw(tp, 1) > 0) {
+        point->x = tp[0].x;
+        point->y = tp[0].y;
+        return true;
+    }
+    return false;
 }
 
 void M5PaperS3DisplayM5GFX::handle_touch(uint16_t x, uint16_t y) {
-    // You can interact with the display based on the touch coordinates
     ESP_LOGI(TAG, "Handling touch at (%d, %d)", x, y);
-    // Example: Draw a circle where the touch occurred
-    M5.Lcd.fillCircle(x, y, 10, GREEN);  // Draw a small circle at the touch point
+    M5.Lcd.fillCircle(x, y, 10, GREEN);
 }
+
+// ===========================================
 
 void M5PaperS3DisplayM5GFX::dump_config() {
     LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
@@ -124,14 +124,6 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
     this->canvas_->drawPixel(x, y, col);
 }
-bool M5PaperS3DisplayM5GFX::get_touch(esphome::display::TouchPoint *point) {
-    m5::touch_point_t tp[1];  // Gebruik m5::touch_point_t
-    if (M5.Display.getTouchRaw(tp, 1) > 0) {
-        point->x = tp[0].x;
-        point->y = tp[0].y;
-        return true;
-    }
-    return false;
-}
+
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
