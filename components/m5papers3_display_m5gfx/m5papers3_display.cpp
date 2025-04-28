@@ -23,11 +23,13 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
     }
-
+if (this->touch_coordinates_sensor != nullptr) {
+        ESP_LOGD(TAG, "Publishing test value to touch sensor.");
+        this->touch_coordinates_sensor->publish_state("42,84");
 // Hier automatisch de touch sensor pakken:
-  if (this->touch_coordinates_sensor == nullptr) {
+ // if (this->touch_coordinates_sensor == nullptr) {
 //    this->touch_coordinates_sensor = &id(touch_coordinates);
-    ESP_LOGD("m5papers3.display_m5gfx", "Touch sensor automatisch gekoppeld.");
+//    ESP_LOGD("m5papers3.display_m5gfx", "Touch sensor automatisch gekoppeld.");
   }
     
     M5.Display.clearDisplay();
