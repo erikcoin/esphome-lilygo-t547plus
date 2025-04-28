@@ -66,18 +66,14 @@ void M5PaperS3DisplayM5GFX::update() {
     update_touch();
 }
 
-void M5PaperS3DisplayM5GFX::update_touch() {
-    int touch_count = M5.Touch.getCount();
-    if (touch_count > 0) {
-        uint16_t x, y;
-        if (M5.Touch.getPoint(&x, &y)) {
-            ESP_LOGI(TAG, "Touch detected at (%d, %d)", x, y);
-            this->touch_x_ = x;
-            this->touch_y_ = y;
-            this->touch_detected_ = true;
-            handle_touch(x, y);  // Handle touch event
-        }
-    }
+bool M5PaperS3DisplayM5GFX::get_touch(display::TouchPoint *point) {
+  touch_point_t tp[1];
+  if (M5.Display.getTouchRaw(tp, 1) > 0) {
+    point->x = tp[0].x;
+    point->y = tp[0].y;
+    return true;
+  }
+  return false;
 }
 
 void M5PaperS3DisplayM5GFX::handle_touch(uint16_t x, uint16_t y) {
