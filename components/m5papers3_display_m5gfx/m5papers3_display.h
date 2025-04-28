@@ -20,7 +20,7 @@ struct TouchPoint {
   uint16_t x;
   uint16_t y;
 };
-TouchPoint touch_point_;  // Voor het opslaan van de touch coördinaten
+
 class M5PaperS3DisplayM5GFX : public display::Display {
  public:
   void setup() override;
@@ -54,6 +54,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   std::function<void(display::Display &)> writer_{nullptr};
   bool touch_detected_{false};
   uint16_t touch_x_{0}, touch_y_{0};
+  TouchPoint touch_point_;  // Voor het opslaan van de touch coördinaten
 };
 
 } // namespace m5papers3_display_m5gfx
