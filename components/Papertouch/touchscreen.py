@@ -12,6 +12,7 @@ CONFIG_SCHEMA = cv.Schema({
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
-    var = await cg.register_component(config, Papertouch.new())
+    #var = await cg.register_component(config, Papertouch.new())
     display_var = await cg.get_variable(config["display"])
     cg.add(var.set_display(display_var))
+    await display.register_display(var, config)
