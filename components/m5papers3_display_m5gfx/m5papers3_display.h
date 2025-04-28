@@ -46,6 +46,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   bool get_touch(TouchPoint *point);  // << GEEN override meer!
   // Add the declaration of send_coordinates here
   void send_coordinates(TouchPoint tp);  // Declaration
+  // Add this to hold the sensor reference
+  text_sensor::TextSensor *touch_coordinates_sensor{nullptr};  // Sensor pointer
 
  protected:
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
