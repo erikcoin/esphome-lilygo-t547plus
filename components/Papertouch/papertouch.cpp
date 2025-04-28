@@ -30,11 +30,13 @@ void PaperTouch::update_touches() {
   }
 
   uint16_t x, y;
-  if (M5.Touch.getTouch(&x, &y)) {
-    touchscreen::TouchPoint point;
-    point.x = x;
-    point.y = y;
-    this->touches_.push_back(point);
+  if (M5.Touch.getCount() > 0) {  // Assuming getCount() works
+    if (M5.Touch.getTouch(0, &x, &y)) {  // Retrieve touch point at index 0
+      touchscreen::TouchPoint point;
+      point.x = x;
+      point.y = y;
+      this->touches_[0] = point;  // Replace push_back with setting map element
+    }
   }
 }
 
