@@ -6,10 +6,11 @@ from esphome.const import CONF_ID
 papertouch_ns = cg.esphome_ns.namespace('papertouch')
 PaperTouch = papertouch_ns.class_('PaperTouch', touchscreen.Touchscreen, cg.Component)
 
-CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({}).extend(cv.COMPONENT_SCHEMA)
+CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({
+    cv.Required(CONF_ID): cv.declare_id(PaperTouch),
+}).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    #await cg.register_component(var, config)
+    #await cg.register_component(var, config)  # Register the component properly
     await touchscreen.register_touchscreen(var, config)
-    
