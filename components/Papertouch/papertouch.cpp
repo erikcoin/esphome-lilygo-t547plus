@@ -6,7 +6,7 @@ namespace papertouch {
 
 static const char *const TAG = "papertouch";
 
-void Papertouch::setup() {
+void papertouch::setup() {
   ESP_LOGI(TAG, "Papertouch setup");
 
   if (!M5.Touch.isEnabled()) {
@@ -15,7 +15,7 @@ void Papertouch::setup() {
   }
 }
 
-void Papertouch::update_touches() {
+void papertouch::update_touches() {
   if (M5.Touch.isEnabled() && M5.Touch.isPressed()) {
     auto point = M5.Touch.getTouchPoint();
     touchscreen::TouchPoint touch_point;
