@@ -125,7 +125,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     this->canvas_->drawPixel(x, y, col);
 }
 void M5PaperS3DisplayM5GFX::update_touch() {
-  touch_point_t tp[1];
+  m5::touch_point_t tp[1];
   if (M5.Display.getTouchRaw(tp, 1) > 0) {
     this->touch_detected_ = true;
     this->touch_x_ = tp[0].x;
