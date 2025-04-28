@@ -139,11 +139,11 @@ void M5PaperS3DisplayM5GFX::update_touch() {
     
     // Trigger an event or send the coordinates to a sensor
     // You could trigger an event, set a state, or check for specific conditions
-    if (tp.x > 100 && tp.x < 200 && tp.y > 100 && tp.y < 200) {
+    //if (tp.x > 100 && tp.x < 200 && tp.y > 100 && tp.y < 200) {
       // Example condition: Touch is in a specific area
-      ESP_LOGD("custom", "Touch in specified area!");
+     // ESP_LOGD("custom", "Touch in specified area!");
       // You can trigger an action here, e.g., set a state, call a lambda, etc.
-    }
+   // }
 
     // Optionally, send the coordinates to an ESPHome sensor (e.g., Text Sensor)
     this->send_coordinates(tp);
@@ -151,14 +151,16 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
-  // Example: Send coordinates as a string to a TextSensor in ESPHome
   std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
+  
+  ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
+
   App.register_lambda([coords]() {
-    // Update a text sensor with the coordinates
-    // Replace "touch_coordinates" with the actual sensor name you have in your YAML
-    id(touch_coordinates).publish_state(coords);
+    ESP_LOGD("custom", "Inside lambda: Updating coordinates to %s", coords.c_str());
+    id(touch_coordinates).publish_state(coords);  // Update the text sensor with the touch coordinates
   });
 }
+
 //void M5PaperS3DisplayM5GFX::update_touch() {
 //    ESP_LOGD(TAG, "Checking for touch...");
 //    if (this->get_touch(&touch_point_)) {
