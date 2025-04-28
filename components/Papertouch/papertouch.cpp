@@ -1,7 +1,7 @@
 #include "papertouch.h"
 #include "esphome/core/log.h"
 #include "M5Unified.h"
-#include "M5GFX"
+#include "M5GFX.h"
 
 namespace esphome {
 namespace papertouch {
