@@ -10,10 +10,16 @@
 #include <M5Unified.h> // For M5.begin() and M5.Display object
 #include <M5GFX.h>     // For LGFX and M5GFX types
 
-namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; } // Bring LGFX_Sprite to the lgfx namespace if not already
+namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; }
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
+
+// ===== Toegevoegd eigen TouchPoint structuur =====
+struct TouchPoint {
+  uint16_t x;
+  uint16_t y;
+};
 
 class M5PaperS3DisplayM5GFX : public display::Display {
  public:
@@ -33,11 +39,10 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   void set_writer(std::function<void(display::Display &)> writer);
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
-  // New methods for touch
+  // Touch methods
   void handle_touch(uint16_t x, uint16_t y);
   void update_touch();
-  //bool get_touch(esphome::display::TouchPoint* point);
-  bool get_touch(esphome::display::TouchPoint *point) override;
+  bool get_touch(TouchPoint *point);  // << GEEN override meer!
 
  protected:
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
@@ -47,8 +52,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
  private:
   int rotation_{0};
   std::function<void(display::Display &)> writer_{nullptr};
-  bool touch_detected_{false};  // Track if a touch is detected
-  uint16_t touch_x_{0}, touch_y_{0};  // Touch coordinates
+  bool touch_detected_{false};
+  uint16_t touch_x_{0}, touch_y_{0};
 };
 
 } // namespace m5papers3_display_m5gfx
