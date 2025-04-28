@@ -131,16 +131,43 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     this->canvas_->drawPixel(x, y, col);
 }
 
-
 void M5PaperS3DisplayM5GFX::update_touch() {
-    ESP_LOGD(TAG, "Checking for touch...");
-    if (this->get_touch(&touch_point_)) {
-        ESP_LOGD(TAG, "Touch detected at (%d, %d)", touch_point_.x, touch_point_.y);
-        handle_touch(touch_point_.x, touch_point_.y);
-    } else {
-        ESP_LOGD(TAG, "No touch detected.");
+  TouchPoint tp;
+  if (this->get_touch(&tp)) {
+    // Log the coordinates for debugging
+    ESP_LOGD("custom", "Touch detected at: x=%d, y=%d", tp.x, tp.y);
+    
+    // Trigger an event or send the coordinates to a sensor
+    // You could trigger an event, set a state, or check for specific conditions
+    if (tp.x > 100 && tp.x < 200 && tp.y > 100 && tp.y < 200) {
+      // Example condition: Touch is in a specific area
+      ESP_LOGD("custom", "Touch in specified area!");
+      // You can trigger an action here, e.g., set a state, call a lambda, etc.
     }
+
+    // Optionally, send the coordinates to an ESPHome sensor (e.g., Text Sensor)
+    this->send_coordinates(tp);
+  }
 }
+
+void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
+  // Example: Send coordinates as a string to a TextSensor in ESPHome
+  std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
+  App.register_lambda([coords]() {
+    // Update a text sensor with the coordinates
+    // Replace "touch_coordinates" with the actual sensor name you have in your YAML
+    id(touch_coordinates).publish_state(coords);
+  });
+}
+//void M5PaperS3DisplayM5GFX::update_touch() {
+//    ESP_LOGD(TAG, "Checking for touch...");
+//    if (this->get_touch(&touch_point_)) {
+//        ESP_LOGD(TAG, "Touch detected at (%d, %d)", touch_point_.x, touch_point_.y);
+//        handle_touch(touch_point_.x, touch_point_.y);
+//    } else {
+ //       ESP_LOGD(TAG, "No touch detected.");
+ //   }
+//}
 
 //void M5PaperS3DisplayM5GFX::update_touch() {
 //    ESP_LOGD(TAG, "update touch %d %d", tp[0].x, tp[0].y);
