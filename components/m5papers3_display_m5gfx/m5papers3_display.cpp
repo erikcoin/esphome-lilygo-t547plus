@@ -1,4 +1,4 @@
-#include "m5papers3_display.h" // Zorg dat de .h bestandsnaam klopt
+#include "m5papers3_display.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
@@ -8,9 +8,7 @@ namespace m5papers3_display_m5gfx {
 static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
-    // Controleer het vrije geheugen
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
-
     auto cfg = M5.config();
     M5.begin(cfg);
 
@@ -25,69 +23,73 @@ void M5PaperS3DisplayM5GFX::setup() {
     auto &gfx = M5.Display;
     gfx.setRotation(this->rotation_);
     ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
-    
     gfx.fillScreen(TFT_WHITE);
     gfx.display();
     gfx.waitDisplay();
 
-    // Setup canvas
-    ESP_LOGD(TAG, "Creating canvas...");
-    //this->canvas_ = M5Canvas(&gfx);
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
     }
-    this->canvas_ = new lgfx::LGFX_Sprite(&gfx);  // Pass parent at creation    this->canvas_.setPsram(true);  // 💾 Force use PSRAM
-    this->canvas_->setColorDepth(1);  // Grayscale: 8-bit is prima
-
+    this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
+    this->canvas_->setColorDepth(1);  // Grayscale: 8-bit
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
-        // Optioneel: probeer opnieuw of log het geheugen verder
     } else {
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
-   /// this->canvas_.setPaletteColor(0, TFT_WHITE);  // Color for 0
-   // ESP_LOGD(TAG, "setPaletteColor0");
-   // this->canvas_.setPaletteColor(1, TFT_BLACK);  // Color for 1
-  //  ESP_LOGD(TAG, "setPaletteColor1");
-  //  this->canvas_.fillSprite(0);  // Fill white at start
-  //  ESP_LOGD(TAG, "fillSprite");
-  //  this->canvas_.pushSprite(0, 0);  // Push to display
-   // ESP_LOGD(TAG, "Canvas pushed");
+
+    // Initialize touchscreen
+    if (!M5.Touch.isEnabled()) {
+        ESP_LOGW(TAG, "Touchscreen not enabled or GT911 not found.");
+    } else {
+        ESP_LOGI(TAG, "Touchscreen initialized.");
+    }
 }
 
 void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
     if (first_time) {
         ESP_LOGD(TAG, "Delaying first update for EPD...");
-        delay(1000);  // 👈 éénmalige vertraging bij de eerste update
+        delay(1000);
         first_time = false;
     }
-    ESP_LOGD(TAG, "Running M5GFX display update...");
 
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     if (this->writer_ != nullptr) {
-        ESP_LOGD(TAG, "Maak wit...");
-       // this->canvas_.fillSprite(TFT_BLACK);
-       // uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
-        this->canvas_->fillSprite(TFT_WHITE);  // begin met wit scherm
-        //this->canvas_.pushSprite(0, 0);
-       // this->canvas_.setTextColor(TFT_BLACK);
-        ESP_LOGD(TAG, "Start writer...");
-        // Schrijf naar scherm met behulp van de lambda
-         this->writer_(*this);  
-        ESP_LOGD(TAG, "Lambda writer done, pushing canvas...");
-        //delay(5000);
-        // Push canvas naar display
-       //// this->do_update_();
-        ESP_LOGD(TAG, "do_update  done, pushing canvas...");
+        this->canvas_->fillSprite(TFT_WHITE);  // Clear the screen
+        this->writer_(*this);
         this->canvas_->pushSprite(0, 0);
-        ESP_LOGD(TAG, "pushsprite  done, pushing canvas...");
-       // delay(5000);
-        // Forceer een volledige e-paper update
-       // M5.Display.display();                 
-      //  M5.Display.waitDisplay();
     }
+
+    // Update touch
+    update_touch();
+}
+
+void M5PaperS3DisplayM5GFX::update_touch() {
+    int touch_count = M5.Touch.getCount();
+    if (touch_count > 0) {
+        uint16_t x, y;
+        if (M5.Touch.getPoint(&x, &y)) {
+            ESP_LOGI(TAG, "Touch detected at (%d, %d)", x, y);
+            this->touch_x_ = x;
+            this->touch_y_ = y;
+            this->touch_detected_ = true;
+            handle_touch(x, y);  // Handle touch event
+        }
+    }
+}
+
+void M5PaperS3DisplayM5GFX::handle_touch(uint16_t x, uint16_t y) {
+    // You can interact with the display based on the touch coordinates
+    ESP_LOGI(TAG, "Handling touch at (%d, %d)", x, y);
+    // Example: Draw a circle where the touch occurred
+    M5.Lcd.fillCircle(x, y, 10, GREEN);  // Draw a small circle at the touch point
+}
+
+void M5PaperS3DisplayM5GFX::dump_config() {
+    LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
+    ESP_LOGCONFIG(TAG, "  Rotation: %d degrees", this->rotation_ * 90);
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
@@ -98,109 +100,34 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
   }
 }
 
-void M5PaperS3DisplayM5GFX::dump_config() {
-  LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper", this);
-  ESP_LOGCONFIG(TAG, "  Rotation: %d degrees", this->rotation_ * 90);
-  LOG_UPDATE_INTERVAL(this);
-}
-
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
-  // Roep gewoon de interne versie aan
-  this->draw_absolute_pixel_internal(x, y, color);
-}
-
-
-
-
-// --- Display Overrides ---
-// set_rotation() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
-  int m5gfx_rotation = 0;
-  switch (rotation) {
-    case 90: m5gfx_rotation = 1; break;
-    case 180: m5gfx_rotation = 2; break;
-    case 270: m5gfx_rotation = 3; break;
-    default: m5gfx_rotation = 0; break;
-  }
-  this->rotation_ = m5gfx_rotation;
-  // Meteen toepassen als setup al geweest is? Optioneel.
-  // if (this->is_ready()) { // is_ready() is wel een geldige check
-  //   M5.Display.setRotation(this->rotation_);
-  // }
+    int m5gfx_rotation = 0;
+    switch (rotation) {
+        case 90: m5gfx_rotation = 1; break;
+        case 180: m5gfx_rotation = 2; break;
+        case 270: m5gfx_rotation = 3; break;
+        default: m5gfx_rotation = 0; break;
+    }
+    this->rotation_ = m5gfx_rotation;
 }
 
-
-// get_width/height_internal(): Verwijder de !this->is_setup_ check
 int M5PaperS3DisplayM5GFX::get_width_internal() {
-  // Vertrouw erop dat M5.Display geldig is wanneer dit wordt aangeroepen na setup()
-  // Een check op M5.getBoard() is minder nuttig hier, M5.Display.width() is directer.
-  return M5.Display.width();
+    return M5.Display.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() {
-  return M5.Display.height();
+    return M5.Display.height();
 }
 
-// fill() blijft zoals in de vorige correctie
 void M5PaperS3DisplayM5GFX::fill(Color color) {
-    
-    //uint16_t col = color.is_on() ? 0x0000 : 0xFFFF;
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
-    ESP_LOGD(TAG, "Canvas fill aangeroepen: %d",col);
- // uint32_t native_color = get_native_m5gfx_color_(color);
- //   uint8_t gray = get_native_m5gfx_color_(color);
-  this->canvas_->fillSprite(col);
-    //M5.Display.fillScreen(col);
+    this->canvas_->fillSprite(col);
 }
 
-// --- Protected Display Overrides ---
-// draw_absolute_pixel_internal() blijft zoals in de vorige correctie
-void M5PaperS3DisplayM5GFX::draw_absolute_pixel_internal(int x, int y, Color color) {
-   if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal())
-    return;
- // uint8_t gray = this->get_native_m5gfx_color_(color);
- //   ESP_LOGD(TAG,"DE KLEUR IS:(%d)", gray);
-//  this->canvas_.drawPixel(x, y, gray);
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
-    
-   //uint32_t native_color = get_native_m5gfx_color_(color);
-//  ESP_LOGD(TAG, "draw_pixel: (%d, %d, %d)", x, y,col);
-//voor schrijven naar scherm doe deze:
- //   M5.Display.drawPixel(x, y, col);
- //voor schrijven naar canvas doe deze:
     this->canvas_->drawPixel(x, y, col);
 }
-
-// Zet esphome kleur om naar 4-bit grijswaarde (0-15)
-//uint8_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
-//  // brightness() geeft float tussen 0.0 en 1.0
-// // float brightness = color.brightness();
-//  float brightness = (0.299f * color.r + 0.587f * color.g + 0.114f * color.b) / 255.0f;
-//  uint8_t gray = static_cast<uint8_t>(brightness * 15.0f);  // voor 16 grijsniveaus
- // return gray;
-//}
-// --- Helper Functie ---
-//uint32_t M5PaperS3DisplayM5GFX::get_native_m5gfx_color_(Color color) {
-    // !! Gebruik color.r, color.g, color.b (uint8_t) en converteer naar float !!
-//    float r_f = color.r / 255.0f;
-//    float g_f = color.g / 255.0f;
-//    float b_f = color.b / 255.0f;
-
-    // Luminantie formule (gewogen gemiddelde)
-//    float gray_f = (r_f * 0.2126f + g_f * 0.7152f + b_f * 0.0722f);
-    // Schaal naar 0-255
-//    uint8_t gray_8bit = static_cast<uint8_t>(gray_f * 255.0f);
-
-    // Converteer 8-bit gray naar M5GFX kleur (RGB888 formaat)
-    
-
-//    ESP_LOGD(TAG, "Input Color: R=%u G=%u B=%u", color.r, color.g, color.b);
-//    ESP_LOGD(TAG, "Float Color: R=%.3f G=%.3f B=%.3f", r_f, g_f, b_f);
-//    ESP_LOGD(TAG, "Grayscale (float): %.3f", gray_f);
- //   ESP_LOGD(TAG, "Grayscale (8-bit): %u", gray_8bit);
-//   // ESP_LOGD(TAG, "M5GFX RGB888 color: 0x%06X", native_color);
-//    return M5.Display.color888(gray_8bit, gray_8bit, gray_8bit);
-//}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
