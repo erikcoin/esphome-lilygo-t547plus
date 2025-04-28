@@ -8,7 +8,7 @@
 namespace esphome {
 namespace papertouch {
 
-class Papertouch : public touchscreen::TouchscreenComponent {
+class papertouch : public touchscreen::TouchscreenComponent {
  public:
   void setup() override;
   void update_touches() override;
