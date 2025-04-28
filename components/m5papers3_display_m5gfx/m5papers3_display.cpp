@@ -11,10 +11,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
     auto cfg = M5.config();
     M5.begin(cfg);
-  // Stel een interval in om elke 100 ms de update_touch() functie aan te roepen
-  this->set_interval(100, [this]() { 
-    this->update_touch();
-  });
+
         // Initialize the touch_coordinates_sensor if it's not nullptr
    // if (this->touch_coordinates_sensor != nullptr) {
     //    this->touch_coordinates_sensor->publish_state("Initializing...");
@@ -165,6 +162,12 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
   ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
   this->touch_coordinates_sensor = touch_coordinates_sensor;
   ESP_LOGD(TAG, "Setting touch_coordinates_sensor is set");
+  
+    // Stel een interval in om elke 100 ms de update_touch() functie aan te roepen
+  this->set_interval(100, [this]() { 
+    this->update_touch();
+  });
+
 }
 
 
