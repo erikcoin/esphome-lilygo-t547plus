@@ -15,8 +15,10 @@ void M5PaperS3DisplayM5GFX::setup() {
   this->set_interval(100, [this]() { 
     this->update_touch();
   });
-    id(touch_coordinates).publish_state("Initializing..."); // Just a test to see if it's working
-
+        // Initialize the touch_coordinates_sensor if it's not nullptr
+    if (this->touch_coordinates_sensor != nullptr) {
+        this->touch_coordinates_sensor->publish_state("Initializing...");
+    }
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     while (!M5.Display.isReadable()) {
@@ -153,12 +155,14 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
-  std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
+    std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
   
-  ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
+    ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
 
-  // Use id() to directly publish the coordinates to the text sensor
-  id(touch_coordinates).publish_state(coords);  // This should work now
+    // Ensure the sensor is not nullptr before publishing
+    if (this->touch_coordinates_sensor != nullptr) {
+        this->touch_coordinates_sensor->publish_state(coords);
+    }
 }
 
 
