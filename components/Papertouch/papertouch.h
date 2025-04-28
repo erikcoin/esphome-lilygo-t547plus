@@ -1,22 +1,27 @@
 #pragma once
 
-#include "esphome/components/touchscreen/touchscreen.h"
-#include "esphome/components/display/display.h"
-
-#include <M5GFX.h>  // Zorg dat M5GFX beschikbaar is!
+#include "esphome.h"
 #include <M5Unified.h>
+
 namespace esphome {
 namespace papertouch {
 
-class papertouch : public touchscreen::TouchscreenComponent {
+class Papertouch : public Component {
  public:
-  void setup() override;
-  void update_touches() override;
+  void setup() override {
+    M5.begin();  // Initialize the M5Stack device
+    M5.Touch.begin();  // Initialize the touch screen
+  }
 
-  void set_display(display::Display* display) { this->display_ = display; }
-
- protected:
-  display::Display* display_;
+  void update() override {
+    if (M5.Touch.isPressed()) {  // Check if the screen is pressed
+      TouchPoint touch = M5.Touch.getPressPoint();  // Get the touch point
+      ESP_LOGD("papertouch", "Touch detected at: %d, %d", touch.x, touch.y);
+      
+      // Do something with the touch coordinates
+      // For example, you could trigger actions or send data to other parts of the system
+    }
+  }
 };
 
 }  // namespace papertouch
