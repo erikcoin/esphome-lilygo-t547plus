@@ -27,6 +27,12 @@ void M5PaperS3DisplayM5GFX::setup() {
         delay(1000);
     }
 
+// Hier automatisch de touch sensor pakken:
+  if (this->touch_coordinates_sensor == nullptr) {
+    this->touch_coordinates_sensor = &id(touch_coordinates);
+    ESP_LOGD("m5papers3.display_m5gfx", "Touch sensor automatisch gekoppeld.");
+  }
+    
     M5.Display.clearDisplay();
     auto &gfx = M5.Display;
     gfx.setRotation(this->rotation_);
@@ -137,22 +143,21 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 }
 
 void M5PaperS3DisplayM5GFX::update_touch() {
-  TouchPoint tp;
-  if (this->get_touch(&tp)) {
-    // Log the coordinates for debugging
-    ESP_LOGD("custom", "Touch detected at: x=%d, y=%d", tp.x, tp.y);
-    
-    // Trigger an event or send the coordinates to a sensor
-    // You could trigger an event, set a state, or check for specific conditions
-    //if (tp.x > 100 && tp.x < 200 && tp.y > 100 && tp.y < 200) {
-      // Example condition: Touch is in a specific area
-     // ESP_LOGD("custom", "Touch in specified area!");
-      // You can trigger an action here, e.g., set a state, call a lambda, etc.
-   // }
-
-    // Optionally, send the coordinates to an ESPHome sensor (e.g., Text Sensor)
-    this->send_coordinates(tp);
+  TouchPoint point;
+  if (!this->get_touch(&point)) {
+    return;
   }
+
+  ESP_LOGD("m5papers3.display_m5gfx", "Raw touch detected at (%d, %d)", point.x, point.y);
+
+  if (this->touch_coordinates_sensor == nullptr) {
+    ESP_LOGW("m5papers3.display_m5gfx", "Touch coordinates sensor not initialized!");
+    return;
+  }
+
+  char buffer[32];
+  snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
+  this->touch_coordinates_sensor->publish_state(buffer);
 }
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
