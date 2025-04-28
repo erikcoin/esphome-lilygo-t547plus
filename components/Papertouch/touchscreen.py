@@ -1,10 +1,8 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.components import display
-from esphome.components import touchscreen
+from esphome.components import display, touchscreen
 
-# Gebruik Component in plaats van een namespace
 Papertouch = cg.Component
 
 CONFIG_SCHEMA = cv.Schema({
@@ -13,15 +11,10 @@ CONFIG_SCHEMA = cv.Schema({
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
+    # Registreer de component
+    var = cg.new_Papertouch()  # Dit moet het component correct instantiëren
+    await cg.register_component(var, config)
 
-    #var = cg.new_Pvariable(config[CONF_ID])
-    #await cg.register_component(var, config)
-    #await display.register_display(var, config)
-
-
-    #var = cg.new_Papertouch()  # Dit moet 
-    var = await touchscreen.register_touchscreen(config, Papertouch.new())
-    #var = await cg.register_component(config, Papertouch.new())
+    # Haal de display variable op en koppel deze aan het touchscreen
     display_var = await cg.get_variable(config["display"])
-    cg.add(var.set_display(display_var))
-    #await display.register_display(var, config)
+    var.set_display(display_var)  # Koppel de display aan het touchscreen component
