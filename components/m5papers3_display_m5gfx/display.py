@@ -15,7 +15,7 @@ from esphome.const import (
 CONF_TOUCH_SENSOR = "touch_coordinates"
 CONF_TOUCH_X_SENSOR = "touch_x"
 CONF_TOUCH_Y_SENSOR = "touch_y"
-
+DEPENDENCIES = ["sensor"]
 AUTO_LOAD = ["display"]
 # Namespace voor onze C++ code
 # Gebruik een andere namespace om conflicten te vermijden als je beide hebt
