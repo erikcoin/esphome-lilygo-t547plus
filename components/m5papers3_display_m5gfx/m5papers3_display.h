@@ -51,6 +51,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   
  protected:
   text_sensor::TextSensor *touch_coordinates_sensor{nullptr};  // Sensor pointer
+  text_sensor::TextSensor *touch_x_sensor{nullptr};
+  text_sensor::TextSensor *touch_y_sensor{nullptr};
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
   M5GFX gfx;
   lgfx::LGFX_Sprite *canvas_{nullptr};
