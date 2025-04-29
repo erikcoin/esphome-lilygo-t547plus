@@ -47,7 +47,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   // Add the declaration of send_coordinates here
   void send_coordinates(TouchPoint tp);  // Declaration
   void set_touch_sensor(text_sensor::TextSensor *sensor);  
-
+  void set_touch_x_sensor(text_sensor::TextSensor *sensor);
+  void set_touch_y_sensor(text_sensor::TextSensor *sensor);
   
  protected:
   text_sensor::TextSensor *touch_coordinates_sensor{nullptr};  // Sensor pointer
