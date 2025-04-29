@@ -64,10 +64,17 @@ async def to_code(config):
         touch_sensor = await cg.get_variable(config[CONF_TOUCH_SENSOR])
         cg.add(var.set_touch_sensor(touch_sensor))
     
-    if CONF_TOUCH_X_SENSOR in config:
-        touch_x = await cg.get_variable(config[CONF_TOUCH_X_SENSOR])
-        cg.add(var.set_touch_x_sensor(touch_x))
+    #if CONF_TOUCH_X_SENSOR in config:
+    #    touch_x = await cg.get_variable(config[CONF_TOUCH_X_SENSOR])
+    #    cg.add(var.set_touch_x_sensor(touch_x))
+
+    #if CONF_TOUCH_Y_SENSOR in config:
+    #    touch_y = await cg.get_variable(config[CONF_TOUCH_Y_SENSOR])
+    #    cg.add(var.set_touch_y_sensor(touch_y))
+    if CONF_TOUCH_Y_SENSOR in config:
+        sens = yield sensor.new_sensor(config["touch_x"])
+        cg.call(mydisplay.set_touch_x_sensor)(sens)
 
     if CONF_TOUCH_Y_SENSOR in config:
-        touch_y = await cg.get_variable(config[CONF_TOUCH_Y_SENSOR])
-        cg.add(var.set_touch_y_sensor(touch_y))
+        sens = yield sensor.new_sensor(config["touch_y"])
+        cg.call(mydisplay.set_touch_y_sensor)(sens)
