@@ -12,6 +12,9 @@ from esphome.const import (
     CONF_UPDATE_INTERVAL,
 )
 CONF_TOUCH_SENSOR = "touch_coordinates"
+CONF_TOUCH_X_SENSOR = "touch_x"
+CONF_TOUCH_Y_SENSOR = "touch_y"
+
 AUTO_LOAD = ["display"]
 # Namespace voor onze C++ code
 # Gebruik een andere namespace om conflicten te vermijden als je beide hebt
@@ -25,6 +28,8 @@ CONFIG_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
         cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
+        cv.Optional(CONF_TOUCH_X_SENSOR): cv.use_id(text_sensor.TextSensor),
+        cv.Optional(CONF_TOUCH_Y_SENSOR): cv.use_id(text_sensor.TextSensor),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -52,8 +57,16 @@ async def to_code(config):
         cg.add(var.set_rotation(config[CONF_ROTATION]))
 
     if CONF_UPDATE_INTERVAL in config:
-         cg.add(var.set_update_interval(config[CONF_UPDATE_INTERVAL]))
+        cg.add(var.set_update_interval(config[CONF_UPDATE_INTERVAL]))
 
     if CONF_TOUCH_SENSOR in config:
         touch_sensor = await cg.get_variable(config[CONF_TOUCH_SENSOR])
         cg.add(var.set_touch_sensor(touch_sensor))
+    
+    if CONF_TOUCH_X_SENSOR in config:
+        touch_x = await cg.get_variable(config[CONF_TOUCH_X_SENSOR])
+        cg.add(var.set_touch_x_sensor(touch_x))
+
+    if CONF_TOUCH_Y_SENSOR in config:
+        touch_y = await cg.get_variable(config[CONF_TOUCH_Y_SENSOR])
+        cg.add(var.set_touch_y_sensor(touch_y))
