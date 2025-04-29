@@ -2,6 +2,7 @@
 import esphome.codegen as cg
 import esphome.components.display as display
 from esphome.components import text_sensor
+from esphome.components import sensor
 import esphome.config_validation as cv
 #from esphome.components import display
 from esphome import automation
