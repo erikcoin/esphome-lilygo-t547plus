@@ -29,8 +29,8 @@ CONFIG_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
         cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
-        cv.Optional(CONF_TOUCH_X_SENSOR): cv.use_id(text_sensor.TextSensor),
-        cv.Optional(CONF_TOUCH_Y_SENSOR): cv.use_id(text_sensor.TextSensor),
+        cv.Optional(CONF_TOUCH_X_SENSOR): cv.use_id(sensor.Sensor),
+        cv.Optional(CONF_TOUCH_Y_SENSOR): cv.use_id(sensor.Sensor),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
