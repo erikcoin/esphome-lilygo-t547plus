@@ -158,6 +158,12 @@ void M5PaperS3DisplayM5GFX::update_touch() {
   snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
     ESP_LOGD("m5papers3.display_m5gfx", "Publishing coordinates: %s", buffer);
   this->touch_coordinates_sensor->publish_state(buffer);
+ // if (this->touch_x_sensor != nullptr) {
+  this->touch_x_sensor->publish_state(std::to_string(point.x));
+//
+//if (this->touch_y_sensor != nullptr) {
+  this->touch_y_sensor->publish_state(std::to_string(point.y));
+//}
 }
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
@@ -171,7 +177,13 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
   });
 
 }
+void M5PaperS3DisplayM5GFX::set_touch_x_sensor(text_sensor::TextSensor *sensor) {
+  this->touch_x_sensor = sensor;
+}
 
+void M5PaperS3DisplayM5GFX::set_touch_y_sensor(text_sensor::TextSensor *sensor) {
+  this->touch_y_sensor = sensor;
+}
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   if (this->touch_coordinates_sensor != nullptr) {
