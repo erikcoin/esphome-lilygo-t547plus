@@ -12,11 +12,6 @@ void M5PaperS3DisplayM5GFX::setup() {
     auto cfg = M5.config();
     M5.begin(cfg);
     M5.Display.clearDisplay();
-        // Initialize the touch_coordinates_sensor if it's not nullptr
-   // if (this->touch_coordinates_sensor != nullptr) {
-    //    this->touch_coordinates_sensor->publish_state("Initializing...");
-    //}
-    //this->touch_coordinates_sensor = id(touch_coordinates);  // This links the sensor from YAML
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     while (!M5.Display.isReadable()) {
@@ -26,10 +21,6 @@ void M5PaperS3DisplayM5GFX::setup() {
 if (this->touch_coordinates_sensor != nullptr) {
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
         this->touch_coordinates_sensor->publish_state("42,84");
-// Hier automatisch de touch sensor pakken:
- // if (this->touch_coordinates_sensor == nullptr) {
-//    this->touch_coordinates_sensor = &id(touch_coordinates);
-//    ESP_LOGD("m5papers3.display_m5gfx", "Touch sensor automatisch gekoppeld.");
   }
     
     M5.Display.clearDisplay();
@@ -69,8 +60,11 @@ void M5PaperS3DisplayM5GFX::update() {
 
     M5.Display.setEpdMode(epd_mode_t::epd_fastest);
     if (this->writer_ != nullptr) {
+        ESP_LOGD(TAG, "Maak wit...");
         this->canvas_->fillSprite(TFT_WHITE);
+        ESP_LOGD(TAG, "Start writer...");
         this->writer_(*this);
+        ESP_LOGD(TAG, "pushsprite, pushing canvas...");
         this->canvas_->pushSprite(0, 0);
     }
 
@@ -154,18 +148,9 @@ void M5PaperS3DisplayM5GFX::update_touch() {
     return;
   }
 
- // char buffer[32];
-//  snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
-//    ESP_LOGD("m5papers3.display_m5gfx", "Publishing coordinates: %s", buffer);
-//  this->touch_coordinates_sensor->publish_state(buffer);
  this->send_coordinates(point);
     
-    // if (this->touch_x_sensor != nullptr) {
- // this->touch_x_sensor->publish_state(point.x);
-//
-//if (this->touch_y_sensor != nullptr) {
-//  this->touch_y_sensor->publish_state(point.y);
-//}
+}
 }
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
@@ -179,21 +164,11 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
   });
 
 }
-//void M5PaperS3DisplayM5GFX::set_touch_x_sensor(sensor::Sensor *sensor) {
-//  this->touch_x_sensor = sensor;
-//}
-
-//void M5PaperS3DisplayM5GFX::set_touch_y_sensor(sensor::Sensor *sensor) {
-//  this->touch_y_sensor = sensor;
-//}
+}
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   if (this->touch_coordinates_sensor != nullptr) {
 
- // char buffer[32];
-//  snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
-
-    //std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);  
     std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y);
     this->touch_coordinates_sensor->publish_state(coords);
     ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
@@ -207,33 +182,6 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
     ESP_LOGW("custom", "Touch coordinates sensor not initialized!");
   }
 }
-
-
-
-
-//void M5PaperS3DisplayM5GFX::update_touch() {
-//    ESP_LOGD(TAG, "Checking for touch...");
-//    if (this->get_touch(&touch_point_)) {
-//        ESP_LOGD(TAG, "Touch detected at (%d, %d)", touch_point_.x, touch_point_.y);
-//        handle_touch(touch_point_.x, touch_point_.y);
-//    } else {
- //       ESP_LOGD(TAG, "No touch detected.");
- //   }
-//}
-
-//void M5PaperS3DisplayM5GFX::update_touch() {
-//    ESP_LOGD(TAG, "update touch %d %d", tp[0].x, tp[0].y);
-//  m5::touch_point_t tp[1];
-//  if (M5.Display.getTouchRaw(tp, 1) > 0) {
-//    this->touch_detected_ = true;
- //   this->touch_x_ = tp[0].x;
-//   this->touch_y_ = tp[0].y;
- //   handle_touch(tp[0].x, tp[0].y);
-      
- // } else {
- //   this->touch_detected_ = false;
- // }
-//}
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
   this->writer_ = writer;
