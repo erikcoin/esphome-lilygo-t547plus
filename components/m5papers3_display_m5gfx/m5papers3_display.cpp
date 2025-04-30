@@ -67,7 +67,7 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->fillSprite(TFT_WHITE);
         ESP_LOGD(TAG, "Start writer...");
         this->writer_(*this);
-        M5.Display.fillScreen(TFT_WHITE);  // indien gewenst
+        //M5.Display.fillScreen(TFT_WHITE);  // indien gewenst
         ESP_LOGD(TAG, "pushsprite, pushing canvas...");
         this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Display...");
