@@ -159,10 +159,10 @@ void M5PaperS3DisplayM5GFX::update_touch() {
     ESP_LOGD("m5papers3.display_m5gfx", "Publishing coordinates: %s", buffer);
   this->touch_coordinates_sensor->publish_state(buffer);
  // if (this->touch_x_sensor != nullptr) {
-  this->touch_x_sensor->publish_state(point.x);
+ // this->touch_x_sensor->publish_state(point.x);
 //
 //if (this->touch_y_sensor != nullptr) {
-  this->touch_y_sensor->publish_state(point.y);
+//  this->touch_y_sensor->publish_state(point.y);
 //}
 }
 
