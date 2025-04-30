@@ -177,13 +177,13 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
   });
 
 }
-void M5PaperS3DisplayM5GFX::set_touch_x_sensor(sensor::Sensor *sensor) {
-  this->touch_x_sensor = sensor;
-}
+//void M5PaperS3DisplayM5GFX::set_touch_x_sensor(sensor::Sensor *sensor) {
+//  this->touch_x_sensor = sensor;
+//}
 
-void M5PaperS3DisplayM5GFX::set_touch_y_sensor(sensor::Sensor *sensor) {
-  this->touch_y_sensor = sensor;
-}
+//void M5PaperS3DisplayM5GFX::set_touch_y_sensor(sensor::Sensor *sensor) {
+//  this->touch_y_sensor = sensor;
+//}
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   if (this->touch_coordinates_sensor != nullptr) {
