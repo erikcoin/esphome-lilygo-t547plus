@@ -13,7 +13,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     M5.begin(cfg);
     M5.Display.clearDisplay();
     ESP_LOGD(TAG, "M5.begin() finished.");
-    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+    M5.Display.setEpdMode(epd_mode_t::epd_quality);
     while (!M5.Display.isReadable()) {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
@@ -61,13 +61,13 @@ void M5PaperS3DisplayM5GFX::update() {
         first_time = false;
     }
 
-    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+    M5.Display.setEpdMode(epd_mode_t::epd_quality);
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Maak wit...");
         this->canvas_->fillSprite(TFT_WHITE);
         ESP_LOGD(TAG, "Start writer...");
         this->writer_(*this);
-        gfx.fillScreen(TFT_WHITE);  // indien gewenst
+        M5.Display.fillScreen(TFT_WHITE);  // indien gewenst
         ESP_LOGD(TAG, "pushsprite, pushing canvas...");
         this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Display...");
