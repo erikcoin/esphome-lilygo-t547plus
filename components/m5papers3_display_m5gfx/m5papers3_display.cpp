@@ -35,6 +35,8 @@ if (this->touch_coordinates_sensor != nullptr) {
     }
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
     this->canvas_->setColorDepth(1);
+    this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
+    this->canvas_->setPaletteColor(1, TFT_BLACK);  // pixel value 1 = zwart
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
@@ -65,6 +67,7 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->fillSprite(TFT_WHITE);
         ESP_LOGD(TAG, "Start writer...");
         this->writer_(*this);
+        gfx.fillScreen(TFT_WHITE);  // indien gewenst
         ESP_LOGD(TAG, "pushsprite, pushing canvas...");
         this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Display...");
