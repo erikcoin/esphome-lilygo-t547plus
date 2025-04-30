@@ -2,7 +2,7 @@
 import esphome.codegen as cg
 import esphome.components.display as display
 from esphome.components import text_sensor
-from esphome.components import sensor
+#from esphome.components import sensor
 import esphome.config_validation as cv
 #from esphome.components import display
 from esphome import automation
@@ -13,9 +13,9 @@ from esphome.const import (
     CONF_UPDATE_INTERVAL,
 )
 CONF_TOUCH_SENSOR = "touch_coordinates"
-CONF_TOUCH_X_SENSOR = "touch_x"
-CONF_TOUCH_Y_SENSOR = "touch_y"
-DEPENDENCIES = ["sensor"]
+#CONF_TOUCH_X_SENSOR = "touch_x"
+#CONF_TOUCH_Y_SENSOR = "touch_y"
+#DEPENDENCIES = ["sensor"]
 AUTO_LOAD = ["display"]
 # Namespace voor onze C++ code
 # Gebruik een andere namespace om conflicten te vermijden als je beide hebt
@@ -29,8 +29,8 @@ CONFIG_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
         cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
-        cv.Optional(CONF_TOUCH_X_SENSOR): cv.use_id(sensor.Sensor),
-        cv.Optional(CONF_TOUCH_Y_SENSOR): cv.use_id(sensor.Sensor),
+        #cv.Optional(CONF_TOUCH_X_SENSOR): cv.use_id(sensor.Sensor),
+        #cv.Optional(CONF_TOUCH_Y_SENSOR): cv.use_id(sensor.Sensor),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -71,10 +71,10 @@ async def to_code(config):
     #if CONF_TOUCH_Y_SENSOR in config:
     #    touch_y = await cg.get_variable(config[CONF_TOUCH_Y_SENSOR])
     #    cg.add(var.set_touch_y_sensor(touch_y))
-    if CONF_TOUCH_Y_SENSOR in config:
-        sens = await sensor.new_sensor(config["touch_x"])
-        cg.call(mydisplay.set_touch_x_sensor)(sens)
+    #if CONF_TOUCH_Y_SENSOR in config:
+    #    sens = await sensor.new_sensor(config["touch_x"])
+    #    cg.call(mydisplay.set_touch_x_sensor)(sens)
 
-    if CONF_TOUCH_Y_SENSOR in config:
-        sens = await sensor.new_sensor(config["touch_y"])
-        cg.call(mydisplay.set_touch_y_sensor)(sens)
+    #if CONF_TOUCH_Y_SENSOR in config:
+    #    sens = await sensor.new_sensor(config["touch_y"])
+    #    cg.call(mydisplay.set_touch_y_sensor)(sens)
