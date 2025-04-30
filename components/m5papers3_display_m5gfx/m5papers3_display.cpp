@@ -194,7 +194,7 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
 //  snprintf(buffer, sizeof(buffer), "%d,%d", point.x, point.y);
 
     //std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);  
-    std::string coords = "std::to_string(tp.x) + "," + std::to_string(tp.y);
+    std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y);
     this->touch_coordinates_sensor->publish_state(coords);
     ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
     // Correct usage of set_timeout with capture
