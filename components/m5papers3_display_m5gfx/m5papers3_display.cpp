@@ -23,13 +23,12 @@ if (this->touch_coordinates_sensor != nullptr) {
         this->touch_coordinates_sensor->publish_state("42,84");
   }
     
-    M5.Display.clearDisplay();
+   // M5.Display.clearDisplay();
     auto &gfx = M5.Display;
     gfx.setRotation(this->rotation_);
     ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
-    gfx.fillScreen(TFT_WHITE);
-    gfx.display();
-    gfx.waitDisplay();
+    //gfx.fillScreen(TFT_WHITE);
+    
 
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
@@ -48,6 +47,8 @@ if (this->touch_coordinates_sensor != nullptr) {
     } else {
         ESP_LOGI(TAG, "Touchscreen initialized.");
     }
+gfx.display();
+    gfx.waitDisplay();
 }
 
 void M5PaperS3DisplayM5GFX::update() {
