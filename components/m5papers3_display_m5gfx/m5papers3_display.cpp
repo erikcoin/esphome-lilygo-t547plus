@@ -11,7 +11,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
     auto cfg = M5.config();
     M5.begin(cfg);
-
+    M5.Display.clearDisplay();
         // Initialize the touch_coordinates_sensor if it's not nullptr
    // if (this->touch_coordinates_sensor != nullptr) {
     //    this->touch_coordinates_sensor->publish_state("Initializing...");
