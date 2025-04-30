@@ -127,15 +127,24 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
     return M5.Display.height();
 }
 
+//void M5PaperS3DisplayM5GFX::fill(Color color) {
+//    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+//    this->canvas_->fillSprite(col);
+//}
 void M5PaperS3DisplayM5GFX::fill(Color color) {
-    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
     this->canvas_->fillSprite(col);
 }
-
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
     this->canvas_->drawPixel(x, y, col);
 }
+
+
+//void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+//    uint16_t col = color.is_on() ? TFT_BLACK : TFT_WHITE;
+//    this->canvas_->drawPixel(x, y, col);
+//}
 
 void M5PaperS3DisplayM5GFX::update_touch() {
   TouchPoint point;
