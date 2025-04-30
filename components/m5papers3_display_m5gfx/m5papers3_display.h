@@ -4,7 +4,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
-#include "esphome/components/sensor/sensor.h"
+//#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"  // Include the text_sensor header
 #include "esphome/components/display/display_buffer.h"
 
@@ -48,13 +48,13 @@ class M5PaperS3DisplayM5GFX : public display::Display {
   // Add the declaration of send_coordinates here
   void send_coordinates(TouchPoint tp);  // Declaration
   void set_touch_sensor(text_sensor::TextSensor *sensor);  
-  void set_touch_x_sensor(sensor::Sensor *sensor);
-  void set_touch_y_sensor(sensor::Sensor *sensor);
+  //void set_touch_x_sensor(sensor::Sensor *sensor);
+  //void set_touch_y_sensor(sensor::Sensor *sensor);
   
  protected:
   text_sensor::TextSensor *touch_coordinates_sensor{nullptr};  // Sensor pointer
-  sensor::Sensor *touch_x_sensor{nullptr};
-  sensor::Sensor *touch_y_sensor{nullptr};
+  //sensor::Sensor *touch_x_sensor{nullptr};
+  //sensor::Sensor *touch_y_sensor{nullptr};
   void draw_absolute_pixel_internal(int x, int y, esphome::Color color);
   M5GFX gfx;
   lgfx::LGFX_Sprite *canvas_{nullptr};
