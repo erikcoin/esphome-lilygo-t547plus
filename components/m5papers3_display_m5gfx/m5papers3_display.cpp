@@ -190,6 +190,9 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
     std::string coords = "X: " + std::to_string(tp.x) + ", Y: " + std::to_string(tp.y);
     this->touch_coordinates_sensor->publish_state(coords);
     ESP_LOGD("custom", "Sending coordinates: %s", coords.c_str());
+      App.scheduler.set_timeout(200, [this]() {
+  this->touch_coordinates_sensor->publish_state("");
+    });
   } else {
     ESP_LOGW("custom", "Touch coordinates sensor not initialized!");
   }
