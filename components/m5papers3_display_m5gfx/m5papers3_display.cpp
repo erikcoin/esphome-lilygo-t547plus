@@ -67,7 +67,7 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "pushsprite, pushing canvas...");
         this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Display...");
-        this->gfx_->display();  // Zorgt voor fysieke refresh van het e-paper scherm
+        this->gfx.display();  // Zorgt voor fysieke refresh van het e-paper scherm
     }
 
     update_touch();
