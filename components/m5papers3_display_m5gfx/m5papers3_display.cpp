@@ -47,8 +47,8 @@ if (this->touch_coordinates_sensor != nullptr) {
     } else {
         ESP_LOGI(TAG, "Touchscreen initialized.");
     }
-gfx.display();
-    gfx.waitDisplay();
+//gfx.display();
+ //   gfx.waitDisplay();
 }
 
 void M5PaperS3DisplayM5GFX::update() {
