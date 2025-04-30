@@ -195,6 +195,7 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   }
     App.scheduler.set_timeout(200, [this]() {
   this->touch_coordinates_sensor->publish_state("");
+    }
 }
 
 
