@@ -11,7 +11,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
     auto cfg = M5.config();
     M5.begin(cfg);
-    M5.Display.clearDisplay();
+    //M5.Display.clearDisplay();
     ESP_LOGD(TAG, "M5.begin() finished.");
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
     while (!M5.Display.isReadable()) {
