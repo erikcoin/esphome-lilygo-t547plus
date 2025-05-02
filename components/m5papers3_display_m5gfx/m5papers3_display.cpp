@@ -41,6 +41,7 @@ if (this->touch_coordinates_sensor != nullptr) {
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
     } else {
+        this->canvas_->setPaletteGrayscale();  // <== DIT IS CRUCIAAL VOOR 4-BIT GRIJS!
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
 
