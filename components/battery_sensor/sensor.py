@@ -4,25 +4,40 @@ from esphome.components import sensor
 from esphome.const import (
     CONF_ID,
     UNIT_VOLT,
+    UNIT_PERCENT,
     ICON_BATTERY,
     DEVICE_CLASS_VOLTAGE,
+    DEVICE_CLASS_BATTERY,
     CONF_UPDATE_INTERVAL,
 )
 
-my_battery_ns = cg.esphome_ns.namespace('battery_sensor')
-MyBatterySensor = my_battery_ns.class_('MyBatterySensor', sensor.Sensor, cg.PollingComponent)
-CONFIG_SCHEMA = sensor.sensor_schema(
-    unit_of_measurement=UNIT_VOLT,
-    icon=ICON_BATTERY,
-    accuracy_decimals=2,
-    device_class=DEVICE_CLASS_VOLTAGE,
-).extend({
-#CONFIG_SCHEMA = sensor.sensor_schema(UNIT_VOLT, ICON_BATTERY, 2, DEVICE_CLASS_VOLTAGE).extend({
+battery_ns = cg.esphome_ns.namespace('battery_sensor')
+MyBatterySensor = battery_ns.class_('MyBatterySensor', sensor.Sensor, cg.PollingComponent)
+MyBatteryPercentageSensor = battery_ns.class_('MyBatteryPercentageSensor', sensor.Sensor, cg.PollingComponent)
+
+CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(MyBatterySensor),
-    cv.Optional(CONF_UPDATE_INTERVAL, default='60s'): cv.update_interval,
+    cv.Optional("percentage"): cv.declare_id(MyBatteryPercentageSensor),
+    cv.Optional(CONF_UPDATE_INTERVAL, default="60s"): cv.update_interval,
 })
 
+
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
-    await cg.register_component(var, config)
-    await sensor.register_sensor(var, config)
+    voltage = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(voltage, config)
+    await sensor.register_sensor(voltage, {
+        "unit_of_measurement": UNIT_VOLT,
+        "icon": ICON_BATTERY,
+        "accuracy_decimals": 2,
+        "device_class": DEVICE_CLASS_VOLTAGE,
+    })
+
+    if "percentage" in config:
+        percent = cg.new_Pvariable(config["percentage"])
+        await cg.register_component(percent, config)
+        await sensor.register_sensor(percent, {
+            "unit_of_measurement": UNIT_PERCENT,
+            "icon": ICON_BATTERY,
+            "accuracy_decimals": 0,
+            "device_class": DEVICE_CLASS_BATTERY,
+        })
