@@ -16,7 +16,7 @@ class MyBatterySensor : public sensor::Sensor, public PollingComponent {
   }
 
   void update() override {
-    float voltage = M5.Power.getBatteryVoltage();  // in volt
+    float voltage = M5.Power.getBatteryVoltage() / 1000.0;  // omrekenen van mV naar V
     ESP_LOGD("battery", "Battery voltage: %.2f V", voltage);
     publish_state(voltage);
   }
