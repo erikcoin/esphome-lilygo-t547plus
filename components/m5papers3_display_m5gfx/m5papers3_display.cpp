@@ -136,7 +136,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
 //   this->canvas_->fillSprite(col);
 //}
 
-void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
+void M5PaperS3DisplayM5GFX::fill(Color color) {
   // Zelfde conversie als hierboven
   uint8_t gray = static_cast<uint8_t>(
     0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b
