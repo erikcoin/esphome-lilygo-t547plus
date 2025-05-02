@@ -9,8 +9,8 @@ from esphome.const import (
     CONF_UPDATE_INTERVAL,
 )
 
-battery_sensor_ns = cg.esphome_ns.namespace('battery_sensor')
-MyBatterySensor = battery_sensor_ns.class_('MyBatterySensor', sensor.Sensor, cg.PollingComponent)
+my_battery_ns = cg.esphome_ns.namespace('battery_sensor')
+MyBatterySensor = my_battery_ns.class_('MyBatterySensor', sensor.Sensor, cg.PollingComponent)
 CONFIG_SCHEMA = sensor.sensor_schema(
     unit_of_measurement=UNIT_VOLT,
     icon=ICON_BATTERY,
