@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL, UNIT_VOLT, ICON_BATTERY, DEVICE_CLASS_VOLTAGE
 
-my_battery_ns = cg.namespace('my_battery')
+my_battery_ns = cg.esphome_ns.namespace('my_battery')
 MyBatterySensor = my_battery_ns.class_('MyBatterySensor', sensor.Sensor, cg.PollingComponent)
 
 CONFIG_SCHEMA = sensor.sensor_schema(UNIT_VOLT, ICON_BATTERY, 2, DEVICE_CLASS_VOLTAGE).extend({
