@@ -5,7 +5,7 @@
 #include <M5Unified.h>
 
 namespace esphome {
-namespace my_battery {
+namespace battery_sensor  {
 
 class MyBatterySensor : public sensor::Sensor, public PollingComponent {
  public:
