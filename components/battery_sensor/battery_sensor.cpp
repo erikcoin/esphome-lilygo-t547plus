@@ -1,7 +1,7 @@
 #include "battery_sensor.h"
 
 namespace esphome {
-namespace my_battery {
+namespace battery_sensor {
 
 // Niks nodig hier, alles zit in de header
 
