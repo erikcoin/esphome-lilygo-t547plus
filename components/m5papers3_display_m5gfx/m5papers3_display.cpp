@@ -34,19 +34,19 @@ if (this->touch_coordinates_sensor != nullptr) {
       delete this->canvas_;
     }
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
-    this->canvas_->setColorDepth(4);
-   // this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
-   // this->canvas_->setPaletteColor(1, TFT_BLACK);  // pixel value 1 = zwart
+    this->canvas_->setColorDepth(1);
+    this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
+    this->canvas_->setPaletteColor(1, TFT_BLACK);  // pixel value 1 = zwart
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
     } else {
             // Palette voor 16 grijstinten instellen
-        for (int i = 0; i < 16; i++) {
-        uint8_t g = 255 - (i * 17);  // 255 -> 0
-        this->canvas_->setPaletteColor(i, gfx.color888(g, g, g));
-        }
-        this->canvas_->setPaletteGrayscale();  // <== DIT IS CRUCIAAL VOOR 4-BIT GRIJS!
+        //for (int i = 0; i < 16; i++) {
+       // uint8_t g = 255 - (i * 17);  // 255 -> 0
+        //this->canvas_->setPaletteColor(i, gfx.color888(g, g, g));
+       // }
+       // this->canvas_->setPaletteGrayscale();  // <== DIT IS CRUCIAAL VOOR 4-BIT GRIJS!
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
 
@@ -137,35 +137,16 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
     return M5.Display.height();
 }
 
-//void M5PaperS3DisplayM5GFX::fill(Color color) {
-//    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
-//   this->canvas_->fillSprite(col);
-//}
-
 void M5PaperS3DisplayM5GFX::fill(Color color) {
-  // Zelfde conversie als hierboven
-  uint8_t gray = static_cast<uint8_t>(
-    0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b
-  );
-  uint8_t gray_4bit = gray >> 4;
-
-  // Vul het hele canvas
-  this->canvas_->fillScreen(gray_4bit);
+    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
+   this->canvas_->fillSprite(col);
 }
 
-//void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-//    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
-//    this->canvas_->drawPixel(x, y, col);
-//}
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-  // Converteer RGB naar luminantie (helderheid) → schaal naar 4-bit (0–15)
-  uint8_t gray = static_cast<uint8_t>(
-    0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b
-  );
-  uint8_t gray_4bit = gray >> 4;  // van 8-bit (0–255) naar 4-bit (0–15)
 
-  // Tekent de pixel met die grijswaarde
-  this->canvas_->drawPixel(x, y, gray_4bit);
+
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+    uint16_t col = (color.raw_32 == 0xFFFFFFFF) ? TFT_WHITE : TFT_BLACK;
+    this->canvas_->drawPixel(x, y, col);
 }
 
 
