@@ -41,6 +41,10 @@ if (this->touch_coordinates_sensor != nullptr) {
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
     } else {
+            // Palette voor 16 grijstinten instellen
+    for (int i = 0; i < 16; i++) {
+        uint8_t g = 255 - (i * 17);  // 255 -> 0
+        this->canvas_->setPaletteColor(i, gfx.color888(g, g, g));
         this->canvas_->setPaletteGrayscale();  // <== DIT IS CRUCIAAL VOOR 4-BIT GRIJS!
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
     }
