@@ -28,21 +28,11 @@ CONFIG_SCHEMA = cv.Schema({
 async def to_code(config):
     voltage = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(voltage, config)
-    await sensor.register_sensor(voltage, {
-        CONF_NAME: config[CONF_NAME],
-        "unit_of_measurement": UNIT_VOLT,
-        "icon": ICON_BATTERY,
-        "accuracy_decimals": 2,
-        "device_class": DEVICE_CLASS_VOLTAGE,
-    })
+    await sensor.register_sensor(voltage, config)
+
 
     if CONF_PERCENTAGE in config:
         percent = cg.new_Pvariable(config[CONF_PERCENTAGE])
         await cg.register_component(percent, config)
-        await sensor.register_sensor(percent, {
-            CONF_NAME: "Battery Percentage",
-            "unit_of_measurement": UNIT_PERCENT,
-            "icon": ICON_BATTERY,
-            "accuracy_decimals": 0,
-            "device_class": DEVICE_CLASS_BATTERY,
-        })
+        await sensor.register_sensor(percent, config)
+
