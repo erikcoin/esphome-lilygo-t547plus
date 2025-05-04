@@ -32,9 +32,9 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
         delay(1000);
     }
 
-    if (this->touch_coordinates_sensor != nullptr) {
+    if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
-        this->touch_coordinates_sensor->publish_state("42,84");
+        this->touch_coordinates_sensor_->publish_state("42,84");
     }
 
     this->gfx_.setRotation(this->rotation_);
@@ -70,7 +70,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
     } else {
          ESP_LOGI(TAG, "Touchscreen initialized.");
          // Setup touch polling interval ONLY if touch is enabled and sensor is set
-         if (this->touch_coordinates_sensor != nullptr) {
+         if (this->touch_coordinates_sensor_ != nullptr) {
              this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
              ESP_LOGI(TAG, "Touch polling interval started.");
          }
@@ -131,7 +131,7 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 
   // ESP_LOGD(TAG, "Raw touch detected via interval at (%d, %d)", point.x, point.y);
 
-  if (this->touch_coordinates_sensor == nullptr) {
+  if (this->touch_coordinates_sensor_ == nullptr) {
     return; // No sensor configured
   }
 
@@ -142,17 +142,17 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
   // This function is called by update_touch when a touch occurs
-  if (this->touch_coordinates_sensor != nullptr) {
+  if (this->touch_coordinates_sensor_ != nullptr) {
     std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y);
-    this->touch_coordinates_sensor->publish_state(coords);
+    this->touch_coordinates_sensor_->publish_state(coords);
     ESP_LOGD(TAG, "Sent touch coordinates: %s", coords.c_str());
 
     // Schedule clearing the state after a delay
     // Use a lambda to capture 'this' correctly
     App.scheduler.set_timeout(this, "clear_touch_sensor", 200, [this]() {
-      if (this->touch_coordinates_sensor != nullptr) {
+      if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Clearing touch coordinates sensor state");
-        this->touch_coordinates_sensor->publish_state("");
+        this->touch_coordinates_sensor_->publish_state("");
       }
     });
   }
@@ -161,7 +161,7 @@ void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
 // Called from Python config
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
   ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
-  this->touch_coordinates_sensor = touch_coordinates_sensor;
+  this->touch_coordinates_sensor_ = touch_coordinates_sensor;
   // Interval timer is now started in setup() after checking M5.Touch.isEnabled()
   // ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
   // this->set_interval("touch_poll", 100, [this]() { this->update_touch(); }); // Moved to setup
@@ -178,7 +178,7 @@ void M5PaperS3DisplayM5GFX::dump_config() /* override */ {
     } else {
         ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized");
     }
-    ESP_LOGCONFIG(TAG, "  Touch Sensor: %s", YESNO(this->touch_coordinates_sensor != nullptr));
+    ESP_LOGCONFIG(TAG, "  Touch Sensor: %s", YESNO(this->touch_coordinates_sensor_ != nullptr));
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() /* override */ {
