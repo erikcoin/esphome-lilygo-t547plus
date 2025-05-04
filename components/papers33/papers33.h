@@ -75,7 +75,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     lgfx::LGFX_Sprite *canvas_{nullptr}; // Corrected type
     std::function<void(display::Display &)> writer_{nullptr};
 
-    //m5gfx::LGFX_Device& gfx_ = M5.Display;
+    m5gfx::LGFX_Device& gfx_ = M5.Display;
 
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
 };
