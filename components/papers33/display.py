@@ -23,7 +23,7 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
 
 CONFIG_SCHEMA = cv.All(
     # Use base Display schema, not FULL_DISPLAY_SCHEMA if not using DisplayBuffer features directly
-    display.DISPLAY_SCHEMA.extend(
+    display.DULL_DISPLAY_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
             cv.Optional(CONF_LAMBDA): cv.returning_lambda, # Standard lambda config
@@ -43,8 +43,8 @@ async def to_code(config):
     await display.register_display(var, config)
 
     # Add libraries
-    cg.add_library("m5stack/M5Unified", ">=0.1.13")
-    cg.add_library("lovyan03/LovyanGFX", ">=1.1.9")
+    #cg.add_library("m5stack/M5Unified", ">=0.1.13")
+    #cg.add_library("lovyan03/LovyanGFX", ">=1.1.9")
 
     # Process lambda
     if CONF_LAMBDA in config:
