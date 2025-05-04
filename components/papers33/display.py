@@ -41,7 +41,7 @@ CONFIG_SCHEMA = cv.All(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    await cg.register_component(var, config) # Register as a component
+    #await cg.register_component(var, config) # Register as a component
     await display.register_display(var, config) # Register as a display
 
     # Add required libraries
