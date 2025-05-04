@@ -15,39 +15,40 @@ from esphome.const import (
 CONF_TOUCH_SENSOR = "touch_coordinates"
 
 # Ensure necessary dependencies are declared for the build system
-# AUTO_LOAD = ["display", "text_sensor"] # text_sensor might be needed if not implicitly loaded
-DEPENDENCIES = ["network"] # Example, M5Unified might need network for some init? Check library deps.
+# "display" dependency is implied by inheriting display.Display
+DEPENDENCIES = ["display", "text_sensor"] # Explicitly depend on text_sensor if used
 
 # Namespace for our C++ code
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
-# Define our C++ class, inheriting from DisplayBuffer now
+# Define our C++ class, inheriting ONLY from display.Display
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.Component, display.Display # Inherit from DisplayBuffer
+    "M5PaperS3DisplayM5GFX", display.Display # Removed cg.Component
 )
 
 CONFIG_SCHEMA = cv.All(
     # Use DISPLAY_SCHEMA which includes basic display props like rotation, update_interval
+    # FULL_DISPLAY_SCHEMA already includes COMPONENT_SCHEMA via DisplayBuffer -> Display -> Component
     display.FULL_DISPLAY_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
             cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
             # Add other config options if needed
         }
-    ).extend(cv.COMPONENT_SCHEMA),
+    ), # Removed .extend(cv.COMPONENT_SCHEMA) as it's redundant
     #cv.require_framework_version(esp_idf=cv.Version(4, 4, 0)), # M5Unified often needs specific IDF
 )
 
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    #await cg.register_component(var, config) # Register as a component
-    await display.register_display(var, config) # Register as a display
+    # Registering as display automatically registers as component
+    await display.register_display(var, config) # Use display registration
 
     # Add required libraries
     # Ensure these versions are compatible with your ESPHome version and each other
     cg.add_library("m5stack/M5Unified", ">=0.1.13") # Specify a version if known good
-    #cg.add_library("lovyan03/LovyanGFX", ">=1.1.9")  # M5GFX depends on LovyanGFX
+    #cg.add_library("lovyan03/LovyanGFX", ">=1.1.9")  # M5GFX depends on LovyanGFX, M5Unified might handle this
 
     # Process lambda first if present
     if CONF_LAMBDA in config:
@@ -58,6 +59,7 @@ async def to_code(config):
 
     # Set rotation if configured
     if CONF_ROTATION in config:
+        # Pass rotation value directly
         cg.add(var.set_rotation(config[CONF_ROTATION]))
 
     # Set touch sensor if configured
@@ -67,7 +69,7 @@ async def to_code(config):
 
     # Optional: If you expose brightness control
     # if CONF_BRIGHTNESS in config:
-    #    cg.add(var.set_brightness(config[CONF_BRIGHTNESS]))
+    #     cg.add(var.set_brightness(config[CONF_BRIGHTNESS]))
 
     # No specific code needed here for grayscale - it's handled in C++ setup
     cg.add_define("USE_M5PAPER_S3_M5GFX") # Optional: Define for conditional compilation if needed elsewhere
