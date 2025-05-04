@@ -23,7 +23,7 @@ m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
 # Define our C++ class, inheriting from DisplayBuffer now
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.Component, display.DisplayBuffer # Inherit from DisplayBuffer
+    "M5PaperS3DisplayM5GFX", cg.Component, display.Display # Inherit from DisplayBuffer
 )
 
 CONFIG_SCHEMA = cv.All(
