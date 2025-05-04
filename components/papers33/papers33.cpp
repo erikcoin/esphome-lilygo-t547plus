@@ -45,7 +45,8 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
       delete this->canvas_;
     }
     // Create sprite using the gfx_ reference
-    this->canvas_ = new lgfx::LGFX_Sprite(M5.Display);
+     auto &gfx = M5.Display;
+    this->canvas_ = new lgfx::LGFX_Sprite(gfx);
     //this->canvas_ = new lgfx::LGFX_Sprite(&this->gfx_);
 
     this->canvas_->setColorDepth(4);
