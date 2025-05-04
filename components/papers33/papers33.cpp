@@ -199,7 +199,7 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
     }
     this->rotation_ = m5gfx_rotation;
     // Apply rotation to the actual display object if it's already initialized
-    if (this->gfx_.isInit()) { // Check if display is initialized
+    if (this->gfx_.width() > 0) { // Check if display is initialized
         this->gfx_.setRotation(this->rotation_);
     }
     // Note: Changing rotation after setup might require canvas recreation
