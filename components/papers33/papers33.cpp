@@ -58,7 +58,7 @@ void M5PaperS3DisplayM5GFX::setup() {
       delete this->canvas_;
     }
     // Use the fully qualified name for LGFX_Sprite
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx); // Corrected type
+    this->canvas_ = new lgfx::LGFX_Sprite(&gfx); // Corrected type
 
     this->canvas_->setColorDepth(4);
     ESP_LOGD(TAG, "Canvas color depth set to 4 bits.");
