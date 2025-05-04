@@ -64,11 +64,11 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
-       // this->touch_coordinates_sensor_->publish_state("42,84");
+        this->touch_coordinates_sensor_->publish_state("42,84");
     }
 
     auto &gfx = M5.Display;
-    //gfx.setRotation(this->rotation_);
+    gfx.setRotation(this->rotation_);
    // ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
 
     if (this->canvas_ != nullptr) {
