@@ -218,7 +218,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() /* override */ {
 void M5PaperS3DisplayM5GFX::fill(Color color) /* override */ {
     if (this->canvas_ == nullptr) return;
     uint8_t palette_index = get_grayscale_palette_index(color);
-    ESP_LOGV(TAG, "fill() called, Color Brightness: %.2f -> Palette Index: %d", color.get_brightness(), palette_index);
+    //ESP_LOGV(TAG, "fill() called, Color Brightness: %.2f -> Palette Index: %d", color.get_brightness(), palette_index);
     this->canvas_->fillSprite(palette_index);
 }
 
