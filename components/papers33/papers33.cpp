@@ -24,10 +24,10 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
     ESP_LOGD(TAG, "M5.begin() finished.");
 
     // Use the gfx_ member reference now
-    this->gfx_.setEpdMode(epd_mode_t::epd_quality);
+    gfx.setEpdMode(epd_mode_t::epd_quality);
     ESP_LOGD(TAG, "EPD Mode set to Quality");
 
-    while (!this->gfx_.isReadable()) {
+    while (!gfx.isReadable()) {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
     }
@@ -37,7 +37,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
         this->touch_coordinates_sensor_->publish_state("42,84");
     }
 
-    this->gfx_.setRotation(this->rotation_);
+    gfx.setRotation(this->rotation_);
     ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
 
 
@@ -88,7 +88,7 @@ void M5PaperS3DisplayM5GFX::update() /* override */ {
     }
 
     // Ensure EPD mode is quality for the update operation
-    this->gfx_.setEpdMode(epd_mode_t::epd_quality);
+    gfx.setEpdMode(epd_mode_t::epd_quality);
 
     if (this->writer_ != nullptr) {
         ESP_LOGV(TAG, "Clearing canvas sprite (fill with index 0 = white)"); // Verbose log level
@@ -101,7 +101,7 @@ void M5PaperS3DisplayM5GFX::update() /* override */ {
         this->canvas_->pushSprite(0, 0);
 
         ESP_LOGV(TAG, "Triggering EPD refresh (display)...");
-        this->gfx_.display(); // Trigger physical update
+        //this->gfx_.display(); // Trigger physical update
 
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
@@ -115,7 +115,7 @@ void M5PaperS3DisplayM5GFX::update() /* override */ {
 bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     m5::touch_point_t tp[1];
     // Use gfx_ reference to get touch data associated with the display instance
-    int touch = this->gfx_.getTouchRaw(tp, 1);
+    int touch = gfx.getTouchRaw(tp, 1);
     if (touch > 0) {
         point->x = tp[0].x;
         point->y = tp[0].y;
