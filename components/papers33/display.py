@@ -26,9 +26,9 @@ CONFIG_SCHEMA = cv.All(
     display.FULL_DISPLAY_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
-            cv.Optional(CONF_LAMBDA): cv.returning_lambda, # Standard lambda config
-            cv.Optional(CONF_ROTATION): cv.int_range(min=0, max=360) | cv.enum(display.DISPLAY_ROTATIONS, upper=True), # Allow degrees or enum
-            cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval, # Standard update interval
+            #cv.Optional(CONF_LAMBDA): cv.returning_lambda, # Standard lambda config
+            #cv.Optional(CONF_ROTATION): cv.int_range(min=0, max=360) | cv.enum(display.DISPLAY_ROTATIONS, upper=True), # Allow degrees or enum
+            #cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval, # Standard update interval
             cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
         }
     ).extend(cv.COMPONENT_SCHEMA),
