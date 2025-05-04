@@ -47,7 +47,7 @@ async def to_code(config):
 
     # Add required libraries
     # Ensure these versions are compatible with your ESPHome version and each other
-    cg.add_library("m5stack/M5Unified", ">=0.1.13") # Specify a version if known good
+    #cg.add_library("m5stack/M5Unified", ">=0.1.13") # Specify a version if known good
     #cg.add_library("lovyan03/LovyanGFX", ">=1.1.9")  # M5GFX depends on LovyanGFX, M5Unified might handle this
 
     # Process lambda first if present
