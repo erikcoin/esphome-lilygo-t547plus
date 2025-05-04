@@ -69,12 +69,12 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     auto &gfx = M5.Display;
     //gfx.setRotation(this->rotation_);
-    ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
+   // ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
 
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
     }
-
+    ESP_LOGD(TAG, "Calculate required memory for the sprite buffer");
     // Calculate required memory for the sprite buffer
     size_t required_bytes = (size_t)gfx.width() * gfx.height() * this->canvas_->getColorDepth() / 8;
     ESP_LOGD(TAG, "Attempting to create canvas sprite %d x %d @ %d bits", gfx.width(), gfx.height(), this->canvas_->getColorDepth());
