@@ -36,7 +36,7 @@ class M5PaperS3DisplayM5GFX : public display::Display, public Component { // Als
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::HARDWARE; }
   void update() override; // Add override
-  ~M5PaperS3DisplayM5GFX() override; // Add override
+  ~M5PaperS3DisplayM5GFX(); //override; // Add override
 
   // --- Display Methods ---
   // These override methods from display::Display
