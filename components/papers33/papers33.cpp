@@ -11,7 +11,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 // Helper function (remains the same)
 static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
-    float brightness = color.get_brightness();
+    float brightness = float brightness = (0.299f * color.r + 0.587f * color.g + 0.114f * color.b) / 255.0f;
     uint8_t index = static_cast<uint8_t>(roundf((1.0f - brightness) * 15.0f));
     return index;
 }
