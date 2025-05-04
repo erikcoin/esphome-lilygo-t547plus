@@ -35,7 +35,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Memory before M5.begin():");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_total_size(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
 
