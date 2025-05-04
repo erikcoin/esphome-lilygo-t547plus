@@ -68,7 +68,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     }
 
     auto &gfx = M5.Display;
-    gfx.setRotation(this->rotation_);
+    //gfx.setRotation(this->rotation_);
     ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
 
     if (this->canvas_ != nullptr) {
