@@ -16,7 +16,7 @@
 
 // Forward declaration for TextSensor
 namespace esphome {
-namespace text_sensor { class TextSensor; }
+//namespace text_sensor { class TextSensor; }
 }
 
 
