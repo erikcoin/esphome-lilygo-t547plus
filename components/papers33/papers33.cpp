@@ -76,7 +76,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     }
     ESP_LOGD(TAG, "Calculate required memory for the sprite buffer");
     // Calculate required memory for the sprite buffer
-    size_t required_bytes = (size_t)gfx.width() * gfx.height() * this->canvas_->getColorDepth() / 8;
+    //size_t required_bytes = (size_t)gfx.width() * gfx.height() * this->canvas_->getColorDepth() / 8;
     ESP_LOGD(TAG, "Attempting to create canvas sprite %d x %d @ %d bits", gfx.width(), gfx.height(), this->canvas_->getColorDepth());
     ESP_LOGD(TAG, "Estimated memory needed for sprite: %u bytes", required_bytes);
      // Log memory status before createSprite
