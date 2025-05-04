@@ -236,9 +236,9 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
     }
     this->rotation_ = m5gfx_rotation;
     // If setup already ran, apply rotation to the display object too
-    if (M5.Display.isInit()) {
-        M5.Display.setRotation(this->rotation_);
-    }
+    //if (M5.Display.isInit()) {
+//        M5.Display.setRotation(this->rotation_);
+//    }
      // And recreate canvas if needed, or just rotate the canvas?
     // Recreating is safest during setup phase. If changed later, might need canvas recreation.
     // LGFX sprites usually inherit rotation but drawing coordinates are affected.
