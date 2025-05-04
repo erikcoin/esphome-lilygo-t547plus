@@ -34,7 +34,6 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
     //cfg.set_psram(true);
     auto cfg = M5.config();
-    cfg.use_psram = true; // Enable PSRAM for M5Unified/LovyanGFX
     M5.begin(cfg);
 
     ESP_LOGD(TAG, "M5.begin() finished.");
