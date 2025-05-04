@@ -71,10 +71,11 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     int rotation_{0};
     // Use the fully qualified name for LGFX_Sprite
     //lgfx::v1::LGFX_Sprite *canvas_{nullptr}; // Corrected type
+    M5GFX gfx;
     lgfx::LGFX_Sprite *canvas_{nullptr}; // Corrected type
     std::function<void(display::Display &)> writer_{nullptr};
 
-    m5gfx::LGFX_Device& gfx_ = M5.Display;
+    //m5gfx::LGFX_Device& gfx_ = M5.Display;
 
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
 };
