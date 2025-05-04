@@ -1,4 +1,4 @@
-#include "m5papers3_display.h" // Use the corrected header
+#include "papers33.h" // Use the corrected header
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/color.h"
