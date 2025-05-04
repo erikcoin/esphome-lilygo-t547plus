@@ -29,7 +29,7 @@ struct TouchPoint {
   uint16_t y;
 };
 
-class M5PaperS3DisplayM5GFX : public display::Display, public Component { // Also inherit Component
+class M5PaperS3DisplayM5GFX : public display::Display { //, public Component { // Also inherit Component
  public:
   // --- Component Lifecycle ---
   void setup() override;
