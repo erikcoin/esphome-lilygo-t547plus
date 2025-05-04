@@ -71,14 +71,14 @@ class M5PaperS3DisplayM5GFX : public display::Display { //, public Component { /
   std::function<void(display::Display &)> writer_{nullptr}; // Lambda for drawing
 
   // Use a reference to the global M5.Display object, initialized by M5.begin()
-  m5gfx::LGFX_Device& gfx_ = M5.Display;
+ // m5gfx::LGFX_Device& gfx_ = M5.Display;
 
   // Touch related members
   text_sensor::TextSensor *touch_coordinates_sensor_{nullptr}; // Sensor entity pointer
   // TouchPoint touch_point_; // Could be local var in update_touch if not needed persistently
 
  // Removed unused members from original header:
- // M5GFX gfx; // Removed, use gfx_ reference instead
+  M5GFX gfx; // Removed, use gfx_ reference instead
  // bool touch_detected_{false};
  // uint16_t touch_x_{0}, touch_y_{0};
  // void draw_absolute_pixel_internal(int x, int y, esphome::Color color); // Not needed for display::Display inheritance with own buffer
