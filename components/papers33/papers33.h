@@ -6,6 +6,7 @@
 #include "esphome/components/display/display.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 // No need for display_buffer.h if inheriting display::Display directly
+#include "esphome/components/display/display_buffer.h"
 
 // Includes for M5GFX and M5Unified
 // These include headers that define LGFX_Sprite, possibly within a namespace like lgfx::v1
