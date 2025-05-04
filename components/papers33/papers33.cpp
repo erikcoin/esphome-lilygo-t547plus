@@ -102,6 +102,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     // This is the call that allocates the main pixel buffer, likely in PSRAM
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
+    bool ok = this->canvas_->createSprite(300, 300);
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (try enabling PSRAM and checking fragmentation?).");
         // Log memory status after failed createSprite
