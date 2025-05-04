@@ -31,12 +31,29 @@ static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
 
 
 void M5PaperS3DisplayM5GFX::setup() {
-    ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
-    //cfg.set_psram(true);
+    // Log memory status before M5.begin()
+    ESP_LOGD(TAG, "Memory before M5.begin():");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
+
     auto cfg = M5.config();
+    cfg.use_psram = true; // Ensure this is true
+    ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
+
     M5.begin(cfg);
 
     ESP_LOGD(TAG, "M5.begin() finished.");
+    // Log memory status after M5.begin()
+    ESP_LOGD(TAG, "Memory after M5.begin():");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
 
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
 
@@ -57,22 +74,53 @@ void M5PaperS3DisplayM5GFX::setup() {
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
     }
+
+    // Calculate required memory for the sprite buffer
+    size_t required_bytes = (size_t)gfx.width() * gfx.height() * this->canvas_->getColorDepth() / 8;
+    ESP_LOGD(TAG, "Attempting to create canvas sprite %d x %d @ %d bits", gfx.width(), gfx.height(), this->canvas_->getColorDepth());
+    ESP_LOGD(TAG, "Estimated memory needed for sprite: %u bytes", required_bytes);
+     // Log memory status before createSprite
+    ESP_LOGD(TAG, "Memory before createSprite:");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
+
     // Use the fully qualified name for LGFX_Sprite
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx); // Corrected type
+    // The new call allocates the sprite object itself, but createSprite allocates the buffer
+    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
 
-    this->canvas_->setColorDepth(4);
-    ESP_LOGD(TAG, "Canvas color depth set to 4 bits.");
+    // After 'new' but before 'createSprite', canvas_ is non-null but the buffer is not allocated
+    if (this->canvas_ == nullptr) {
+         ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself!");
+         // This is a different error than createSprite failing, likely internal RAM issue
+         return; // Cannot proceed if sprite object fails
+    }
 
-    //this->canvas_->setPaletteGrayscale();
-    ESP_LOGD(TAG, "Canvas palette set to grayscale.");
 
+    // This is the call that allocates the main pixel buffer, likely in PSRAM
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
-        ESP_LOGE(TAG, "Failed to create canvas sprite! Check memory (try enabling PSRAM?).");
+        ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (try enabling PSRAM and checking fragmentation?).");
+        // Log memory status after failed createSprite
+        ESP_LOGE(TAG, "Memory after *failed* createSprite:");
+        ESP_LOGE(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+        ESP_LOGE(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+        ESP_LOGE(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+        ESP_LOGE(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
         delete this->canvas_;
-        this->canvas_ = nullptr;
+        this->canvas_ = nullptr; // Set to nullptr so update() knows it failed
     } else {
-        ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
+        ESP_LOGD(TAG, "Canvas sprite buffer created successfully.");
+        // Log memory status after successful createSprite
+        ESP_LOGD(TAG, "Memory after *successful* createSprite:");
+        ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+        ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+        ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+        ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
         this->canvas_->fillSprite(0);
     }
 
@@ -82,7 +130,6 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGI(TAG, "Touchscreen initialized.");
     }
 }
-
 void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
     if (first_time) {
