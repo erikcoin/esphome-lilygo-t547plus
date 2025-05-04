@@ -2,7 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/color.h" // Include for Color definition
-#include <cmath> // Include for roundf
+//#include <cmath> // Include for roundf
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
