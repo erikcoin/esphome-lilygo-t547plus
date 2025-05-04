@@ -23,7 +23,7 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
 
 CONFIG_SCHEMA = cv.All(
     # Use base Display schema, not FULL_DISPLAY_SCHEMA if not using DisplayBuffer features directly
-    display.DULL_DISPLAY_SCHEMA.extend(
+    display.FULL_DISPLAY_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
             cv.Optional(CONF_LAMBDA): cv.returning_lambda, # Standard lambda config
