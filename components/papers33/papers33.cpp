@@ -3,6 +3,7 @@
 #include "esphome/core/application.h"
 #include "esphome/core/color.h" // Include for Color definition
 #include <cmath> // Include for roundf
+#include <algorithm> // Include for std::max (if not using color.gray())
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
@@ -12,11 +13,19 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 // Helper function to convert ESPHome Color to a 4-bit grayscale palette index (0-15)
 // Assumes palette index 0 is white and 15 is black.
 static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
-    // Get brightness (0.0f = black, 1.0f = white)
-    float brightness = color.get_brightness();
-    // Map brightness [0.0, 1.0] to palette index [15, 0]
-    // We invert because palette index 0 is typically white in LovyanGFX grayscale palettes
-    uint8_t index = static_cast<uint8_t>(roundf((1.0f - brightness) * 15.0f));
+    // Use color.gray() which returns a grayscale value (0-255)
+    // 0 = black, 255 = white
+    float gray_value = color.gray(); // Get the grayscale value (0-255)
+
+    // Map gray_value [0, 255] to palette index [15, 0]
+    // gray_value 0 (black) should map to index 15
+    // gray_value 255 (white) should map to index 0
+    float index_float = (255.0f - gray_value) / 255.0f * 15.0f;
+    uint8_t index = static_cast<uint8_t>(roundf(index_float));
+
+    // Ensure index is within bounds [0, 15]
+    index = std::min((uint8_t)15, std::max((uint8_t)0, index));
+
     return index; // Returns 0 for white, 15 for black, and intermediates
 }
 
@@ -39,9 +48,12 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
     }
-    if (this->touch_coordinates_sensor != nullptr) {
+
+    // Correct member name touch_coordinates_sensor_
+    if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
-        this->touch_coordinates_sensor->publish_state("42,84"); // Initial test value
+        // Correct member name touch_coordinates_sensor_
+        this->touch_coordinates_sensor_->publish_state("42,84"); // Initial test value
     }
 
     auto &gfx = M5.Display; // Use reference for convenience
@@ -71,7 +83,7 @@ void M5PaperS3DisplayM5GFX::setup() {
         // Formula for 16 levels from white (255) to black (0)
         // uint8_t level = 255 - (i * 17); // i=0 => 255 (white), i=15 => 0 (black) - Reversed from helper!
         // Let's match the helper: index 0 = white, index 15 = black
-         uint8_t level = (15 - i) * 17; // i=0 => 255 (white), i=15 => 0 (black)
+          uint8_t level = (15 - i) * 17; // i=0 => 255 (white), i=15 => 0 (black)
         // color888 creates a 24-bit color M5GFX understands
         this->canvas_->setPaletteColor(i, gfx.color888(level, level, level));
         ESP_LOGD(TAG, "Palette index %d set to gray level %d", i, level);
@@ -134,10 +146,10 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->pushSprite(0, 0);
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
-        // Trigger the physical E-Paper screen update
-        this->gfx.display();
+        // Correct member name gfx_
+        this->gfx_.display();
         // Optional: Wait for display update to finish if needed for timing
-        // this->gfx.waitDisplay();
+        // this->gfx_.waitDisplay(); // Correct member name gfx_
 
         // Optional: Switch back to a faster mode if subsequent operations need it
         // M5.Display.setEpdMode(epd_mode_t::epd_fast);
@@ -145,14 +157,14 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
         // Optionally, still trigger display if you want the clear to show
         // this->canvas_->pushSprite(0, 0);
-        // this->gfx.display();
+        // this->gfx_.display(); // Correct member name gfx_
     }
 
     // Update touch separately, happens regardless of writer
     update_touch();
 }
 
-// ======= Touch related functions remain the same =======
+// ======= Touch related functions remains the same except member name corrections =======
 bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     m5::touch_point_t tp[1];
     int touch = M5.Display.getTouchRaw(tp, 1);
@@ -173,7 +185,8 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 
   // ESP_LOGD(TAG, "Raw touch detected at (%d, %d)", point.x, point.y); // Logged in get_touch
 
-  if (this->touch_coordinates_sensor == nullptr) {
+  // Correct member name touch_coordinates_sensor_
+  if (this->touch_coordinates_sensor_ == nullptr) {
     // ESP_LOGW(TAG, "Touch coordinates sensor not initialized!"); // Only warn once maybe?
     return;
   }
@@ -182,25 +195,32 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
-  if (this->touch_coordinates_sensor != nullptr) {
+  // Correct member name touch_coordinates_sensor_
+  if (this->touch_coordinates_sensor_ != nullptr) {
     std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y);
-    this->touch_coordinates_sensor->publish_state(coords);
+    // Correct member name touch_coordinates_sensor_
+    this->touch_coordinates_sensor_->publish_state(coords);
     // ESP_LOGV(TAG, "Sending coordinates: %s", coords.c_str()); // Use Verbose
 
     // Clear state after a short delay
-    App.scheduler.set_timeout(this, "clear_touch_sensor", 200, [this]() {
-      if (this->touch_coordinates_sensor != nullptr)
-        this->touch_coordinates_sensor->publish_state("");
+    // Use the correct method for scheduling from Component base class (inherited via Display)
+    this->set_timeout("clear_touch_sensor", 200, [this]() {
+      // Correct member name touch_coordinates_sensor_
+      if (this->touch_coordinates_sensor_ != nullptr)
+        // Correct member name touch_coordinates_sensor_
+        this->touch_coordinates_sensor_->publish_state("");
     });
   }
 }
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
   ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
-  this->touch_coordinates_sensor = touch_coordinates_sensor;
+  // Correct member name touch_coordinates_sensor_
+  this->touch_coordinates_sensor_ = touch_coordinates_sensor;
   ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
 
   // Setup interval polling for touch updates
+  // This calls the set_interval from the Component base class (no longer ambiguous)
   this->set_interval("touch_poll", 100, [this]() { this->update_touch(); }); // Give interval a name
 }
 // ========================================================
@@ -208,7 +228,9 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
 
 void M5PaperS3DisplayM5GFX::dump_config() {
     LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper (4-bit Grayscale)", this);
-    ESP_LOGCONFIG(TAG, "  Rotation: %d degrees", this->rotation_ * 90);
+    // Display rotation in degrees
+    int display_rotation_deg = this->rotation_ * 90;
+    ESP_LOGCONFIG(TAG, "  Rotation: %d degrees", display_rotation_deg);
     // Log canvas info if available
     if (this->canvas_) {
         ESP_LOGCONFIG(TAG, "  Canvas Size: %d x %d", this->canvas_->width(), this->canvas_->height());
@@ -235,33 +257,32 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
         default: m5gfx_rotation = 0; break; // Case 0
     }
     this->rotation_ = m5gfx_rotation;
-    // If setup already ran, apply rotation to the display object too
-    //if (M5.Display.isInit()) {
-//        M5.Display.setRotation(this->rotation_);
-//    }
-     // And recreate canvas if needed, or just rotate the canvas?
-    // Recreating is safest during setup phase. If changed later, might need canvas recreation.
-    // LGFX sprites usually inherit rotation but drawing coordinates are affected.
+    // The actual M5GFX rotation will be applied in setup() or maybe update()
+    // Applying it here might be too early or require canvas recreation.
+    // If M5.Display is already initialized, you *could* set it, but doing it in setup is safer.
+    // If you change rotation dynamically after setup, you'd need to handle canvas recreation.
 }
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
     // Return canvas width if exists, otherwise display width
+    // Note: M5GFX width/height changes based on rotation.
     return (this->canvas_) ? this->canvas_->width() : M5.Display.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() {
     // Return canvas height if exists, otherwise display height
+    // Note: M5GFX width/height changes based on rotation.
     return (this->canvas_) ? this->canvas_->height() : M5.Display.height();
 }
 
-// *** Change 5: Modify fill() to use grayscale mapping ***
+// *** Change 5: Use grayscale mapping ***
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     if (this->canvas_ == nullptr) return;
     uint8_t palette_index = get_grayscale_palette_index(color);
     this->canvas_->fillSprite(palette_index);
 }
 
-// *** Change 6: Modify draw_pixel_at() to use grayscale mapping ***
+// *** Change 6: Use grayscale mapping ***
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     if (this->canvas_ == nullptr) return;
     // Check bounds
