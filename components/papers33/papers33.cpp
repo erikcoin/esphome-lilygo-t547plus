@@ -1,4 +1,4 @@
-#include "papers3.h"
+#include "papers33.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/color.h" // Include for Color definition
