@@ -22,8 +22,8 @@ namespace text_sensor { class TextSensor; }
 }
 
 // Explicitly refer to the v1 namespace LGFX_Sprite
-namespace lgfx { namespace v1 { class LGFX_Sprite; } } // Add explicit v1 forward declaration if needed, or just use the full name
-
+//namespace lgfx { namespace v1 { class LGFX_Sprite; } } // Add explicit v1 forward declaration if needed, or just use the full name
+namespace lgfx { using LGFX_Sprite = ::LGFX_Sprite; }
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
