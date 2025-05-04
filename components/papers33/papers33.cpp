@@ -56,7 +56,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
     ESP_LOGD(TAG, "Canvas palette set to grayscale.");
 
     // Create the sprite buffer in memory
-    bool ok = this->canvas_->createSprite(this->gfx_.width(), this->gfx_.height());
+    bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite! Check memory.");
         delete this->canvas_;
@@ -201,8 +201,8 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
     }
     this->rotation_ = m5gfx_rotation;
     // Apply rotation to the actual display object if it's already initialized
-    if (this->gfx_.width() > 0) { // Check if display is initialized
-        this->gfx_.setRotation(this->rotation_);
+    if (gfx.width() > 0) { // Check if display is initialized
+        gfx.setRotation(this->rotation_);
     }
     // Note: Changing rotation after setup might require canvas recreation
     // if the dimensions change relative to the physical display.
@@ -210,11 +210,11 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
 
 // Use canvas dimensions if available, otherwise fallback to gfx_ dimensions
 int M5PaperS3DisplayM5GFX::get_width_internal() /* override */ {
-    return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
+    return (this->canvas_) ? this->canvas_->width() : gfx.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() /* override */ {
-    return (this->canvas_) ? this->canvas_->height() : this->gfx_.height();
+    return (this->canvas_) ? this->canvas_->height() : gfx.height();
 }
 
 void M5PaperS3DisplayM5GFX::fill(Color color) /* override */ {
