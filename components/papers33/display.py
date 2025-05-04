@@ -23,8 +23,7 @@ m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
 # Define our C++ class, inheriting ONLY from display.Display
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", display.Display # Removed cg.Component
-)
+    "M5PaperS3DisplayM5GFX", cg.Component, display.Display)
 
 CONFIG_SCHEMA = cv.All(
     # Use DISPLAY_SCHEMA which includes basic display props like rotation, update_interval
