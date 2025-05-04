@@ -41,8 +41,8 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 
     auto cfg = M5.config();
-    cfg.use_psram = true; // Ensure this is true
-    ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
+    //cfg.use_psram = true; // Ensure this is true
+   // ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
 
     M5.begin(cfg);
 
