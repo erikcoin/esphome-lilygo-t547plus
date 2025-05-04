@@ -35,7 +35,7 @@ CONFIG_SCHEMA = cv.All(
             # Add other config options if needed
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.require_framework_version(esp_idf=cv.Version(4, 4, 0)), # M5Unified often needs specific IDF
+    #cv.require_framework_version(esp_idf=cv.Version(4, 4, 0)), # M5Unified often needs specific IDF
 )
 
 
