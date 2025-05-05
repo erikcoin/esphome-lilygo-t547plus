@@ -12,14 +12,19 @@ namespace m5papers3_display_m5gfx {
 static const char *const TAG = "m5papers3.display_m5gfx";
 
 // Helper function to convert ESPHome Color to a 4-bit grayscale palette index (0-15)
+//static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
+//    float gray_value = (color.r + color.g + color.b) / 3.0f;
+//    float index_float = (255.0f - gray_value) / 255.0f * 15.0f;
+//    uint8_t index = static_cast<uint8_t>(roundf(index_float));
+//    index = std::min((uint8_t)15, std::max((uint8_t)0, index));
+//    return index;
+//}
 static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
-    float gray_value = (color.r + color.g + color.b) / 3.0f;
-    float index_float = (255.0f - gray_value) / 255.0f * 15.0f;
-    uint8_t index = static_cast<uint8_t>(roundf(index_float));
-    index = std::min((uint8_t)15, std::max((uint8_t)0, index));
+    float brightness = color.get_brightness();
+    // Current logic: Maps brightness [0.0(black), 1.0(white)] to index [15, 0]
+    uint8_t index = static_cast<uint8_t>(roundf((1.0f - brightness) * 15.0f));
     return index;
 }
-
 
 void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Memory before M5.begin():");
