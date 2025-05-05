@@ -9,6 +9,13 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
+    ESP_LOGD(TAG, "Memory before M5.begin():");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_total_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
     auto cfg = M5.config();
     M5.begin(cfg);
     //M5.Display.clearDisplay();
@@ -18,6 +25,14 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
     }
+
+    ESP_LOGD(TAG, "M5.begin() finished.");
+    ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
 if (this->touch_coordinates_sensor != nullptr) {
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
         this->touch_coordinates_sensor->publish_state("42,84");
