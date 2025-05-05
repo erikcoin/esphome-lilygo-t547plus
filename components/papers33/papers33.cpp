@@ -54,7 +54,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 
     ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
-    M5.Display.setEpdMode(epd_mode_t::epd_fast);
+    M5.Display.setEpdMode(epd_mode_t::epd_quality);
     ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
 
     ESP_LOGD(TAG, "Waiting for EPD to be readable...");
@@ -191,7 +191,7 @@ void M5PaperS3DisplayM5GFX::update() {
         return;
     }
 
-    gfx_.setEpdMode(epd_mode_t::epd_quality);
+    this->gfx_.setEpdMode(epd_mode_t::epd_quality);
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
@@ -204,13 +204,13 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->pushSprite(0, 0);
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
-        //this->gfx_.display();
-        gfx_.display();
+        this->gfx_.display();
+        //gfx_.display();
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
     }
 
-    update_touch();
+   // update_touch();
 }
 
 // Touch related functions (no changes needed here from previous correction)
