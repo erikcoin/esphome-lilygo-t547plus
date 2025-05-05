@@ -63,6 +63,7 @@ if (this->touch_coordinates_sensor != nullptr) {
        // }
        // this->canvas_->setPaletteGrayscale();  // <== DIT IS CRUCIAAL VOOR 4-BIT GRIJS!
         ESP_LOGD(TAG, "Canvas created with size: %d x %d", gfx.width(), gfx.height());
+        ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     }
 
     if (!M5.Touch.isEnabled()) {
