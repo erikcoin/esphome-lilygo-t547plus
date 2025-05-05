@@ -195,7 +195,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
-        //this->canvas_->fillSprite(0);
+        this->canvas_->fillSprite(0);
 
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this);
@@ -204,7 +204,7 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->pushSprite(0, 0);
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
-        //this->gfx_.display();
+        this->gfx.display();
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
     }
