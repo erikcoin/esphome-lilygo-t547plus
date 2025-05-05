@@ -49,7 +49,7 @@ if (this->touch_coordinates_sensor != nullptr) {
       delete this->canvas_;
     }
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
-    this->canvas_->setColorDepth(4);
+    this->canvas_->setColorDepth(1);
     //this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
     //this->canvas_->setPaletteColor(1, TFT_BLACK);  // pixel value 1 = zwart
     bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
