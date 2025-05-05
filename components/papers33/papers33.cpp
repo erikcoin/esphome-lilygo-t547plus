@@ -311,7 +311,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
         return;
     }
     uint8_t palette_index = get_grayscale_palette_index(color);
-    ESP_LOGD(TAG, "drawPixel  with color: %d ", palette_index);
+    //ESP_LOGD(TAG, "drawPixel  with color: %d ", palette_index);
     this->canvas_->drawPixel(x, y, palette_index);
 }
 
