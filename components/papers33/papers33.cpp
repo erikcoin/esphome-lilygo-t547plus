@@ -24,10 +24,10 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
     ESP_LOGD(TAG, "M5.begin() finished.");
 
     // Use the gfx_ member reference now
-    gfx.setEpdMode(epd_mode_t::epd_quality);
+    M5.Display.setEpdMode(epd_mode_t::epd_quality);
     ESP_LOGD(TAG, "EPD Mode set to Quality");
 
-    while (!gfx.isReadable()) {
+    while (!M5.Display.isReadable()) {
         ESP_LOGD(TAG, "Waiting for EPD to be ready...");
         delay(1000);
     }
@@ -36,7 +36,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
         ESP_LOGD(TAG, "Publishing test value to touch sensor.");
         this->touch_coordinates_sensor_->publish_state("42,84");
     }
-
+    auto &gfx = M5.Display;
     gfx.setRotation(this->rotation_);
     ESP_LOGD(TAG, "M5GFX Rotation set to: %d", this->rotation_);
 
@@ -45,7 +45,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
       delete this->canvas_;
     }
     // Create sprite using the gfx_ reference
-     auto &gfx = M5.Display;
+     
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
     //this->canvas_ = new lgfx::LGFX_Sprite(&this->gfx_);
 
