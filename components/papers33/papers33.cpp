@@ -54,7 +54,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 
     ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
-    M5.Display.setEpdMode(epd_mode_t::epd_fastest);
+    M5.Display.setEpdMode(epd_mode_t::epd_fast);
     ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
 
     ESP_LOGD(TAG, "Waiting for EPD to be readable...");
