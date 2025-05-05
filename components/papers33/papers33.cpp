@@ -19,9 +19,21 @@ static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
 
 void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/keyword if style requires
     ESP_LOGD(TAG, "Free heap: %d bytes", esp_get_free_heap_size());
+    ESP_LOGD(TAG, "Memory before M5.begin():");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_total_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+
     auto cfg = M5.config();
     M5.begin(cfg);
     ESP_LOGD(TAG, "M5.begin() finished.");
+    ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
 
     // Use the gfx_ member reference now
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
