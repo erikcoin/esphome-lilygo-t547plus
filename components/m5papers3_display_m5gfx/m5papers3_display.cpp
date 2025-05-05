@@ -48,7 +48,7 @@ if (this->touch_coordinates_sensor != nullptr) {
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
     }
-    
+    this->canvas_.setPsram(true);  // <-- DIT IS BELANGRIJK
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
     this->canvas_->setColorDepth(4);
     //this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
