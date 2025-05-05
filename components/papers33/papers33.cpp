@@ -69,7 +69,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Delay finished.");
 
     // Touch block commented out as per user's testing
-    /*
+    
     if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Touch sensor configured, entering touch block...");
         ESP_LOGD(TAG, "Publishing test value to touch sensor...");
@@ -79,7 +79,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Touch sensor not configured, skipping touch block.");
     }
-    */
+    
 
     auto &gfx = M5.Display;
     // Rotation code removed by user
