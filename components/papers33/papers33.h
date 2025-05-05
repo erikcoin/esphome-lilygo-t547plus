@@ -5,7 +5,7 @@
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-// #include "esphome/components/display/display_buffer.h" // Not needed if inheriting Display
+#include "esphome/components/display/display_buffer.h" // Not needed if inheriting Display
 
 // Includes for M5GFX and M5Unified
 #include <M5Unified.h> // For M5.begin() and M5.Display object
