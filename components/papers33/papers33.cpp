@@ -19,12 +19,7 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 //    index = std::min((uint8_t)15, std::max((uint8_t)0, index));
 //    return index;
 //}
-static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
-    float brightness = color.get_brightness();
-    // Current logic: Maps brightness [0.0(black), 1.0(white)] to index [15, 0]
-    uint8_t index = static_cast<uint8_t>(roundf((1.0f - brightness) * 15.0f));
-    return index;
-}
+
 
 void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Memory before M5.begin():");
@@ -305,22 +300,50 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
     return (this->canvas_) ? this->canvas_->height() : M5.Display.height();
 }
 
-void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
+//void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
+//    if (this->canvas_ == nullptr) return;
+//    uint8_t palette_index = get_grayscale_palette_index(color);
+//    ESP_LOGD(TAG, "fillsprite with color: %d ", palette_index);
+//    this->canvas_->fillSprite(palette_index);
+//}
+
+//void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+//    if (this->canvas_ == nullptr) return;
+//    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal()) {
+//        return;
+//    }
+//    uint8_t palette_index = get_grayscale_palette_index(color);
+//    //ESP_LOGD(TAG, "drawPixel  with color: %d ", palette_index);
+//    this->canvas_->drawPixel(x, y, palette_index);
+//}
+void M5PaperS3DisplayM5GFX::fill(Color color) /* override */ {
     if (this->canvas_ == nullptr) return;
-    uint8_t palette_index = get_grayscale_palette_index(color);
-    ESP_LOGD(TAG, "fillsprite with color: %d ", palette_index);
-    this->canvas_->fillSprite(palette_index);
+    // Convert ESPHome Color (r,g,b are 0-255) to RGB888 format (uint32_t)
+    // using the M5GFX helper function available via our gfx_ reference.
+    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
+
+    ESP_LOGV(TAG, "fill() called with RGB888: %x", rgb888_color);
+
+    // Pass the full color value to fillSprite.
+    // The sprite will find the closest match in its active grayscale palette.
+    this->canvas_->fillSprite(rgb888_color);
 }
 
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) /* override */ {
     if (this->canvas_ == nullptr) return;
-    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal()) {
+    // Check bounds using canvas dimensions
+    if (x < 0 || x >= this->canvas_->width() || y < 0 || y >= this->canvas_->height()) {
         return;
     }
-    uint8_t palette_index = get_grayscale_palette_index(color);
-    //ESP_LOGD(TAG, "drawPixel  with color: %d ", palette_index);
-    this->canvas_->drawPixel(x, y, palette_index);
+    // Convert ESPHome Color to RGB888 format
+    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
+
+    // Pass the full color value to drawPixel.
+    // The sprite will find the closest match in its active grayscale palette.
+    this->canvas_->drawPixel(x, y, rgb888_color);
 }
+
+
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
   this->writer_ = writer;
