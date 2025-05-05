@@ -191,11 +191,11 @@ void M5PaperS3DisplayM5GFX::update() {
         return;
     }
 
-    //M5.Display.setEpdMode(epd_mode_t::epd_quality);
+    gfx_.setEpdMode(epd_mode_t::epd_quality);
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
-        this->canvas_->fillSprite(0);
+        this->canvas_->fillSprite(15);
 
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this);
