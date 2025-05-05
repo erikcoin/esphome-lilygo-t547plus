@@ -48,12 +48,13 @@ if (this->touch_coordinates_sensor != nullptr) {
     if (this->canvas_ != nullptr) {
       delete this->canvas_;
     }
+    
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
     this->canvas_->setColorDepth(4);
     //this->canvas_->setPaletteColor(0, TFT_WHITE);  // pixel value 0 = wit
     //this->canvas_->setPaletteColor(1, TFT_BLACK);  // pixel value 1 = zwart
     //bool ok = this->canvas_->createSprite(gfx.width(), gfx.height());
-    bool ok = this->canvas_->createSprite(300, 300, true);
+    bool ok = this->canvas_->createSprite(300, 300);
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite!");
     } else {
