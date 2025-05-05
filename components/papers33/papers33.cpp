@@ -299,7 +299,7 @@ int M5PaperS3DisplayM5GFX::get_height_internal() {
     return (this->canvas_) ? this->canvas_->height() : M5.Display.height();
 }
 
-void M5PaperS3DisplayM5GFX::fill(Color color) {
+void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
     if (this->canvas_ == nullptr) return;
     uint8_t palette_index = get_grayscale_palette_index(color);
     ESP_LOGD(TAG, "fillsprite with color: %d ", palette_index);
