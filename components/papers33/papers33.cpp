@@ -32,8 +32,8 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     ESP_LOGD(TAG, "Calling M5.config()...");
     auto cfg = M5.config();
-    cfg.use_psram = true; // Ensure this is true
-    ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
+   // //cfg.use_psram = true; // Ensure this is true
+   // ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
     ESP_LOGD(TAG, "Calling M5.begin()...");
 
     M5.begin(cfg); // This is where I2C errors are seen in logs
@@ -119,7 +119,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
     this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
     ESP_LOGD(TAG, "new lgfx::v1::LGFX_Sprite() finished.");
-
+    this->canvas_->setPsram(true);  // <-- DIT IS BELANGRIJK
 
     if (this->canvas_ == nullptr) {
          ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
