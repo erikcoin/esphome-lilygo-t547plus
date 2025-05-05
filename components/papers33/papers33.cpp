@@ -195,7 +195,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
-        this->canvas_->fillSprite(4);
+        this->canvas_->fillSprite(15);
 
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this);
