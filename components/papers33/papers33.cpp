@@ -165,7 +165,7 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
 
         ESP_LOGD(TAG, "Calling canvas_->fillSprite()...");
-        this->canvas_->fillSprite(0);
+        //this->canvas_->fillSprite(0);
         ESP_LOGD(TAG, "canvas_->fillSprite() finished.");
     }
 
