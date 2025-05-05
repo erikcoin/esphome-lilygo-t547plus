@@ -49,7 +49,7 @@ void M5PaperS3DisplayM5GFX::setup() /* override */ { // Add override comment/key
     this->canvas_ = new lgfx::LGFX_Sprite(&gfx);
     //this->canvas_ = new lgfx::LGFX_Sprite(&this->gfx_);
 
-    this->canvas_->setColorDepth(4);
+    this->canvas_->setColorDepth(1);
     ESP_LOGD(TAG, "Canvas color depth set to 4 bits.");
 
     this->canvas_->setPaletteGrayscale();
