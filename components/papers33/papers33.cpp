@@ -205,7 +205,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
         //this->gfx_.display();
-        gfx.display();
+        gfx_.display();
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
     }
