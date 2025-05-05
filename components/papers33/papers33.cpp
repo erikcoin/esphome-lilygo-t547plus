@@ -204,7 +204,7 @@ void M5PaperS3DisplayM5GFX::update() {
         this->canvas_->pushSprite(0, 0);
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
-        this->gfx.display();
+        this->gfx_.display();
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
     }
