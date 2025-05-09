@@ -233,12 +233,22 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         return;
     }
 
-    // Push only the affected portion
-    this->canvas_->pushSprite(x, y);
+    // Temporarily store only the affected region
+    LGFX_Sprite temp_canvas;
+    temp_canvas.createSprite(w, h);  // Create a small buffer for partial updates
 
-    // Perform display refresh for the updated region
-    this->gfx_.display(x, y, w, h); // Assuming 'true' allows partial refresh (check your display compatibility)
+    ESP_LOGD(TAG, "Copying existing buffer into temp_canvas...");
+    temp_canvas.fillScreen(0xFFFFFF);  // Clear the temporary buffer
+    temp_canvas.pushImage(0, 0, w, h, this->canvas_->getBuffer() + (y * this->canvas_->width() + x));
+
+    ESP_LOGD(TAG, "Rendering updated partial region...");
+    this->canvas_->pushSprite(x, y);  // Update only the required region
+
+    // Perform partial screen refresh
+    ESP_LOGD(TAG, "Triggering display refresh for the updated area...");
+    this->gfx_.display(x, y, w, h);
 }
+
 
 void M5PaperS3DisplayM5GFX::update_touch() {
   TouchPoint point;
