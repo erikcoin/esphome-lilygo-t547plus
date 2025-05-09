@@ -9,7 +9,7 @@
 
 // Includes for M5GFX and M5Unified
 // These include headers that define LGFX_Sprite, possibly within a namespace like lgfx::v1
-//#include <M5Unified.h> // For M5.begin() and M5.Display object
+#include <M5Unified.h> // For M5.begin() and M5.Display object
 #include <M5GFX.h>      // For LGFX types
 
 // Remove the ambiguous forward declaration
