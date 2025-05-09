@@ -117,21 +117,21 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 
     ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
-    ESP_LOGD(TAG, "new lgfx::v1::LGFX_Sprite() finished.");
-    this->canvas_->setPsram(true);  // <-- DIT IS BELANGRIJK
+    //this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
+    //ESP_LOGD(TAG, "new lgfx::v1::LGFX_Sprite() finished.");
+    //this->canvas_->setPsram(true);  // <-- DIT IS BELANGRIJK
 
-    if (this->canvas_ == nullptr) {
-         ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
-         return;
-    }
+    //if (this->canvas_ == nullptr) {
+    //     ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
+    //     return;
+    //}
 
-    ESP_LOGD(TAG, "Setting canvas color depth to 4 bits...");
-    this->canvas_->setColorDepth(4);
-    ESP_LOGD(TAG, "Canvas color depth set.");
+    //ESP_LOGD(TAG, "Setting canvas color depth to 4 bits...");
+   // this->canvas_->setColorDepth(4);
+   // ESP_LOGD(TAG, "Canvas color depth set.");
 
     ESP_LOGD(TAG, "Setting canvas palette to grayscale...");
-    this->canvas_->setPaletteGrayscale();
+    //this->canvas_->setPaletteGrayscale();
     ESP_LOGD(TAG, "Canvas palette set.");
 
      // Log memory status before createSprite (actual allocation)
@@ -139,15 +139,33 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height); // Log dimensions used
+        // Verify PSRAM availability BEFORE allocating
+    size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    size_t largest_psram_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
 
+    ESP_LOGD(TAG, "Free PSRAM: %u bytes", free_psram);
+    ESP_LOGD(TAG, "Largest PSRAM Free Block: %u bytes", largest_psram_block);
+
+    if (free_psram < required_bytes || largest_psram_block < required_bytes) {
+        ESP_LOGE(TAG, "PSRAM seems fragmented or insufficient!");
+        return;
+    }
+
+    // Allocate the display buffer manually using ESP-IDF heap_caps_malloc()
+    ESP_LOGD(TAG, "Allocating canvas in PSRAM manually...");
+    this->canvas_ = (LGFX_Sprite*) heap_caps_malloc(sizeof(LGFX_Sprite), MALLOC_CAP_SPIRAM);
+
+    if (this->canvas_ == nullptr) {
+        ESP_LOGE(TAG, "Failed to allocate canvas in PSRAM! Defaulting to internal RAM.");
+        this->canvas_ = new LGFX_Sprite(); // Fallback to internal RAM
+    }
+
+    this->canvas_->setPsram(true);
     // This is the call that allocates the main pixel buffer
     bool ok = this->canvas_->createSprite(display_width, display_height); // Use stored dimensions
     ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
-if (!heap_caps_malloc(sizeof(lgfx::v1::LGFX_Sprite), MALLOC_CAP_SPIRAM)) {
-        ESP_LOGE(TAG, "PSRAM allocation failed! Defaulting to internal RAM.");
-    } else {
-        ESP_LOGD(TAG, "Canvas allocated in PSRAM successfully.");
-    }
+
+// Log allocated address to confirm memory type
 ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
 
     if (!ok) {
