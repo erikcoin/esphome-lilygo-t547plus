@@ -237,19 +237,28 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         return;
     }
 
-    // Temporarily store only the affected region
+    // Force temp_canvas to use PSRAM
+    ESP_LOGD(TAG, "Allocating temp_canvas in PSRAM...");
     LGFX_Sprite temp_canvas;
-    temp_canvas.createSprite(w, h);  // Create a small buffer for partial updates
+    
+    temp_canvas.setPsram(true); // Explicitly enable PSRAM usage
+    temp_canvas.createSprite(w, h);
+
+    if (!heap_caps_malloc(sizeof(LGFX_Sprite), MALLOC_CAP_SPIRAM)) {
+        ESP_LOGE(TAG, "Failed to allocate temp_canvas in PSRAM! Defaulting to internal RAM.");
+    } else {
+        ESP_LOGD(TAG, "temp_canvas allocated in PSRAM successfully.");
+    }
 
     ESP_LOGD(TAG, "Copying existing buffer into temp_canvas...");
-    temp_canvas.fillScreen(0xFFFFFF);  // Clear the temporary buffer
+    temp_canvas.fillScreen(0xFFFFFF);
     temp_canvas.pushImage(0, 0, w, h, this->canvas_->getBuffer() + (y * this->canvas_->width() + x));
 
     ESP_LOGD(TAG, "Rendering updated partial region...");
-    this->canvas_->pushSprite(x, y);  // Update only the required region
+    temp_canvas.pushSprite(x, y); // Only push affected region instead of entire sprite
 
     // Perform partial screen refresh
-    ESP_LOGD(TAG, "Triggering display refresh for the updated area...");
+    ESP_LOGD(TAG, "Triggering display refresh for updated area...");
     this->gfx_.display(x, y, w, h);
 }
 
