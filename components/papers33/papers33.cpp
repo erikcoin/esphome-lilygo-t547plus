@@ -148,6 +148,7 @@ if (!heap_caps_malloc(sizeof(lgfx::v1::LGFX_Sprite), MALLOC_CAP_SPIRAM)) {
     } else {
         ESP_LOGD(TAG, "Canvas allocated in PSRAM successfully.");
     }
+ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
 
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
