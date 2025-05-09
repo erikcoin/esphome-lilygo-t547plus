@@ -225,6 +225,21 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     return false;
 }
 
+void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
+    ESP_LOGD(TAG, "Performing partial update for region (%d, %d, %d, %d)", x, y, w, h);
+
+    if (this->canvas_ == nullptr) {
+        ESP_LOGE(TAG, "Canvas not initialized, cannot perform partial update!");
+        return;
+    }
+
+    // Push only the affected portion
+    this->canvas_->pushSprite(x, y, w, h);
+
+    // Perform display refresh for the updated region
+    this->gfx_.display(true); // Assuming 'true' allows partial refresh (check your display compatibility)
+}
+
 void M5PaperS3DisplayM5GFX::update_touch() {
   TouchPoint point;
   if (!this->get_touch(&point)) {
