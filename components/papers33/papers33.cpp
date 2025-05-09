@@ -234,10 +234,10 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
     }
 
     // Push only the affected portion
-    this->canvas_->pushSprite(x, y, w, h);
+    this->canvas_->pushSprite(x, y);
 
     // Perform display refresh for the updated region
-    this->gfx_.display(true); // Assuming 'true' allows partial refresh (check your display compatibility)
+    this->gfx_.display(x, y, w, h); // Assuming 'true' allows partial refresh (check your display compatibility)
 }
 
 void M5PaperS3DisplayM5GFX::update_touch() {
