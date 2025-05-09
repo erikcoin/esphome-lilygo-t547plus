@@ -41,7 +41,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     // --- Add a delay immediately after M5.begin() ---
     ESP_LOGD(TAG, "Adding delay after M5.begin()...");
-    delay(100); // Small delay after M5.begin()
+    vTaskDelay(pdMS_TO_TICKS(100)); //delay(100); // Small delay after M5.begin()
     ESP_LOGD(TAG, "Delay finished.");
     // --------------------------------------------------
 
@@ -60,7 +60,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Waiting for EPD to be readable...");
     while (!M5.Display.isReadable()) {
         ESP_LOGD(TAG, "EPD not readable yet, waiting...");
-        delay(1000);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
     ESP_LOGD(TAG, "EPD is readable.");
 
