@@ -143,7 +143,11 @@ void M5PaperS3DisplayM5GFX::setup() {
     // This is the call that allocates the main pixel buffer
     bool ok = this->canvas_->createSprite(display_width, display_height); // Use stored dimensions
     ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
-
+if (!heap_caps_malloc(sizeof(lgfx::v1::LGFX_Sprite), MALLOC_CAP_SPIRAM)) {
+        ESP_LOGE(TAG, "PSRAM allocation failed! Defaulting to internal RAM.");
+    } else {
+        ESP_LOGD(TAG, "Canvas allocated in PSRAM successfully.");
+    }
 
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
