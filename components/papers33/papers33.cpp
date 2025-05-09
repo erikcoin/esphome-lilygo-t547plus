@@ -36,7 +36,7 @@ void M5PaperS3DisplayM5GFX::setup() {
    // ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
     ESP_LOGD(TAG, "Calling M5.begin()...");
 
-    M5.begin(cfg); // This is where I2C errors are seen in logs
+    //M5.begin(cfg); // This is where I2C errors are seen in logs
     ESP_LOGD(TAG, "M5.begin() finished.");
 
     // --- Add a delay immediately after M5.begin() ---
