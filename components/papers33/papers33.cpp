@@ -101,8 +101,8 @@ void M5PaperS3DisplayM5GFX::setup() {
     // Get display dimensions using gfx
     // *** CRASH LIKELY HAPPENS HERE WHEN CALLING gfx.width() or gfx.height() ***
     ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()..."); // New log before the call
-    int display_width = gfx.width(); // Get dimensions BEFORE allocation test
-    int display_height = gfx.height(); // Get dimensions BEFORE allocation test
+    int display_width = 300;//gfx.width(); // Get dimensions BEFORE allocation test
+    int display_height = 300;//gfx.height(); // Get dimensions BEFORE allocation test
     ESP_LOGD(TAG, "Finished calling gfx.width() and gfx.height(). Display dimensions: %d x %d", display_width, display_height); // Log after and get values again
 
 
