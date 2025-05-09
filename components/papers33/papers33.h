@@ -39,6 +39,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     // --- Component Lifecycle ---
     void setup() override;
     void dump_config() override;
+    void partial_update(int x, int y, int w, int h);
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
