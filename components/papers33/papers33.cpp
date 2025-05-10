@@ -214,18 +214,15 @@ void M5PaperS3DisplayM5GFX::update() {
         return;
     }
 
-    // Apply deep refresh mode to reduce ghosting
-    ESP_LOGD(TAG, "Setting EPD mode to deep refresh...");
-    this->gfx_.setEpdMode(epd_mode_t::epd_quality);
+ESP_LOGD(TAG, "Clearing ghost artifacts using fast refresh mode...");
+this->gfx_.setEpdMode(epd_mode_t::epd_fast);
+this->gfx_.fillScreen(0xFFFFFF);
+this->gfx_.display();
+vTaskDelay(pdMS_TO_TICKS(500));
 
-    // Optional inversion trick to erase ghosting
-    ESP_LOGD(TAG, "Performing inversion trick to clear ghosting...");
-    this->gfx_.fillScreen(0x000000); // Fill black
-    this->gfx_.display();
-    delay(500); // Short delay for inversion effect
-    this->gfx_.fillScreen(0xFFFFFF); // Fill white
-    this->gfx_.display();
-    delay(500);
+ESP_LOGD(TAG, "Switching back to quality refresh...");
+this->gfx_.setEpdMode(epd_mode_t::epd_quality);
+this->gfx_.display();;
 
     // Perform additional full refresh cycles if necessary
     for (int i = 0; i < 2; i++) {
