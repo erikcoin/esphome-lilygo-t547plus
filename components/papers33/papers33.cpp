@@ -214,7 +214,26 @@ void M5PaperS3DisplayM5GFX::update() {
         return;
     }
 
+    // Apply deep refresh mode to reduce ghosting
+    ESP_LOGD(TAG, "Setting EPD mode to deep refresh...");
     this->gfx_.setEpdMode(epd_mode_t::epd_quality);
+
+    // Optional inversion trick to erase ghosting
+    ESP_LOGD(TAG, "Performing inversion trick to clear ghosting...");
+    this->gfx_.fillScreen(0x000000); // Fill black
+    this->gfx_.display();
+    delay(500); // Short delay for inversion effect
+    this->gfx_.fillScreen(0xFFFFFF); // Fill white
+    this->gfx_.display();
+    delay(500);
+
+    // Perform additional full refresh cycles if necessary
+    for (int i = 0; i < 2; i++) {
+        ESP_LOGD(TAG, "Performing full refresh cycle %d...", i + 1);
+        this->gfx_.clear();
+        this->gfx_.display();
+        delay(500);
+    }
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
@@ -228,12 +247,11 @@ void M5PaperS3DisplayM5GFX::update() {
 
         ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
         this->gfx_.display();
-        //gfx_.display();
     } else {
         ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
     }
 
-   // update_touch();
+    ESP_LOGD(TAG, "EPD refresh completed.");
 }
 
 // Touch related functions (no changes needed here from previous correction)
