@@ -215,22 +215,19 @@ void M5PaperS3DisplayM5GFX::update() {
     }
 
 ESP_LOGD(TAG, "Clearing ghost artifacts using fast refresh mode...");
-this->gfx_.setEpdMode(epd_mode_t::epd_fast);
-this->gfx_.fillScreen(0xFFFFFF);
-this->gfx_.display();
-vTaskDelay(pdMS_TO_TICKS(500));
+for (int i = 0; i < 3; i++) {
+    M5.Display.fillScreen(0xAAAAAA);  // Medium gray
+    M5.Display.display();
+    vTaskDelay(pdMS_TO_TICKS(500));
 
-ESP_LOGD(TAG, "Switching back to quality refresh...");
-this->gfx_.setEpdMode(epd_mode_t::epd_quality);
-this->gfx_.display();;
+    M5.Display.fillScreen(0x555555);  // Darker gray
+    M5.Display.display();
+    vTaskDelay(pdMS_TO_TICKS(500));
 
-    // Perform additional full refresh cycles if necessary
-    for (int i = 0; i < 2; i++) {
-        ESP_LOGD(TAG, "Performing full refresh cycle %d...", i + 1);
-        this->gfx_.clear();
-        this->gfx_.display();
-        delay(500);
-    }
+    M5.Display.fillScreen(0xFFFFFF);  // Full white
+    M5.Display.display();
+    vTaskDelay(pdMS_TO_TICKS(500));
+}
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
