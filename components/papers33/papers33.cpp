@@ -94,7 +94,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     // --- Add a delay specifically before getting display dimensions ---
     ESP_LOGD(TAG, "Adding delay before getting display dimensions...");
-    delay(100); // Delay before calling width()/height()
+   // delay(100); // Delay before calling width()/height()
     ESP_LOGD(TAG, "Delay finished.");
     // -----------------------------------------------------------------
 
@@ -140,8 +140,8 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height); // Log dimensions used
         // Verify PSRAM availability BEFORE allocating
-    //size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
-    //size_t largest_psram_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    size_t largest_psram_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
 
     ESP_LOGD(TAG, "Free PSRAM: %u bytes", free_psram);
     ESP_LOGD(TAG, "Largest PSRAM Free Block: %u bytes", largest_psram_block);
