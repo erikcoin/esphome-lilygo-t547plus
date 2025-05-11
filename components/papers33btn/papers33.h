@@ -43,7 +43,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
-
+    void update_button(int index, const std::string &label, uint16_t bg_color, uint16_t text_color);
     // --- Display Methods ---
     void fill(Color color) override;
     int get_width_internal() override;
