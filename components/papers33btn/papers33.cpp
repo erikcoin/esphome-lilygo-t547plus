@@ -3,6 +3,7 @@
 #include "esphome/core/application.h"
 #include "esphome/core/color.h"
 #include <cmath>
+#include <string>
 #include <algorithm> // For std::min and std::max
 #include <esp_heap_caps.h> // Include for heap info functions
 
@@ -31,7 +32,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     button_sprites_[i]->setPsram(true);
     button_sprites_[i]->createSprite(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-    draw_button_(i, ("Btn " + String(i + 1)), TFT_WHITE, TFT_BLACK);
+    draw_button_(i, ("Btn " + std::to_string(i + 1)), TFT_WHITE, TFT_BLACK);
 
     int row = i / 2;
     int col = i % 2;
