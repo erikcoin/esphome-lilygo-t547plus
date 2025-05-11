@@ -56,7 +56,7 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGE(TAG, "Canvas not available in update()!");
         return;
     }
-M5.Display.setEpdMode(epd_mode_t::epd_reset); // Perform a full hardware reset
+M5.Display.setEpdMode(epd_mode_t::epd_fastest); // Perform a full hardware reset
 M5.Display.display();
 vTaskDelay(pdMS_TO_TICKS(1000)); // Give enough time for full refresh
 
