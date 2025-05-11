@@ -251,6 +251,24 @@ for (int i = 0; i < 3; i++) {
     ESP_LOGD(TAG, "EPD refresh completed.");
 }
 
+void M5PaperS3DisplayM5GFX::update_button(int index, const std::string &label, uint16_t bg_color, uint16_t text_color) {
+  if (index < 0 || index >= 6) return;
+
+  auto* spr = button_sprites_[index];
+  if (!spr) return;
+
+  spr->fillScreen(bg_color);
+  spr->setTextColor(text_color);
+  spr->setTextDatum(middle_center);
+  spr->drawString(label.c_str(), BUTTON_WIDTH / 2, BUTTON_HEIGHT / 2);
+
+  int x = (index % 2) * BUTTON_WIDTH;
+  int y = (index / 2) * BUTTON_HEIGHT;
+  spr->pushSprite(x, y);
+
+  this->gfx_.display();  // Optional: only for e-paper
+}
+
 // Touch related functions (no changes needed here from previous correction)
 bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     m5::touch_point_t tp[1];
