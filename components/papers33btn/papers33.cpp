@@ -124,7 +124,7 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     }
     return false;
 }
-void M5PaperS3DisplayM5GFX::draw_button_(int index, const char* label, uint16_t bg_color, uint16_t text_color) {
+void M5PaperS3DisplayM5GFX::draw_button(int index, const char* label, uint16_t bg_color, uint16_t text_color) {
   if (!button_sprites_[index]) return;
 
   auto* spr = button_sprites_[index];
