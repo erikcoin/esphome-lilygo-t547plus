@@ -23,6 +23,12 @@ namespace text_sensor { class TextSensor; }
 // Explicitly refer to the v1 namespace LGFX_Sprite
 namespace lgfx { namespace v1 { class LGFX_Sprite; } } // Add explicit v1 forward declaration if needed, or just use the full name
 
+LGFX_Sprite* button_sprites_[6];
+static constexpr int SCREEN_WIDTH = 560;
+static constexpr int SCREEN_HEIGHT = 940;
+static constexpr int BUTTON_WIDTH = SCREEN_WIDTH / 2;   // 280
+static constexpr int BUTTON_HEIGHT = SCREEN_HEIGHT / 3; // ~313
+
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
