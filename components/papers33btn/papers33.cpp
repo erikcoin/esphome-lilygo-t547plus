@@ -20,186 +20,29 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 //    return index;
 //}
 
-
 void M5PaperS3DisplayM5GFX::setup() {
-    ESP_LOGD(TAG, "Memory before M5.begin():");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_total_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+  ESP_LOGI(TAG, "Initializing M5PaperS3DisplayM5GFX");
+  this->gfx_.begin();
+  this->gfx_.setRotation(0);
+  this->gfx_.setEpdMode(epd_mode_t::epd_fastest);
 
+  for (int i = 0; i < 6; i++) {
+    button_sprites_[i] = new LGFX_Sprite(&gfx_);
+    button_sprites_[i]->setPsram(true);
+    button_sprites_[i]->createSprite(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-    ESP_LOGD(TAG, "Calling M5.config()...");
-    auto cfg = M5.config();
-   // //cfg.use_psram = true; // Ensure this is true
-   // ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
-    ESP_LOGD(TAG, "Calling M5.begin()...");
+    draw_button_(i, ("Btn " + String(i + 1)).c_str(), TFT_WHITE, TFT_BLACK);
 
-    M5.begin(cfg); // This is where I2C errors are seen in logs
-    ESP_LOGD(TAG, "M5.begin() finished.");
+    int row = i / 2;
+    int col = i % 2;
+    int x = col * BUTTON_WIDTH;
+    int y = row * BUTTON_HEIGHT;
+    button_sprites_[i]->pushSprite(x, y);
+  }
 
-    // --- Add a delay immediately after M5.begin() ---
-    ESP_LOGD(TAG, "Adding delay after M5.begin()...");
-    vTaskDelay(pdMS_TO_TICKS(100)); //delay(100); // Small delay after M5.begin()
-    ESP_LOGD(TAG, "Delay finished.");
-    // --------------------------------------------------
-
-
-    ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
-
-    ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
-    M5.Display.setEpdMode(epd_mode_t::epd_quality);
-    ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
-
-    ESP_LOGD(TAG, "Waiting for EPD to be readable...");
-    while (!M5.Display.isReadable()) {
-        ESP_LOGD(TAG, "EPD not readable yet, waiting...");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-    ESP_LOGD(TAG, "EPD is readable.");
-
-    ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
-    delay(500);
-    ESP_LOGD(TAG, "Delay finished.");
-
-    // Touch block commented out as per user's testing
-    
-    if (this->touch_coordinates_sensor_ != nullptr) {
-        ESP_LOGD(TAG, "Touch sensor configured, entering touch block...");
-        ESP_LOGD(TAG, "Publishing test value to touch sensor...");
-        this->touch_coordinates_sensor_->publish_state("42,84");
-        ESP_LOGD(TAG, "Test value published.");
-        ESP_LOGD(TAG, "Exiting touch block.");
-    } else {
-        ESP_LOGD(TAG, "Touch sensor not configured, skipping touch block.");
-    }
-    
-
-    auto &gfx = M5.Display;
-    // Rotation code removed by user
-
-
-    if (this->canvas_ != nullptr) {
-      ESP_LOGD(TAG, "Deleting existing canvas_...");
-      delete this->canvas_;
-      this->canvas_ = nullptr;
-      ESP_LOGD(TAG, "Existing canvas_ deleted.");
-    }
-
-    // --- Add a delay specifically before getting display dimensions ---
-    ESP_LOGD(TAG, "Adding delay before getting display dimensions...");
-   // delay(100); // Delay before calling width()/height()
-    ESP_LOGD(TAG, "Delay finished.");
-    // -----------------------------------------------------------------
-
-    // Get display dimensions using gfx
-    // *** CRASH LIKELY HAPPENS HERE WHEN CALLING gfx.width() or gfx.height() ***
-    ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()..."); // New log before the call
-    int display_width = gfx.width(); // Get dimensions BEFORE allocation test
-    int display_height = gfx.height(); // Get dimensions BEFORE allocation test
-    ESP_LOGD(TAG, "Finished calling gfx.width() and gfx.height(). Display dimensions: %d x %d", display_width, display_height); // Log after and get values again
-
-
-    // Calculate required memory for the sprite buffer (based on retrieved dimensions)
-    size_t required_bytes = (size_t)display_width * display_height * 4 / 8; // Use retrieved dimensions
-    ESP_LOGD(TAG, "Estimated memory needed for sprite buffer (4 bit): %u bytes", required_bytes);
-
-
-     // Log memory status before new LGFX_Sprite
-    ESP_LOGD(TAG, "Memory before new LGFX_Sprite:");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-
-    ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
-    //ESP_LOGD(TAG, "new lgfx::v1::LGFX_Sprite() finished.");
-    this->canvas_->setPsram(true);  // <-- DIT IS BELANGRIJK
-
-    //if (this->canvas_ == nullptr) {
-    //     ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
-    //     return;
-    //}
-
-    //ESP_LOGD(TAG, "Setting canvas color depth to 4 bits...");
-   this->canvas_->setColorDepth(4);
-   // ESP_LOGD(TAG, "Canvas color depth set.");
-
-    ESP_LOGD(TAG, "Setting canvas palette to grayscale...");
-    this->canvas_->setPaletteGrayscale();
-    ESP_LOGD(TAG, "Canvas palette set.");
-
-     // Log memory status before createSprite (actual allocation)
-    ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height); // Log dimensions used
-        // Verify PSRAM availability BEFORE allocating
-    size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
-    size_t largest_psram_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
-
-    ESP_LOGD(TAG, "Free PSRAM: %u bytes", free_psram);
-    ESP_LOGD(TAG, "Largest PSRAM Free Block: %u bytes", largest_psram_block);
-
-  //  if (free_psram < required_bytes || largest_psram_block < required_bytes) {
-  //      ESP_LOGE(TAG, "PSRAM seems fragmented or insufficient!");
-  //      return;
-  //  }
-
-    // Allocate the display buffer manually using ESP-IDF heap_caps_malloc()
-    //ESP_LOGD(TAG, "Allocating canvas in PSRAM manually...");
-    //this->canvas_ = (LGFX_Sprite*) heap_caps_malloc(sizeof(LGFX_Sprite), MALLOC_CAP_SPIRAM);
-
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Failed to allocate canvas in PSRAM! Defaulting to internal RAM.");
-        this->canvas_ = new LGFX_Sprite(); // Fallback to internal RAM
-    }
-
-    this->canvas_->setPsram(true);
-    // This is the call that allocates the main pixel buffer
-    bool ok = this->canvas_->createSprite(display_width, display_height); // Use stored dimensions
-    ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
-
-// Log allocated address to confirm memory type
-ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
-
-    if (!ok) {
-        ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
-        ESP_LOGE(TAG, "Sprite allocation requested size: %d x %d", display_width, display_height); // Log dimensions requested
-        // Log memory status after failed createSprite
-        ESP_LOGE(TAG, "Memory after *failed* createSprite:");
-        ESP_LOGE(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-        ESP_LOGE(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
-        // Cleanup the sprite object itself if buffer allocation failed
-        delete this->canvas_;
-        this->canvas_ = nullptr;
-    } else {
-        ESP_LOGD(TAG, "Canvas sprite buffer created successfully.");
-        ESP_LOGD(TAG, "Sprite allocated with size: %d x %d", this->canvas_->width(), this->canvas_->height());
-        // Log memory status after successful createSprite
-        ESP_LOGD(TAG, "Memory after *successful* createSprite:");
-        ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-        ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
-        //ESP_LOGD(TAG, "Calling canvas_->fillSprite()...");
-        //this->canvas_->fillSprite(0);
-        //ESP_LOGD(TAG, "canvas_->fillSprite() finished.");
-    }
-
-    if (!M5.Touch.isEnabled()) {
-        ESP_LOGW(TAG, "Touchscreen not enabled or GT911 not found.");
-    } else {
-        ESP_LOGI(TAG, "Touchscreen initialized.");
-    }
-     ESP_LOGD(TAG, "End of setup().");
-
+  this->gfx_.display();  // Refresh e-paper
 }
+
 
 void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
@@ -280,33 +123,16 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     }
     return false;
 }
+void M5PaperS3DisplayM5GFX::draw_button_(int index, const char* label, uint16_t bg_color, uint16_t text_color) {
+  if (!button_sprites_[index]) return;
 
-void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
-    ESP_LOGD(TAG, "Performing partial update for region (%d, %d, %d, %d)", x, y, w, h);
-
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Canvas not initialized, cannot perform partial update!");
-        return;
-    }
-
-    // Ensure temp_canvas uses PSRAM
-    LGFX_Sprite temp_canvas;
-    temp_canvas.setPsram(true);  
-    temp_canvas.createSprite(w, h);
-
-    ESP_LOGD(TAG, "Copying existing buffer into temp_canvas...");
-
-    // **Fix: Cast `getBuffer()` to `uint8_t*` before performing arithmetic**
-    uint8_t* buffer_ptr = static_cast<uint8_t*>(this->canvas_->getBuffer());
-
-    temp_canvas.pushImage(0, 0, w, h, buffer_ptr + (y * this->canvas_->width() + x));
-
-    ESP_LOGD(TAG, "Rendering updated partial region...");
-    temp_canvas.pushSprite(x, y); 
-
-    ESP_LOGD(TAG, "Triggering display refresh for updated area...");
-    this->gfx_.display(x, y, w, h);
+  auto* spr = button_sprites_[index];
+  spr->fillScreen(bg_color);
+  spr->setTextColor(text_color);
+  spr->setTextDatum(middle_center);
+  spr->drawString(label, BUTTON_WIDTH / 2, BUTTON_HEIGHT / 2);
 }
+
 
 
 
