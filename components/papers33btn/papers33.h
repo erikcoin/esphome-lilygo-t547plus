@@ -56,7 +56,9 @@ static constexpr int BUTTON_HEIGHT = SCREEN_HEIGHT / 3; // ~313
     int get_width_internal() override;
     int get_height_internal() override;
     void draw_pixel_at(int x, int y, esphome::Color color) override;
-    void draw_button(int index, const char* label, uint16_t bg_color, uint16_t text_color) ;
+   // void draw_button(int index, const char* label, uint16_t bg_color, uint16_t text_color) ;
+    void draw_button_(int index, const std::string &label, uint16_t bg_color, uint16_t text_color);
+
     display::DisplayType get_display_type() override {
         return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
     }
