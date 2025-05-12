@@ -131,7 +131,7 @@ void M5PaperS3DisplayM5GFX::draw_button_(int index, const std::string &label, ui
   spr->fillScreen(bg_color);
   spr->setTextColor(text_color);
   spr->setTextDatum(middle_center);
-  spr->drawString(label, BUTTON_WIDTH / 2, BUTTON_HEIGHT / 2);
+  spr->drawString(label.c_str(), BUTTON_WIDTH / 2, BUTTON_HEIGHT / 2);
 }
 
 
