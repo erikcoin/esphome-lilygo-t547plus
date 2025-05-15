@@ -1,6 +1,8 @@
 import esphome.codegen as cg
 import esphome.components.display as display
-from esphome.components import text_sensor, automation # <-- Import automation
+from esphome.components import text_sensor
+# Corrected import for automation helpers:
+from esphome.components.automation import validate_automation, build_automation
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_ID,
@@ -12,14 +14,13 @@ from esphome.const import (
     CONF_WIDTH,
     CONF_HEIGHT,
     CONF_ON_PRESS,
-    # CONF_ON_RELEASE, # You could add this later
 )
 
 CONF_TOUCH_SENSOR = "touch_coordinates"
-CONF_BUTTONS = "buttons" # New key for button configuration
+CONF_BUTTONS = "buttons"
 
 DEPENDENCIES = ["network"]
-AUTO_LOAD = ["display", "text_sensor", "binary_sensor"] # binary_sensor might be useful if buttons expose state
+AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
 
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
@@ -27,15 +28,13 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
     "M5PaperS3DisplayM5GFX", cg.Component, display.Display
 )
 
-# Schema for a single button
 BUTTON_SCHEMA = cv.Schema({
     cv.Required(CONF_X): cv.int_range(min=0),
     cv.Required(CONF_Y): cv.int_range(min=0),
     cv.Required(CONF_WIDTH): cv.int_range(min=1),
     cv.Required(CONF_HEIGHT): cv.int_range(min=1),
-    cv.Optional(CONF_ON_PRESS): automation.validate_automation(single=True),
-    # cv.Optional(CONF_ON_RELEASE): automation.validate_automation(single=True), # For future
-    # cv.Optional(CONF_ID): cv.declare_id(binary_sensor.BinarySensor), # If you want buttons to be binary_sensors
+    # Use validate_automation directly
+    cv.Optional(CONF_ON_PRESS): validate_automation(single=True),
 })
 
 CONFIG_SCHEMA = cv.All(
@@ -43,7 +42,7 @@ CONFIG_SCHEMA = cv.All(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
             cv.Optional(CONF_TOUCH_SENSOR): cv.use_id(text_sensor.TextSensor),
-            cv.Optional(CONF_BUTTONS): cv.ensure_list(BUTTON_SCHEMA), # List of buttons
+            cv.Optional(CONF_BUTTONS): cv.ensure_list(BUTTON_SCHEMA),
         }
     ).extend(cv.COMPONENT_SCHEMA),
 )
@@ -69,34 +68,25 @@ async def to_code(config):
         touch_sens = await cg.get_variable(config[CONF_TOUCH_SENSOR])
         cg.add(var.set_touch_sensor(touch_sens))
 
-    # Process buttons
     if CONF_BUTTONS in config:
         for i, button_config in enumerate(config[CONF_BUTTONS]):
-            # Create an automation for on_press
             on_press_automation = None
             if CONF_ON_PRESS in button_config:
-                # The trigger type for the automation will be void (no parameters from C++ to automation)
-                # The Automation object itself is what we need to pass to C++
-                # We'll need to create a unique ID for the automation storage in C++
-                # ESPHome handles the actual creation of the Automation object internally
-                # when build_automation is called.
-                # We'll create a C++ Automation<> object that the display component can trigger.
-                auto = cg.new_Pvariable(button_config[CONF_ON_PRESS]) # This is the trigger's config ID
-                await automation.build_automation(
-                    auto, # The Automation object
-                    [],   # Parameters for the lambda in the automation (empty for simple trigger)
-                    button_config[CONF_ON_PRESS] # The automation configuration from YAML
+                auto = cg.new_Pvariable(button_config[CONF_ON_PRESS])
+                # Use build_automation directly
+                await build_automation(
+                    auto,
+                    [],
+                    button_config[CONF_ON_PRESS]
                 )
-                on_press_automation = auto # Store the pointer to the Automation object
+                on_press_automation = auto
 
-            # Add the button to the C++ component
-            # We pass nullptr if no automation is configured
             cg.add(var.add_button(
                 button_config[CONF_X],
                 button_config[CONF_Y],
                 button_config[CONF_WIDTH],
                 button_config[CONF_HEIGHT],
-                on_press_automation if on_press_automation else cg.nullptr # Pass the automation obj or nullptr
+                on_press_automation if on_press_automation else cg.nullptr
             ))
 
     cg.add_define("USE_M5PAPER_S3_M5GFX")
