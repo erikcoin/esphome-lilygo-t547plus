@@ -5,38 +5,40 @@
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-// No need for display_buffer.h if inheriting display::Display directly
+#include "esphome/core/automation.h" // <-- Include for Automation
 
-// Includes for M5GFX and M5Unified
-// These include headers that define LGFX_Sprite, possibly within a namespace like lgfx::v1
-#include <M5Unified.h> // For M5.begin() and M5.Display object
-#include <M5GFX.h>      // For LGFX types
+#include <M5Unified.h>
+#include <M5GFX.h>
 
-// Remove the ambiguous forward declaration
-// namespace lgfx { class LGFX_Sprite; } // REMOVED
+#include <vector> // <-- Include for std::vector
 
-// Forward declaration for TextSensor
 namespace esphome {
 namespace text_sensor { class TextSensor; }
 }
 
-// Explicitly refer to the v1 namespace LGFX_Sprite
-namespace lgfx { namespace v1 { class LGFX_Sprite; } } // Add explicit v1 forward declaration if needed, or just use the full name
+namespace lgfx { namespace v1 { class LGFX_Sprite; } }
 
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-// Custom TouchPoint struct (as provided)
 struct TouchPoint {
     uint16_t x;
     uint16_t y;
 };
 
-// Inherit ONLY from display::Display. display::Display already inherits from Component.
-class M5PaperS3DisplayM5GFX : public display::Display {
+// Structure to hold button data
+struct ButtonConfig {
+    int x;
+    int y;
+    int width;
+    int height;
+    Automation<> *on_press_automation; // Pointer to the automation to trigger
+    // Automation<> *on_release_automation; // For future
+};
+
+class M5PaperS3DisplayM5GFX : public display.Display {
  public:
-    // --- Component Lifecycle ---
     void setup() override;
     void dump_config() override;
     void partial_update(int x, int y, int w, int h);
@@ -44,7 +46,6 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     void update() override;
     ~M5PaperS3DisplayM5GFX();
 
-    // --- Display Methods ---
     void fill(Color color) override;
     int get_width_internal() override;
     int get_height_internal() override;
@@ -54,28 +55,25 @@ class M5PaperS3DisplayM5GFX : public display::Display {
         return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
     }
 
-    // --- Custom Methods ---
     void set_rotation(int rotation);
-    void set_writer(std::function<void(display::Display &)> writer);
-
-    // --- Touch Methods ---
+    void set_writer(std::function<void(display.Display &)> writer);
     void set_touch_sensor(text_sensor::TextSensor *sensor);
 
+    // Method to add a button from generated code
+    void add_button(int x, int y, int width, int height, Automation<> *on_press_automation);
+
  protected:
-    // --- Internal Helper Methods ---
     void update_touch();
     bool get_touch(TouchPoint *point);
-    void send_coordinates(TouchPoint tp);
+    void send_coordinates_and_check_buttons(TouchPoint tp); // Modified to check buttons
 
-    // --- Member Variables ---
     int rotation_{0};
-    // Use the fully qualified name for LGFX_Sprite
-    lgfx::v1::LGFX_Sprite *canvas_{nullptr}; // Corrected type
-    std::function<void(display::Display &)> writer_{nullptr};
-
+    lgfx::v1::LGFX_Sprite *canvas_{nullptr};
+    std::function<void(display.Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
-
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
+
+    std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
 };
 
 } // namespace m5papers3_display_m5gfx
