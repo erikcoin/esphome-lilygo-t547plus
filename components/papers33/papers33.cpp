@@ -3,193 +3,118 @@
 #include "esphome/core/application.h"
 #include "esphome/core/color.h"
 #include <cmath>
-#include <algorithm> // For std::min and std::max
-#include <esp_heap_caps.h> // Include for heap info functions
+#include <algorithm>
+#include <esp_heap_caps.h>
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
 
-// Helper function to convert ESPHome Color to a 4-bit grayscale palette index (0-15)
-//static inline uint8_t get_grayscale_palette_index(esphome::Color color) {
-//    float gray_value = (color.r + color.g + color.b) / 3.0f;
-//    float index_float = (255.0f - gray_value) / 255.0f * 15.0f;
-//    uint8_t index = static_cast<uint8_t>(roundf(index_float));
-//    index = std::min((uint8_t)15, std::max((uint8_t)0, index));
-//    return index;
-//}
-
-
+// ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Memory before M5.begin():");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Total PSRAM: %u bytes", heap_caps_get_total_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
 
     ESP_LOGD(TAG, "Calling M5.config()...");
     auto cfg = M5.config();
-   // //cfg.use_psram = true; // Ensure this is true
-   // ESP_LOGD(TAG, "M5.config().use_psram set to: %s", cfg.use_psram ? "true" : "false");
     ESP_LOGD(TAG, "Calling M5.begin()...");
-
-    M5.begin(cfg); // This is where I2C errors are seen in logs
+    M5.begin(cfg);
     ESP_LOGD(TAG, "M5.begin() finished.");
 
-    // --- Add a delay immediately after M5.begin() ---
     ESP_LOGD(TAG, "Adding delay after M5.begin()...");
-    vTaskDelay(pdMS_TO_TICKS(100)); //delay(100); // Small delay after M5.begin()
+    vTaskDelay(pdMS_TO_TICKS(100));
     ESP_LOGD(TAG, "Delay finished.");
-    // --------------------------------------------------
-
 
     ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
 
     ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
     ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
 
     ESP_LOGD(TAG, "Waiting for EPD to be readable...");
-    while (!M5.Display.isReadable()) {
-        ESP_LOGD(TAG, "EPD not readable yet, waiting...");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-    ESP_LOGD(TAG, "EPD is readable.");
+    // while (!M5.Display.isReadable()) { // This can hang if there's an issue
+    //     ESP_LOGD(TAG, "EPD not readable yet, waiting...");
+    //     vTaskDelay(pdMS_TO_TICKS(1000));
+    // }
+    // ESP_LOGD(TAG, "EPD is readable.");
+    // Consider a timeout or alternative check if isReadable() causes issues
+    vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time
 
     ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
     delay(500);
     ESP_LOGD(TAG, "Delay finished.");
 
-    // Touch block commented out as per user's testing
-    
     if (this->touch_coordinates_sensor_ != nullptr) {
-        ESP_LOGD(TAG, "Touch sensor configured, entering touch block...");
-        ESP_LOGD(TAG, "Publishing test value to touch sensor...");
-        this->touch_coordinates_sensor_->publish_state("42,84");
+        ESP_LOGD(TAG, "Touch sensor configured, publishing test value...");
+        this->touch_coordinates_sensor_->publish_state("test:42,84"); // Indicate test
         ESP_LOGD(TAG, "Test value published.");
-        ESP_LOGD(TAG, "Exiting touch block.");
     } else {
-        ESP_LOGD(TAG, "Touch sensor not configured, skipping touch block.");
+        ESP_LOGD(TAG, "Touch sensor not configured.");
     }
-    
 
     auto &gfx = M5.Display;
-    // Rotation code removed by user
+    // Apply initial rotation to M5.Display IF it's not done by LovyanGFX automatically
+    // This->rotation_ is set via set_rotation which converts degrees to 0-3
+    // M5.Display.setRotation(this->rotation_); // Typically LovyanGFX handles this based on its config or calls
 
 
     if (this->canvas_ != nullptr) {
-      ESP_LOGD(TAG, "Deleting existing canvas_...");
-      delete this->canvas_;
-      this->canvas_ = nullptr;
-      ESP_LOGD(TAG, "Existing canvas_ deleted.");
+        ESP_LOGD(TAG, "Deleting existing canvas_...");
+        delete this->canvas_;
+        this->canvas_ = nullptr;
+        ESP_LOGD(TAG, "Existing canvas_ deleted.");
     }
 
-    // --- Add a delay specifically before getting display dimensions ---
-    ESP_LOGD(TAG, "Adding delay before getting display dimensions...");
-   // delay(100); // Delay before calling width()/height()
-    ESP_LOGD(TAG, "Delay finished.");
-    // -----------------------------------------------------------------
-
-    // Get display dimensions using gfx
-    // *** CRASH LIKELY HAPPENS HERE WHEN CALLING gfx.width() or gfx.height() ***
-    ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()..."); // New log before the call
-    int display_width = gfx.width(); // Get dimensions BEFORE allocation test
-    int display_height = gfx.height(); // Get dimensions BEFORE allocation test
-    ESP_LOGD(TAG, "Finished calling gfx.width() and gfx.height(). Display dimensions: %d x %d", display_width, display_height); // Log after and get values again
+    ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()...");
+    int display_width = gfx.width();
+    int display_height = gfx.height();
+    ESP_LOGD(TAG, "Display dimensions: %d x %d (rotation %d applied to gfx by LovyanGFX)", display_width, display_height, gfx.getRotation());
 
 
-    // Calculate required memory for the sprite buffer (based on retrieved dimensions)
-    size_t required_bytes = (size_t)display_width * display_height * 4 / 8; // Use retrieved dimensions
+    size_t required_bytes = (size_t)display_width * display_height * 4 / 8;
     ESP_LOGD(TAG, "Estimated memory needed for sprite buffer (4 bit): %u bytes", required_bytes);
 
-
-     // Log memory status before new LGFX_Sprite
     ESP_LOGD(TAG, "Memory before new LGFX_Sprite:");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 
     ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx);
-    //ESP_LOGD(TAG, "new lgfx::v1::LGFX_Sprite() finished.");
-    this->canvas_->setPsram(true);  // <-- DIT IS BELANGRIJK
-
-    //if (this->canvas_ == nullptr) {
-    //     ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
-    //     return;
-    //}
-
-    //ESP_LOGD(TAG, "Setting canvas color depth to 4 bits...");
-   this->canvas_->setColorDepth(4);
-   // ESP_LOGD(TAG, "Canvas color depth set.");
-
-    ESP_LOGD(TAG, "Setting canvas palette to grayscale...");
+    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx); // Sprite for the main display
+    if (this->canvas_ == nullptr) {
+        ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
+        return; // Cannot proceed
+    }
+    this->canvas_->setPsram(true);
+    this->canvas_->setColorDepth(4);
     this->canvas_->setPaletteGrayscale();
-    ESP_LOGD(TAG, "Canvas palette set.");
 
-     // Log memory status before createSprite (actual allocation)
     ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height); // Log dimensions used
-        // Verify PSRAM availability BEFORE allocating
-    size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
-    size_t largest_psram_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height);
 
-    ESP_LOGD(TAG, "Free PSRAM: %u bytes", free_psram);
-    ESP_LOGD(TAG, "Largest PSRAM Free Block: %u bytes", largest_psram_block);
-
-  //  if (free_psram < required_bytes || largest_psram_block < required_bytes) {
-  //      ESP_LOGE(TAG, "PSRAM seems fragmented or insufficient!");
-  //      return;
-  //  }
-
-    // Allocate the display buffer manually using ESP-IDF heap_caps_malloc()
-    //ESP_LOGD(TAG, "Allocating canvas in PSRAM manually...");
-    //this->canvas_ = (LGFX_Sprite*) heap_caps_malloc(sizeof(LGFX_Sprite), MALLOC_CAP_SPIRAM);
-
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Failed to allocate canvas in PSRAM! Defaulting to internal RAM.");
-        this->canvas_ = new LGFX_Sprite(); // Fallback to internal RAM
-    }
-
-    this->canvas_->setPsram(true);
-    // This is the call that allocates the main pixel buffer
-    bool ok = this->canvas_->createSprite(display_width, display_height); // Use stored dimensions
+    bool ok = this->canvas_->createSprite(display_width, display_height);
     ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
-
-// Log allocated address to confirm memory type
-ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
+    ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
 
     if (!ok) {
         ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
-        ESP_LOGE(TAG, "Sprite allocation requested size: %d x %d", display_width, display_height); // Log dimensions requested
-        // Log memory status after failed createSprite
+        ESP_LOGE(TAG, "Sprite allocation requested size: %d x %d", display_width, display_height);
         ESP_LOGE(TAG, "Memory after *failed* createSprite:");
         ESP_LOGE(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
         ESP_LOGE(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
-        // Cleanup the sprite object itself if buffer allocation failed
         delete this->canvas_;
         this->canvas_ = nullptr;
     } else {
-        ESP_LOGD(TAG, "Canvas sprite buffer created successfully.");
-        ESP_LOGD(TAG, "Sprite allocated with size: %d x %d", this->canvas_->width(), this->canvas_->height());
-        // Log memory status after successful createSprite
+        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. Size: %d x %d", this->canvas_->width(), this->canvas_->height());
         ESP_LOGD(TAG, "Memory after *successful* createSprite:");
         ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
         ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-
-        //ESP_LOGD(TAG, "Calling canvas_->fillSprite()...");
-        //this->canvas_->fillSprite(0);
-        //ESP_LOGD(TAG, "canvas_->fillSprite() finished.");
+        // this->canvas_->fillSprite(15); // Fill white initially
     }
 
     if (!M5.Touch.isEnabled()) {
@@ -197,72 +122,113 @@ ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
     } else {
         ESP_LOGI(TAG, "Touchscreen initialized.");
     }
-     ESP_LOGD(TAG, "End of setup().");
-
+    ESP_LOGD(TAG, "End of setup().");
 }
 
+
+// Method to add a button (called from generated code)
+void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Automation<> *on_press_automation) {
+    ESP_LOGD(TAG, "Adding button: x=%d, y=%d, w=%d, h=%d, has_action=%s",
+             x, y, width, height, (on_press_automation != nullptr ? "true" : "false"));
+    ButtonConfig button;
+    button.x = x;
+    button.y = y;
+    button.width = width;
+    button.height = height;
+    button.on_press_automation = on_press_automation;
+    this->buttons_.push_back(button);
+}
+
+// ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
     if (first_time) {
         ESP_LOGD(TAG, "Delaying first update for EPD...");
-        delay(1000);
+        delay(1000); // Allow EPD to settle, also good if setup had issues
         first_time = false;
+
+        // Initial clear/refresh sequence (optional, but can help with ghosting from boot)
+        ESP_LOGD(TAG, "Performing initial EPD clear sequence...");
+        M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
+        M5.Display.fillScreen(TFT_WHITE);
+        M5.Display.display();
+        vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full white refresh
+        M5.Display.fillScreen(TFT_BLACK);
+        M5.Display.display();
+        vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full black refresh
+        M5.Display.fillScreen(TFT_WHITE);
+        M5.Display.display();
+        vTaskDelay(pdMS_TO_TICKS(1500));
+        ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
+        M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
     }
+
 
     if (this->canvas_ == nullptr) {
         ESP_LOGE(TAG, "Canvas not available in update()!");
         return;
     }
-M5.Display.setEpdMode(epd_mode_t::epd_reset); // Perform a full hardware reset
-M5.Display.display();
-vTaskDelay(pdMS_TO_TICKS(1000)); // Give enough time for full refresh
 
-ESP_LOGD(TAG, "Clearing ghost artifacts using fast refresh mode...");
-for (int i = 0; i < 3; i++) {
-    M5.Display.fillScreen(0xAAAAAA);  // Medium gray
-    M5.Display.display();
-    vTaskDelay(pdMS_TO_TICKS(500));
-
-    M5.Display.fillScreen(0x555555);  // Darker gray
-    M5.Display.display();
-    vTaskDelay(pdMS_TO_TICKS(500));
-
-    M5.Display.fillScreen(0xFFFFFF);  // Full white
-    M5.Display.display();
-    vTaskDelay(pdMS_TO_TICKS(500));
-}
+    // Your ghost artifact clearing (consider if needed on every update or less frequently)
+    // M5.Display.setEpdMode(epd_mode_t::epd_reset); // Perform a full hardware reset
+    // M5.Display.display();
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // ESP_LOGD(TAG, "Clearing ghost artifacts using fast refresh mode...");
+    // for (int i = 0; i < 1; i++) { // Reduced loops for faster update for now
+    //   M5.Display.fillScreen(0xFFFFFF); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
+    //   M5.Display.fillScreen(0x000000); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
+    //   M5.Display.fillScreen(0xFFFFFF); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
+    // }
+    M5.Display.setEpdMode(epd_mode_t::epd_quality); // Or epd_fast for quicker updates if quality is okay
 
     if (this->writer_ != nullptr) {
-        ESP_LOGD(TAG, "Clearing canvas sprite (fill with index 0 = white)");
-        this->canvas_->fillSprite(15);
+        ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
+        // Assuming palette index 15 is white for 4-bit grayscale.
+        // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
+        this->canvas_->fillSprite(this->gfx_.color888(255, 255, 255));
+
 
         ESP_LOGD(TAG, "Calling writer lambda...");
-        this->writer_(*this);
+        this->writer_(*this); // This is where user draws to the display (this->canvas_)
 
-        ESP_LOGD(TAG, "Pushing sprite to display buffer...");
+        ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
+        // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
         this->canvas_->pushSprite(0, 0);
 
-        ESP_LOGD(TAG, "Triggering EPD refresh (display)...");
-        this->gfx_.display();
+        ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
+        M5.Display.display(); // Tell the EPD to show what's in its buffer
     } else {
-        ESP_LOGD(TAG, "No writer lambda set, skipping drawing.");
+        ESP_LOGD(TAG, "No writer lambda set, skipping drawing. Pushing current canvas content.");
+        // If no writer, we might still want to push the (potentially empty or old) canvas
+        // and refresh the display, or do nothing.
+        // For now, let's assume if no writer, no explicit update is needed beyond initial clear.
+        // However, if there was a partial update, we might want to refresh.
+        // M5.Display.display(); // Uncomment if you want to refresh even without a writer
     }
 
-    ESP_LOGD(TAG, "EPD refresh completed.");
+    ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
 }
 
-// Touch related functions (no changes needed here from previous correction)
+
 bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
-    m5::touch_point_t tp[1];
-    int touch = M5.Display.getTouchRaw(tp, 1);
-    if (touch > 0) {
-        point->x = tp[0].x;
-        point->y = tp[0].y;
+    m5::touch_point_t tp[1]; // M5Unified uses m5::touch_point_t
+    // M5.Display.getTouch uses LovyanGFX's touch system
+    // M5.Touch.getDetail() uses M5Unified's direct touch controller interface
+    
+    // Let's try M5.Touch as it's more abstract from M5Unified
+    if (M5.Touch.getCount() > 0) {
+        auto touch_detail = M5.Touch.getDetail(); // Get primary touch point detail
+        // Check if the point is valid (e.g., within screen bounds, if necessary)
+        // The coordinates from M5.Touch should already be mapped to screen rotation
+        point->x = touch_detail.x;
+        point->y = touch_detail.y;
+        ESP_LOGV(TAG, "Touch detected via M5.Touch: x=%d, y=%d, id=%d, size=%d", touch_detail.x, touch_detail.y, touch_detail.id, touch_detail.size);
         return true;
     }
     return false;
 }
 
+// ... (partial_update() remains the same)
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
     ESP_LOGD(TAG, "Performing partial update for region (%d, %d, %d, %d)", x, y, w, h);
 
@@ -271,149 +237,152 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         return;
     }
 
-    // Ensure temp_canvas uses PSRAM
-    LGFX_Sprite temp_canvas;
-    temp_canvas.setPsram(true);  
-    temp_canvas.createSprite(w, h);
+    // For partial updates on e-paper, we usually draw to the main canvas_
+    // then tell the display to only refresh a portion.
+    // The writer lambda should have already updated the relevant part of this->canvas_
 
-    ESP_LOGD(TAG, "Copying existing buffer into temp_canvas...");
+    ESP_LOGD(TAG, "Pushing partial sprite region from main canvas to display...");
+    // This tells LovyanGFX to copy a portion of the source sprite (this->canvas_)
+    // to the destination (M5.Display) at the given coordinates.
+    this->canvas_->pushSprite(x, y, x, y, w, h);
 
-    // **Fix: Cast `getBuffer()` to `uint8_t*` before performing arithmetic**
-    uint8_t* buffer_ptr = static_cast<uint8_t*>(this->canvas_->getBuffer());
-
-    temp_canvas.pushImage(0, 0, w, h, buffer_ptr + (y * this->canvas_->width() + x));
-
-    ESP_LOGD(TAG, "Rendering updated partial region...");
-    temp_canvas.pushSprite(x, y); 
-
-    ESP_LOGD(TAG, "Triggering display refresh for updated area...");
+    ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
+    // This tells the EPD controller to only update the specified rectangle on the physical screen.
     this->gfx_.display(x, y, w, h);
+    ESP_LOGD(TAG, "Partial EPD refresh initiated for region (%d,%d,%d,%d).",x,y,w,h);
 }
-
 
 
 void M5PaperS3DisplayM5GFX::update_touch() {
   TouchPoint point;
   if (!this->get_touch(&point)) {
+    // No touch or touch released, check for button release actions if implemented
     return;
   }
-
-  if (this->touch_coordinates_sensor_ == nullptr) {
-    return;
-  }
-
-  this->send_coordinates(point);
+  // Touch is active
+  this->send_coordinates_and_check_buttons(point);
 }
 
-void M5PaperS3DisplayM5GFX::send_coordinates(TouchPoint tp) {
-  if (this->touch_coordinates_sensor_ != nullptr) {
-    std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y);
-    this->touch_coordinates_sensor_->publish_state(coords);
+void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
+    bool button_pressed = false;
+    for (const auto& button : this->buttons_) {
+        if (tp.x >= button.x && tp.x < (button.x + button.width) &&
+            tp.y >= button.y && tp.y < (button.y + button.height)) {
+            
+            ESP_LOGD(TAG, "Button pressed: x=%d, y=%d (Touch: %d,%d)", button.x, button.y, tp.x, tp.y);
+            if (button.on_press_automation != nullptr) {
+                button.on_press_automation->trigger(); // Trigger the associated automation
+            }
+            button_pressed = true;
+            // Optional: break here if you only want one button press per touch event,
+            // even if buttons overlap.
+            break; 
+        }
+    }
 
-    this->set_timeout("clear_touch_sensor", 200, [this]() {
-      if (this->touch_coordinates_sensor_ != nullptr)
-        this->touch_coordinates_sensor_->publish_state("");
-    });
-  }
+    if (this->touch_coordinates_sensor_ != nullptr) {
+        std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y) + (button_pressed ? ",B" : ""); // Add ,B if button was hit
+        this->touch_coordinates_sensor_->publish_state(coords);
+
+        // Clear the touch sensor state after a short delay so it acts as an event
+        this->set_timeout("clear_touch_sensor", 200, [this]() {
+            if (this->touch_coordinates_sensor_ != nullptr)
+                this->touch_coordinates_sensor_->publish_state("");
+        });
+    }
 }
+
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
-  ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
-  this->touch_coordinates_sensor_ = touch_coordinates_sensor;
-  ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
+    ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
+    this->touch_coordinates_sensor_ = touch_coordinates_sensor;
+    ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
 
-  this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
+    // Poll for touch at a regular interval
+    this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
 }
-
 
 void M5PaperS3DisplayM5GFX::dump_config() {
     LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper (4-bit Grayscale)", this);
-    int display_rotation_deg = this->rotation_ * 90;
-    ESP_LOGCONFIG(TAG, "  Rotation: %d degrees", display_rotation_deg);
+    int display_rotation_deg = 0;
+    // this->rotation_ stores M5GFX 0-3. Convert back for logging.
+    if (this->rotation_ == 1) display_rotation_deg = 90;
+    else if (this->rotation_ == 2) display_rotation_deg = 180;
+    else if (this->rotation_ == 3) display_rotation_deg = 270;
+    ESP_LOGCONFIG(TAG, "  Rotation (applied to M5.Display): %d degrees (M5GFX value %d)", display_rotation_deg, this->rotation_);
+
     if (this->canvas_) {
-        ESP_LOGCONFIG(TAG, "  Canvas Size: %d x %d", this->canvas_->width(), this->canvas_->height());
+        ESP_LOGCONFIG(TAG, "  Canvas Size: %d x %d (gfx: %dx%d)", this->canvas_->width(), this->canvas_->height(), this->gfx_.width(), this->gfx_.height());
         ESP_LOGCONFIG(TAG, "  Canvas Color Depth: %d bits", this->canvas_->getColorDepth());
     } else {
-        ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized");
+        ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized (gfx: %dx%d)", this->gfx_.width(), this->gfx_.height());
+    }
+    if (this->touch_coordinates_sensor_ != nullptr) {
+        LOG_TEXT_SENSOR("  ", "Touch Coordinates Sensor", this->touch_coordinates_sensor_);
+    }
+    ESP_LOGCONFIG(TAG, "  Configured Buttons: %d", this->buttons_.size());
+    for(const auto& btn : this->buttons_){
+        ESP_LOGCONFIG(TAG, "    Button: x=%d, y=%d, w=%d, h=%d, action=%s", btn.x, btn.y, btn.width, btn.height, (btn.on_press_automation ? "Yes" : "No"));
     }
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
-  if (this->canvas_ != nullptr) {
-    delete this->canvas_;
-    this->canvas_ = nullptr;
-    ESP_LOGD(TAG, "Canvas deleted safely.");
-  }
+    if (this->canvas_ != nullptr) {
+        delete this->canvas_;
+        this->canvas_ = nullptr;
+        ESP_LOGD(TAG, "Canvas deleted safely in destructor.");
+    }
 }
 
-void M5PaperS3DisplayM5GFX::set_rotation(int rotation) {
-    int m5gfx_rotation = 0;
-    switch (rotation) {
-        case 90: m5gfx_rotation = 1; break;
-        case 180: m5gfx_rotation = 2; break;
-        case 270: m5gfx_rotation = 3; break;
-        default: m5gfx_rotation = 0; break; // Case 0 and others map to 0
-    }
-    this->rotation_ = m5gfx_rotation;
+void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
+    int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
+    if (rotation_degrees == 90) m5gfx_rotation_val = 1;
+    else if (rotation_degrees == 180) m5gfx_rotation_val = 2;
+    else if (rotation_degrees == 270) m5gfx_rotation_val = 3;
+    
+    this->rotation_ = m5gfx_rotation_val; // Store our logical rotation
+    ESP_LOGD(TAG, "set_rotation: degrees=%d mapped to M5GFX rotation=%d", rotation_degrees, m5gfx_rotation_val);
+    
+    // It's crucial that M5.Display (the gfx_ object) has its rotation set correctly
+    // because canvas_->createSprite(width, height) will use gfx_.width() and gfx_.height()
+    // which are rotation-dependent.
+    // LovyanGFX usually applies rotation during its own setup or M5.begin().
+    // If you need to change it dynamically AFTER M5.begin(), you'd call:
+    // this->gfx_.setRotation(this->rotation_);
+    // And then you might need to re-create the sprite if its dimensions depend on the display's current rotation.
+    // For simplicity, we assume rotation is set once at startup.
+    // The canvas will be created using the dimensions of the gfx object AFTER M5.begin() has configured it.
 }
+
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
-    // Note: M5GFX width/height changes based on rotation.
-    return (this->canvas_) ? this->canvas_->width() : M5.Display.width();
+    // Width should reflect the canvas dimensions, which are based on M5.Display's rotated dimensions
+    return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() {
-    // Note: M5GFX width/height changes based on rotation.
-    return (this->canvas_) ? this->canvas_->height() : M5.Display.height();
+    return (this->canvas_) ? this->canvas_->height() : this->gfx_.height();
 }
 
-//void M5PaperS3DisplayM5GFX::fill(esphome::Color color) {
-//    if (this->canvas_ == nullptr) return;
-//    uint8_t palette_index = get_grayscale_palette_index(color);
-//    ESP_LOGD(TAG, "fillsprite with color: %d ", palette_index);
-//    this->canvas_->fillSprite(palette_index);
-//}
-
-//void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-//    if (this->canvas_ == nullptr) return;
-//    if (x < 0 || x >= this->get_width_internal() || y < 0 || y >= this->get_height_internal()) {
-//        return;
-//    }
-//    uint8_t palette_index = get_grayscale_palette_index(color);
-//    //ESP_LOGD(TAG, "drawPixel  with color: %d ", palette_index);
-//    this->canvas_->drawPixel(x, y, palette_index);
-//}
-void M5PaperS3DisplayM5GFX::fill(Color color) /* override */ {
+void M5PaperS3DisplayM5GFX::fill(Color color) {
     if (this->canvas_ == nullptr) return;
-    // Convert ESPHome Color (r,g,b are 0-255) to RGB888 format (uint32_t)
-    // using the M5GFX helper function available via our gfx_ reference.
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
-
     ESP_LOGV(TAG, "fill() called with RGB888: %x", rgb888_color);
-
-    // Pass the full color value to fillSprite.
-    // The sprite will find the closest match in its active grayscale palette.
     this->canvas_->fillSprite(rgb888_color);
 }
 
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) /* override */ {
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     if (this->canvas_ == nullptr) return;
-    // Check bounds using canvas dimensions
+    // Bounds check should use canvas dimensions
     if (x < 0 || x >= this->canvas_->width() || y < 0 || y >= this->canvas_->height()) {
         return;
     }
-    // Convert ESPHome Color to RGB888 format
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
-
-    // Pass the full color value to drawPixel.
-    // The sprite will find the closest match in its active grayscale palette.
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
 
-
-
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
-  this->writer_ = writer;
+    this->writer_ = writer;
 }
 
 } // namespace m5papers3_display_m5gfx
