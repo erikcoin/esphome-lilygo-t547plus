@@ -9,7 +9,7 @@ from esphome.const import (
     CONF_LAMBDA,
     CONF_ROTATION,
     CONF_UPDATE_INTERVAL,
-    CONF_X, # Standard coordinate keys
+    CONF_X,
     CONF_Y,
     CONF_WIDTH,
     CONF_HEIGHT,
