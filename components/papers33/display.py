@@ -2,7 +2,7 @@ import esphome.codegen as cg
 import esphome.components.display as display
 from esphome.components import text_sensor
 # Corrected import for automation helpers:
-from esphome.components.automation import validate_automation, build_automation
+from esphome.automation import validate_automation, build_automation
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_ID,
