@@ -29,8 +29,8 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
 )
 
 BUTTON_SCHEMA = cv.Schema({
-    cv.Required(CONF_X): cv.int_range(min=0),
-    cv.Required(CONF_Y): cv.int_range(min=0),
+    cv.Required(CONF_X_GRID): cv.int_range(min=0),
+    cv.Required(CONF_Y_GRID): cv.int_range(min=0),
     cv.Required(CONF_WIDTH): cv.int_range(min=1),
     cv.Required(CONF_HEIGHT): cv.int_range(min=1),
     # Use validate_automation directly
