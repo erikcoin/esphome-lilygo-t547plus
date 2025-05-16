@@ -244,7 +244,8 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
     ESP_LOGD(TAG, "Pushing partial sprite region from main canvas to display...");
     // This tells LovyanGFX to copy a portion of the source sprite (this->canvas_)
     // to the destination (M5.Display) at the given coordinates.
-    this->canvas_->pushSprite(x, y, x, y, w, h);
+    //wellicht hier pushimage() gebruiken.
+    this->canvas_->pushSprite(x, y);
 
     ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
     // This tells the EPD controller to only update the specified rectangle on the physical screen.
@@ -381,7 +382,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
 
-void M5PaperS3DisplayM5GFX::set_writer(std::function<void(display::Display &)> writer) {
+void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
 
