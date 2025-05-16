@@ -130,13 +130,13 @@ void M5PaperS3DisplayM5GFX::setup() {
 void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Automation<> *on_press_automation) {
     ESP_LOGD(TAG, "Adding button: x=%d, y=%d, w=%d, h=%d, has_action=%s",
              x, y, width, height, (on_press_automation != nullptr ? "true" : "false"));
-    ButtonConfig button;
-    button.x = x;
-    button.y = y;
-    button.width = width;
-    button.height = height;
-    button.on_press_automation = on_press_automation;
-    this->buttons_.push_back(button);
+    ButtonConfig button_cfg;
+    button_cfg.x = x;
+    button_cfg.y = y;
+    button_cfg.width = width;
+    button_cfg.height = height;
+    button_cfg.on_press_automation = on_press_automation;
+    this->buttons_.push_back(button_cfg);
 }
 
 // ... (update() method remains largely the same)
@@ -152,15 +152,13 @@ void M5PaperS3DisplayM5GFX::update() {
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
         M5.Display.fillScreen(TFT_WHITE);
         M5.Display.display();
-        delay(1000);
-        //vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full white refresh
+        delay(500);
         M5.Display.fillScreen(TFT_BLACK);
         M5.Display.display();
-        delay(1000);
-        //vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full black refresh
+        delay(500);
         M5.Display.fillScreen(TFT_WHITE);
         M5.Display.display();
-        delay(1000);
+        delay(500);
 //vTaskDelay(pdMS_TO_TICKS(1500));
         ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
@@ -172,18 +170,8 @@ void M5PaperS3DisplayM5GFX::update() {
         return;
     }
 
-    // Your ghost artifact clearing (consider if needed on every update or less frequently)
-    // M5.Display.setEpdMode(epd_mode_t::epd_reset); // Perform a full hardware reset
-    // M5.Display.display();
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // ESP_LOGD(TAG, "Clearing ghost artifacts using fast refresh mode...");
-    // for (int i = 0; i < 1; i++) { // Reduced loops for faster update for now
-    //   M5.Display.fillScreen(0xFFFFFF); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
-    //   M5.Display.fillScreen(0x000000); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
-    //   M5.Display.fillScreen(0xFFFFFF); M5.Display.display(); vTaskDelay(pdMS_TO_TICKS(200));
-    // }
-    M5.Display.setEpdMode(epd_mode_t::epd_quality); // Or epd_fast for quicker updates if quality is okay
 
+ 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
         // Assuming palette index 15 is white for 4-bit grayscale.
@@ -240,15 +228,9 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         return;
     }
 
-    // For partial updates on e-paper, we usually draw to the main canvas_
-    // then tell the display to only refresh a portion.
-    // The writer lambda should have already updated the relevant part of this->canvas_
-
     ESP_LOGD(TAG, "Pushing partial sprite region from main canvas to display...");
-    // This tells LovyanGFX to copy a portion of the source sprite (this->canvas_)
-    // to the destination (M5.Display) at the given coordinates.
     //wellicht hier pushimage() gebruiken.
-    this->canvas_->pushSprite(x, y);
+    this->canvas_->pushSprite(0, 0);
 
     ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
     // This tells the EPD controller to only update the specified rectangle on the physical screen.
@@ -268,40 +250,44 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
-    bool button_pressed = false;
-    for (const auto& button : this->buttons_) {
+    bool button_pressed_handled = false; // Renamed from button_pressed for clarity
+    ESP_LOGD(TAG, "Touch event at x=%d, y=%d. Checking %d buttons.", tp.x, tp.y, this->buttons_.size());
+    for (const auto& button : this->buttons_) { // Iterate ButtonConfig objects
         if (tp.x >= button.x && tp.x < (button.x + button.width) &&
             tp.y >= button.y && tp.y < (button.y + button.height)) {
             
-            ESP_LOGD(TAG, "Button pressed: x=%d, y=%d (Touch: %d,%d)", button.x, button.y, tp.x, tp.y);
-            if (button.on_press_automation != nullptr) {
-                button.on_press_automation->trigger(); // Trigger the associated automation
+            ESP_LOGI(TAG, "Button pressed! Area: x=%d,y=%d,w=%d,h=%d. Touch: x=%d,y=%d",
+                     button.x, button.y, button.width, button.height, tp.x, tp.y);
+            if (button.on_press_automation != nullptr) { // This will now check the stored Automation<>*
+                ESP_LOGD(TAG, "Triggering on_press_automation for the button.");
+                button.on_press_automation->trigger(); // Trigger the associated YAML automation
+            } else {
+                ESP_LOGD(TAG, "Button has no on_press_automation configured (pointer is null).");
             }
-            button_pressed = true;
-            // Optional: break here if you only want one button press per touch event,
-            // even if buttons overlap.
+            button_pressed_handled = true;
             break; 
         }
     }
 
     if (this->touch_coordinates_sensor_ != nullptr) {
-        std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y) + (button_pressed ? ",B" : ""); // Add ,B if button was hit
+        std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y) + (button_pressed_handled ? ",B_HIT" : "");
         this->touch_coordinates_sensor_->publish_state(coords);
+        ESP_LOGD(TAG, "Published to touch_coordinates_sensor: %s", coords.c_str());
 
-        // Clear the touch sensor state after a short delay so it acts as an event
         this->set_timeout("clear_touch_sensor", 200, [this]() {
             if (this->touch_coordinates_sensor_ != nullptr)
                 this->touch_coordinates_sensor_->publish_state("");
         });
     }
+     if (!button_pressed_handled) {
+        ESP_LOGV(TAG, "Touch at x=%d, y=%d did not hit any configured button.", tp.x, tp.y);
+    }
 }
-
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
     ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
     this->touch_coordinates_sensor_ = touch_coordinates_sensor;
     ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
-
     // Poll for touch at a regular interval
     this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
 }
@@ -347,21 +333,12 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     this->rotation_ = m5gfx_rotation_val; // Store our logical rotation
     ESP_LOGD(TAG, "set_rotation: degrees=%d mapped to M5GFX rotation=%d", rotation_degrees, m5gfx_rotation_val);
     
-    // It's crucial that M5.Display (the gfx_ object) has its rotation set correctly
-    // because canvas_->createSprite(width, height) will use gfx_.width() and gfx_.height()
-    // which are rotation-dependent.
-    // LovyanGFX usually applies rotation during its own setup or M5.begin().
-    // If you need to change it dynamically AFTER M5.begin(), you'd call:
-    // this->gfx_.setRotation(this->rotation_);
-    // And then you might need to re-create the sprite if its dimensions depend on the display's current rotation.
-    // For simplicity, we assume rotation is set once at startup.
-    // The canvas will be created using the dimensions of the gfx object AFTER M5.begin() has configured it.
+
 }
 
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
-    // Width should reflect the canvas dimensions, which are based on M5.Display's rotated dimensions
-    return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
+     return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() {
@@ -388,8 +365,8 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
-Trigger<> *M5PaperS3DisplayM5GFX::get_on_press_trigger(int button_index) {
-  return &on_press_triggers_[button_index];  // maakt er eentje aan als hij nog niet bestond
+//Trigger<> *M5PaperS3DisplayM5GFX::get_on_press_trigger(int button_index) {
+//  return &on_press_triggers_[button_index];  // maakt er eentje aan als hij nog niet bestond
 }
 
 } // namespace m5papers3_display_m5gfx
