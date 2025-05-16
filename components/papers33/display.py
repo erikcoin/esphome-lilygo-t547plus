@@ -70,17 +70,22 @@ async def to_code(config):
     
     if CONF_BUTTONS in config:
         for i, button_config in enumerate(config[CONF_BUTTONS]):
-            on_press_automation = None
+            automation_obj = cg.nullptr # Default to nullptr
             if CONF_ON_PRESS in button_config:
-                trigger = var.get_on_press_trigger(i)
-                await build_automation(trigger, [], button_config[CONF_ON_PRESS])
-
+                # Create a Pvariable for the Automation object using its config ID
+                automation_obj = cg.new_Pvariable(button_config[CONF_ON_PRESS])
+                # Build/configure this automation object
+                await build_automation(
+                    automation_obj, 
+                    [],     
+                    button_config[CONF_ON_PRESS]
+                )
             cg.add(var.add_button(
                 button_config[CONF_X_GRID],
                 button_config[CONF_Y_GRID],
                 button_config[CONF_WIDTH],
                 button_config[CONF_HEIGHT],
-                on_press_automation if on_press_automation else cg.nullptr
+                automation_obj
             ))
 
     cg.add_define("USE_M5PAPER_S3_M5GFX")
