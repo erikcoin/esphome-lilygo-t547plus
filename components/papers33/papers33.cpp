@@ -60,7 +60,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     // Apply initial rotation to M5.Display IF it's not done by LovyanGFX automatically
     // This->rotation_ is set via set_rotation which converts degrees to 0-3
     // M5.Display.setRotation(this->rotation_); // Typically LovyanGFX handles this based on its config or calls
-
+    this->on_press_triggers_[i] = Trigger<>();
 
     if (this->canvas_ != nullptr) {
         ESP_LOGD(TAG, "Deleting existing canvas_...");
@@ -384,6 +384,9 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
+}
+Trigger<> *M5PaperS3DisplayM5GFX::get_on_press_trigger(int button_index) {
+  return &on_press_triggers_[button_index];  // maakt er eentje aan als hij nog niet bestond
 }
 
 } // namespace m5papers3_display_m5gfx
