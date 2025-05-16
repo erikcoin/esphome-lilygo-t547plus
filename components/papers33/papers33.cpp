@@ -152,13 +152,16 @@ void M5PaperS3DisplayM5GFX::update() {
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
         M5.Display.fillScreen(TFT_WHITE);
         M5.Display.display();
-        vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full white refresh
+        delay(1000);
+        //vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full white refresh
         M5.Display.fillScreen(TFT_BLACK);
         M5.Display.display();
-        vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full black refresh
+        delay(1000);
+        //vTaskDelay(pdMS_TO_TICKS(1500)); // Longer delay for full black refresh
         M5.Display.fillScreen(TFT_WHITE);
         M5.Display.display();
-        vTaskDelay(pdMS_TO_TICKS(1500));
+        delay(1000);
+//vTaskDelay(pdMS_TO_TICKS(1500));
         ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
     }
