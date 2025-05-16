@@ -79,8 +79,8 @@ async def to_code(config):
                 )
 
             cg.add(var.add_button(
-                button_config[CONF_X],
-                button_config[CONF_Y],
+                button_config[CONF_X_GRID],
+                button_config[CONF_Y_GRID],
                 button_config[CONF_WIDTH],
                 button_config[CONF_HEIGHT],
                 on_press_automation if on_press_automation else cg.nullptr
