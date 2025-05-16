@@ -74,7 +74,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
 
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
-    std::map<int, Trigger<>> on_press_triggers_{};
+    //std::map<int, Trigger<>> on_press_triggers_{};
 };
 
 } // namespace m5papers3_display_m5gfx
