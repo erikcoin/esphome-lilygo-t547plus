@@ -56,7 +56,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     }
 
     void set_rotation(int rotation);
-    void set_writer(std::function<void(display.Display &)> writer);
+    void set_writer(std::function<void(display::Display &)> writer);
     void set_touch_sensor(text_sensor::TextSensor *sensor);
 
     // Method to add a button from generated code
