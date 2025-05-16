@@ -67,19 +67,16 @@ async def to_code(config):
     if CONF_TOUCH_SENSOR in config:
         touch_sens = await cg.get_variable(config[CONF_TOUCH_SENSOR])
         cg.add(var.set_touch_sensor(touch_sens))
-
+    
     if CONF_BUTTONS in config:
         for i, button_config in enumerate(config[CONF_BUTTONS]):
             on_press_automation = None
             if CONF_ON_PRESS in button_config:
-                auto = cg.new_Pvariable(button_config[CONF_ON_PRESS])
-                # Use build_automation directly
-                await build_automation(
-                    auto,
+                on_press_automation = await build_automation(
+                    var.get_on_press_trigger(i),
                     [],
                     button_config[CONF_ON_PRESS]
                 )
-                on_press_automation = auto
 
             cg.add(var.add_button(
                 button_config[CONF_X],
