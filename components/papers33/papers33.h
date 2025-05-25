@@ -5,12 +5,12 @@
 #include "esphome/core/log.h"
 #include "esphome/components/display/display.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-#include "esphome/core/automation.h" // <-- Include for Automation
+#include "esphome/core/automation.h" 
 
 #include <M5Unified.h>
 #include <M5GFX.h>
 
-#include <vector> // <-- Include for std::vector
+#include <vector> 
 
 namespace esphome {
 namespace text_sensor { class TextSensor; }
@@ -45,6 +45,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
+    Trigger<> *make_button_trigger();
+    void add_button(int x, int y, int width, int height, Trigger<> *trigger);
     //Trigger<> *get_on_press_trigger(int button_index);
     void fill(Color color) override;
     int get_width_internal() override;
