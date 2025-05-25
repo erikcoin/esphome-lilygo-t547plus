@@ -364,12 +364,12 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 void M5PaperS3Display::loop() {
     M5.update();
     TouchPoint_t t = M5.Touch.getTouchPointRaw();
-  if (t.isPressed()) {
-    last_touch_ = touch::TouchPoint(t.x, t.y);
-    touch_sensor_->publish_state("touch");
-  } else {
-    last_touch_ = touch::TouchPoint::none();
-  }
+    if (t.isPressed()) {
+        last_touch_ = touch::TouchPoint(t.x, t.y);
+        touch_sensor_->publish_state("touch");
+    } else {
+        last_touch_ = touch::TouchPoint::none();
+    }
 }
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
