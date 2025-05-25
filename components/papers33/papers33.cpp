@@ -258,9 +258,9 @@ void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
             
             ESP_LOGI(TAG, "Button pressed! Area: x=%d,y=%d,w=%d,h=%d. Touch: x=%d,y=%d",
                      button.x, button.y, button.width, button.height, tp.x, tp.y);
-            if (button.on_press_automation != nullptr) { // This will now check the stored Automation<>*
+            if (button.trigger‎ != nullptr) { // This will now check the stored Automation<>*
                 ESP_LOGD(TAG, "Triggering on_press_automation for the button.");
-                button.on_press_automation->trigger(); // Trigger the associated YAML automation
+                button.trigger‎->trigger(); // Trigger the associated YAML automation
             } else {
                 ESP_LOGD(TAG, "Button has no on_press_automation configured (pointer is null).");
             }
@@ -312,7 +312,7 @@ void M5PaperS3DisplayM5GFX::dump_config() {
     }
     ESP_LOGCONFIG(TAG, "  Configured Buttons: %d", this->buttons_.size());
     for(const auto& btn : this->buttons_){
-        ESP_LOGCONFIG(TAG, "    Button: x=%d, y=%d, w=%d, h=%d, action=%s", btn.x, btn.y, btn.width, btn.height, (btn.on_press_automation ? "Yes" : "No"));
+        ESP_LOGCONFIG(TAG, "    Button: x=%d, y=%d, w=%d, h=%d, action=%s", btn.x, btn.y, btn.width, btn.height, (btn.trigger ? "Yes" : "No"));
     }
 }
 
@@ -361,7 +361,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
-/void M5PaperS3Display::loop() {
+void M5PaperS3Display::loop() {
 if (button_cfg.trigger != nullptr) {
     button_cfg.trigger->trigger();
 }
