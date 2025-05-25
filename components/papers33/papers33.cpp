@@ -19,6 +19,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     ESP_LOGD(TAG, "Calling M5.config()...");
     auto cfg = M5.config();
+    cfg.internal_touch = true;
     ESP_LOGD(TAG, "Calling M5.begin()...");
     M5.begin(cfg);
     ESP_LOGD(TAG, "M5.begin() finished.");
