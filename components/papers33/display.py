@@ -67,25 +67,26 @@ async def to_code(config):
     if CONF_TOUCH_SENSOR in config:
         touch_sens = await cg.get_variable(config[CONF_TOUCH_SENSOR])
         cg.add(var.set_touch_sensor(touch_sens))
-    
+
     if CONF_BUTTONS in config:
         for i, button_config in enumerate(config[CONF_BUTTONS]):
-            automation_obj = cg.nullptr # Default to nullptr
+            on_press_automation = None
             if CONF_ON_PRESS in button_config:
-                # Create a Pvariable for the Automation object using its config ID
-                automation_obj = cg.new_Pvariable(button_config[CONF_ON_PRESS])
-                # Build/configure this automation object
+                auto = cg.new_Pvariable(button_config[CONF_ON_PRESS])
+                # Use build_automation directly
                 await build_automation(
-                    automation_obj, 
-                    [],     
+                    auto,
+                    [],
                     button_config[CONF_ON_PRESS]
                 )
+                on_press_automation = auto
+
             cg.add(var.add_button(
-                button_config[CONF_X_GRID],
-                button_config[CONF_Y_GRID],
+                button_config[CONF_X],
+                button_config[CONF_Y],
                 button_config[CONF_WIDTH],
                 button_config[CONF_HEIGHT],
-                automation_obj
+                on_press_automation if on_press_automation else cg.nullptr
             ))
 
     cg.add_define("USE_M5PAPER_S3_M5GFX")
