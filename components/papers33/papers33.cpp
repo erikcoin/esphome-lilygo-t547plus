@@ -376,7 +376,7 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 }
 //Trigger<> *M5PaperS3DisplayM5GFX::get_on_press_trigger(int button_index) {
 //  return &on_press_triggers_[button_index];  // maakt er eentje aan als hij nog niet bestond
-}
+//}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
