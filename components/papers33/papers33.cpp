@@ -350,10 +350,8 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
-void M5PaperS3Display::loop() {
-if (button_cfg.trigger != nullptr) {
-    button_cfg.trigger->trigger();
-}
+void M5PaperS3DisplayM5GFX::loop() {
+this->update_touch();
 }
 //    M5.update();
 //   TouchPoint_t t = M5.Touch.getTouchPointRaw();
