@@ -33,7 +33,8 @@ struct ButtonConfig {
     int y;
     int width;
     int height;
-    Automation<> *on_press_automation; // Pointer to the automation to trigger
+    Trigger<> *trigger = nullptr;
+    //Automation<> *on_press_automation; // Pointer to the automation to trigger
     // Automation<> *on_release_automation; // For future
 };
 
