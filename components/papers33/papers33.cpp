@@ -198,6 +198,8 @@ void M5PaperS3DisplayM5GFX::update() {
     }
 
     ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
+this->update_touch();
+
 }
 
 
@@ -240,34 +242,34 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
 
 
 void M5PaperS3DisplayM5GFX::update_touch() {
-  TouchPoint point;
-  if (!this->get_touch(&point)) {
-    // No touch or touch released, check for button release actions if implemented
-    return;
-  }
-  // Touch is active
-  this->send_coordinates_and_check_buttons(point);
+    TouchPoint tp;
+    if (this->get_touch(&tp)) {
+        ESP_LOGD(TAG, "Touch at x=%d, y=%d", tp.x, tp.y);
+        if (this->touch_coordinates_sensor_ != nullptr) {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "%d,%d", tp.x, tp.y);
+            this->touch_coordinates_sensor_->publish_state(buf);
+        }
+        this->send_coordinates_and_check_buttons(tp);
+    }
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
-    bool button_pressed_handled = false; // Renamed from button_pressed for clarity
-    ESP_LOGD(TAG, "Touch event at x=%d, y=%d. Checking %d buttons.", tp.x, tp.y, this->buttons_.size());
-    for (const auto& button : this->buttons_) { // Iterate ButtonConfig objects
-        if (tp.x >= button.x && tp.x < (button.x + button.width) &&
-            tp.y >= button.y && tp.y < (button.y + button.height)) {
-            
-            ESP_LOGI(TAG, "Button pressed! Area: x=%d,y=%d,w=%d,h=%d. Touch: x=%d,y=%d",
-                     button.x, button.y, button.width, button.height, tp.x, tp.y);
-            if (button.trigger‎ != nullptr) { // This will now check the stored Automation<>*
-                ESP_LOGD(TAG, "Triggering on_press_automation for the button.");
-                button.trigger‎->trigger(); // Trigger the associated YAML automation
+    for (auto &button : this->buttons_) {
+        bool within_x = tp.x >= button.x && tp.x <= (button.x + button.width);
+        bool within_y = tp.y >= button.y && tp.y <= (button.y + button.height);
+        if (within_x && within_y) {
+            ESP_LOGI(TAG, "Touch inside button area at (%d, %d, %d, %d)", button.x, button.y, button.width, button.height);
+            if (button.trigger != nullptr) {
+                ESP_LOGI(TAG, "Triggering button action...");
+                button.trigger->trigger();  // Trigger the action
             } else {
-                ESP_LOGD(TAG, "Button has no on_press_automation configured (pointer is null).");
+                ESP_LOGW(TAG, "Button has no trigger associated!");
             }
-            button_pressed_handled = true;
-            break; 
+            return; // Optional: stop after first matching button
         }
     }
+}
 
     if (this->touch_coordinates_sensor_ != nullptr) {
         std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y) + (button_pressed_handled ? ",B_HIT" : "");
