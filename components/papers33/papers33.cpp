@@ -127,15 +127,15 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 
 // Method to add a button (called from generated code)
-void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Automation<> *on_press_automation) {
+void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Trigger<> *trigger) {
     ESP_LOGD(TAG, "Adding button: x=%d, y=%d, w=%d, h=%d, has_action=%s",
-             x, y, width, height, (on_press_automation != nullptr ? "true" : "false"));
+             x, y, width, height, (trigger != nullptr ? "true" : "false"));
     ButtonConfig button_cfg;
     button_cfg.x = x;
     button_cfg.y = y;
     button_cfg.width = width;
     button_cfg.height = height;
-    button_cfg.on_press_automation = on_press_automation;
+    button_cfg.trigger = trigger;
     this->buttons_.push_back(button_cfg);
 }
 
@@ -361,7 +361,11 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
-//void M5PaperS3Display::loop() {
+/void M5PaperS3Display::loop() {
+if (button_cfg.trigger != nullptr) {
+    button_cfg.trigger->trigger();
+}
+}
 //    M5.update();
 //   TouchPoint_t t = M5.Touch.getTouchPointRaw();
 //   if (t.isPressed()) {
@@ -374,9 +378,9 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
-//Trigger<> *M5PaperS3DisplayM5GFX::get_on_press_trigger(int button_index) {
-//  return &on_press_triggers_[button_index];  // maakt er eentje aan als hij nog niet bestond
-//}
+Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
+  return new Trigger<>();
+}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
