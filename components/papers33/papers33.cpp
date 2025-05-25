@@ -362,10 +362,8 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
 void M5PaperS3Display::loop() {
-  M5.update(); 
-  
-  
-  TouchPoint_t t = M5.Touch.getTouchPointRaw();
+    M5.update();
+    TouchPoint_t t = M5.Touch.getTouchPointRaw();
   if (t.isPressed()) {
     last_touch_ = touch::TouchPoint(t.x, t.y);
     touch_sensor_->publish_state("touch");
