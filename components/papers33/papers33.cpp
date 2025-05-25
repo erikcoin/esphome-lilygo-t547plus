@@ -51,7 +51,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     if (this->touch_coordinates_sensor_ != nullptr) {
         ESP_LOGD(TAG, "Touch sensor configured, publishing test value...");
-        this->touch_coordinates_sensor_->publish_state("test:42,84"); // Indicate test
+        this->touch_coordinates_sensor_->publish_state("42,84"); // Indicate test
         ESP_LOGD(TAG, "Test value published.");
     } else {
         ESP_LOGD(TAG, "Touch sensor not configured.");
