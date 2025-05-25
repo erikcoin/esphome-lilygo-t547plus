@@ -370,7 +370,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
  //   } else {
   //      last_touch_ = touch::TouchPoint::none();
  //   }
-%/}
+//}
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
