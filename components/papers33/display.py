@@ -69,20 +69,17 @@ async def to_code(config):
         cg.add(var.set_touch_sensor(touch_sens))
 
     if CONF_BUTTONS in config:
-        for i, button_config in enumerate(config[CONF_BUTTONS]):
-            automation_obj = None
+        for button_config in config[CONF_BUTTONS]:
+            trigger = None
             if CONF_ON_PRESS in button_config:
-                automation_obj = await build_automation(
-                    var,  # owner
-                    [],   # argument types (none)
-                    button_config[CONF_ON_PRESS]
-                )
+                trigger = cg.call(var.make_button_trigger())
+                await build_automation(trigger, [], button_config[CONF_ON_PRESS])
             cg.add(var.add_button(
                 button_config[CONF_X_GRID],
                 button_config[CONF_Y_GRID],
                 button_config[CONF_WIDTH],
                 button_config[CONF_HEIGHT],
-                automation_obj or cg.nullptr
+                trigger or cg.nullptr
             ))
 
     cg.add_define("USE_M5PAPER_S3_M5GFX")
