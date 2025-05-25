@@ -63,7 +63,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     void set_touch_sensor(text_sensor::TextSensor *sensor);
 
     // Method to add a button from generated code
-    void add_button(int x, int y, int width, int height, Automation<> *on_press_automation);
+    //void add_button(int x, int y, int width, int height, Automation<> *on_press_automation);
 
  protected:
     void update_touch();
