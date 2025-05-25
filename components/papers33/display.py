@@ -72,7 +72,7 @@ async def to_code(config):
         for button_config in config[CONF_BUTTONS]:
             trigger = None
             if CONF_ON_PRESS in button_config:
-                trigger = cg.call(var.make_button_trigger())
+                trigger = await cg.call_get(var.make_button_trigger())
                 await build_automation(trigger, [], button_config[CONF_ON_PRESS])
             cg.add(var.add_button(
                 button_config[CONF_X_GRID],
