@@ -271,20 +271,7 @@ void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
     }
 }
 
-    if (this->touch_coordinates_sensor_ != nullptr) {
-        std::string coords = std::to_string(tp.x) + "," + std::to_string(tp.y) + (button_pressed_handled ? ",B_HIT" : "");
-        this->touch_coordinates_sensor_->publish_state(coords);
-        ESP_LOGD(TAG, "Published to touch_coordinates_sensor: %s", coords.c_str());
 
-        this->set_timeout("clear_touch_sensor", 200, [this]() {
-            if (this->touch_coordinates_sensor_ != nullptr)
-                this->touch_coordinates_sensor_->publish_state("");
-        });
-    }
-     if (!button_pressed_handled) {
-        ESP_LOGV(TAG, "Touch at x=%d, y=%d did not hit any configured button.", tp.x, tp.y);
-    }
-}
 
 void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
     ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
