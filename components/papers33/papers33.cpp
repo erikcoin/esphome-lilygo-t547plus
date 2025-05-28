@@ -138,6 +138,8 @@ void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Trig
     button_cfg.height = height;
     button_cfg.trigger = trigger;
     this->buttons_.push_back(button_cfg);
+
+    ESP_LOGD(TAG, "Button trigger assigned? %s", (button_cfg.trigger != nullptr ? "Yes" : "No"));
 }
 
 // ... (update() method remains largely the same)
@@ -353,15 +355,15 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 }
 void M5PaperS3DisplayM5GFX::loop() {
  update_touch();
-    M5.update(); // Update touch and other inputs
+//    M5.update(); // Update touch and other inputs
 
-    TouchPoint tp;
-    if (get_touch(&tp)) {  // Check if touch is detected
-        ESP_LOGD(TAG, "Touch detected at x=%d, y=%d", tp.x, tp.y);
-        send_coordinates_and_check_buttons(tp); // Process button interactions
-    }
+//    TouchPoint tp;
+//    if (get_touch(&tp)) {  // Check if touch is detected
+//        ESP_LOGD(TAG, "Touch detected at x=%d, y=%d", tp.x, tp.y);
+//        send_coordinates_and_check_buttons(tp); // Process button interactions
+//    }
 
-    vTaskDelay(pdMS_TO_TICKS(50)); // Small delay to prevent excessive polling
+//    vTaskDelay(pdMS_TO_TICKS(50)); // Small delay to prevent excessive polling
 }
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
