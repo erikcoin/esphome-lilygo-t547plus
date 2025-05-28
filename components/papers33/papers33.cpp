@@ -266,6 +266,7 @@ void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
             if (button.trigger != nullptr) {
                 ESP_LOGI(TAG, "Triggering button action...");
                 button.trigger->trigger();  // Trigger the action
+                ESP_LOGI(TAG, "Trigger execution should be complete.");
             } else {
                 ESP_LOGW(TAG, "Button has no trigger associated!");
             }
