@@ -81,5 +81,5 @@ async def to_code(config):
                     button_config[CONF_HEIGHT],
                     trigger or cg.nullptr
                 ))
-
+                print("Button trigger created:", trigger)
     cg.add_define("USE_M5PAPER_S3_M5GFX")
