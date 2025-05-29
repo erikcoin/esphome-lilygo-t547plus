@@ -47,7 +47,10 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
-    Trigger<> *make_button_trigger();
+Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
+  return new Trigger<>();
+}
+    //Trigger<> *make_button_trigger();
     void add_button(int x, int y, int width, int height, Trigger<> *trigger);
     //Trigger<> *get_on_press_trigger(int button_index);
     void fill(Color color) override;
