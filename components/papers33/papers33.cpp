@@ -355,7 +355,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
     this->canvas_->drawPixel(x, y, rgb888_color);
 }
 void M5PaperS3DisplayM5GFX::loop() {
- this->update_touch();
+ //this->update_touch();
     M5.update(); // Update touch and other inputs
 
     TouchPoint tp;
@@ -364,7 +364,7 @@ void M5PaperS3DisplayM5GFX::loop() {
         send_coordinates_and_check_buttons(tp); // Process button interactions
     }
 
-    vTaskDelay(pdMS_TO_TICKS(100)); // Small delay to prevent excessive polling
+    vTaskDelay(pdMS_TO_TICKS(300)); // Small delay to prevent excessive polling
 }
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
