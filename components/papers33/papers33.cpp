@@ -360,8 +360,9 @@ void M5PaperS3DisplayM5GFX::loop() {
 
     TouchPoint tp;
    if (get_touch(&tp)) {  // Check if touch is detected
-        ESP_LOGD(TAG, "Touch detected at x=%d, y=%d", tp.x, tp.y);
+        ESP_LOGD(TAG, "Touch from loop detected at x=%d, y=%d", tp.x, tp.y);
         send_coordinates_and_check_buttons(tp); // Process button interactions
+       
     }
 
     vTaskDelay(pdMS_TO_TICKS(300)); // Small delay to prevent excessive polling
