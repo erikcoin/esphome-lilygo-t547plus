@@ -364,8 +364,8 @@ void M5PaperS3DisplayM5GFX::loop() {
         send_coordinates_and_check_buttons(tp); // Process button interactions
        
     }
-
-    vTaskDelay(pdMS_TO_TICKS(300)); // Small delay to prevent excessive polling
+delay(100);
+    //vTaskDelay(pdMS_TO_TICKS(300)); // Small delay to prevent excessive polling
 }
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
