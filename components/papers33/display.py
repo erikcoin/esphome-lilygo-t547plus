@@ -76,7 +76,7 @@ async def to_code(config):
                 print("Created trigger:", trigger)
                 if trigger:
                     print("Trigger assigned, running build_automation...")
-                    await build_automation(trigger, [], button_config[CONF_ON_PRESS])
+                    await automation.build_automation(trigger, [], button_config[CONF_ON_PRESS])
                 else:
                     print("Trigger is None, automation will fail!")
                 #await build_automation(trigger, [], button_config[CONF_ON_PRESS])
