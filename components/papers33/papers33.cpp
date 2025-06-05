@@ -258,6 +258,12 @@ void M5PaperS3DisplayM5GFX::update_touch() {
 }
 
 void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
+static unsigned long last_touch_time = 0;
+unsigned long current_time = millis();
+if (current_time - last_touch_time < 300) { // Ignore touches within 300ms
+    return;
+}
+last_touch_time = current_time;
     for (auto &button : this->buttons_) {
         bool within_x = tp.x >= button.x && tp.x <= (button.x + button.width);
         bool within_y = tp.y >= button.y && tp.y <= (button.y + button.height);
