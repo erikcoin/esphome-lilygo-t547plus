@@ -48,7 +48,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     void update() override;
     ~M5PaperS3DisplayM5GFX();
 
-    Trigger<> *make_button_trigger();
+    Trigger<> *make_button_trigger() { return &this->release_trigger_; }
     void add_button(int x, int y, int width, int height, Trigger<> *trigger);
     //Trigger<> *get_on_press_trigger(int button_index);
     void fill(Color color) override;
@@ -77,7 +77,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     std::function<void(display::Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
-
+    Trigger<> release_trigger_;
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
     //std::map<int, Trigger<>> on_press_triggers_{};
 };
