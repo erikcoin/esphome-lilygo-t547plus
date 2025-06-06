@@ -377,9 +377,9 @@ delay(100);
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
-Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
-  return new Trigger<>();
-}
+//Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
+//  return new Trigger<>();
+//}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
