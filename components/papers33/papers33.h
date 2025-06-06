@@ -33,7 +33,7 @@ struct ButtonConfig {
     int y;
     int width;
     int height;
-    std::string id;
+    std::string buttonid;
     Trigger<> *trigger = nullptr;
     //Automation<> *on_press_automation; // Pointer to the automation to trigger
     // Automation<> *on_release_automation; // For future
@@ -50,7 +50,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     ~M5PaperS3DisplayM5GFX();
 
     Trigger<> *make_button_trigger() { return &this->release_trigger_; }
-    void add_button(int x, int y, int width, int height, const std::string &id, Trigger<> *trigger);//{
+    void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);//{
  //   ButtonConfig config = {x, y, width, height, id, trigger};
 //    this->buttons_.push_back(config);
 //}
