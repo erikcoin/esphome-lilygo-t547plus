@@ -25,7 +25,7 @@ AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.PollingComponent, display.Display
+    "M5PaperS3DisplayM5GFX", cg.Component, display.Display
 )
 
 BUTTON_SCHEMA = cv.Schema({
