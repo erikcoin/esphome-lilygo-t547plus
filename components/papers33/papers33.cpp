@@ -128,7 +128,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 
 // Method to add a button (called from generated code)
-void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, Trigger<> *trigger) {
+void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, const std::string &id, Trigger<> *trigger) {
     ESP_LOGD(TAG, "Adding button: x=%d, y=%d, w=%d, h=%d, has_action=%s",
              x, y, width, height, (trigger != nullptr ? "true" : "false"));
     ButtonConfig button_cfg;
