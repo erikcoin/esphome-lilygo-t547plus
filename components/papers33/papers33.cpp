@@ -288,7 +288,7 @@ void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coor
     this->touch_coordinates_sensor_ = touch_coordinates_sensor;
     ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
     // Poll for touch at a regular interval
- //polling   this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
+    this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
 }
 
 void M5PaperS3DisplayM5GFX::dump_config() {
