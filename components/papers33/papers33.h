@@ -38,7 +38,7 @@ struct ButtonConfig {
     // Automation<> *on_release_automation; // For future
 };
 
-class M5PaperS3DisplayM5GFX : public display::Display {
+class M5PaperS3DisplayM5GFX : public PollingComponent, display::Display {
  public:
     void setup() override;
     void loop();
