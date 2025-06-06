@@ -50,10 +50,10 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     ~M5PaperS3DisplayM5GFX();
 
     Trigger<> *make_button_trigger() { return &this->release_trigger_; }
-    void add_button(int x, int y, int width, int height, const std::string &id, Trigger<> *trigger){
-    ButtonConfig config = {x, y, width, height, id, trigger};
-    this->buttons_.push_back(config);
-}
+    void add_button(int x, int y, int width, int height, const std::string &id, Trigger<> *trigger);//{
+ //   ButtonConfig config = {x, y, width, height, id, trigger};
+//    this->buttons_.push_back(config);
+//}
     //Trigger<> *get_on_press_trigger(int button_index);
     void fill(Color color) override;
     int get_width_internal() override;
