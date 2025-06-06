@@ -86,6 +86,7 @@ async def to_code(config):
                     button_config[CONF_Y_GRID],
                     button_config[CONF_WIDTH],
                     button_config[CONF_HEIGHT],
+                    button_config[CONF_ID],
                     trigger or cg.nullptr
                 ))
                 print("4Adding button:", button_config[CONF_X_GRID], button_config[CONF_Y_GRID])
