@@ -18,6 +18,7 @@ from esphome.const import (
 
 CONF_TOUCH_SENSOR = "touch_coordinates"
 CONF_BUTTONS = "buttons"
+CONF_BUTTON_ID = "buttonid"
 
 DEPENDENCIES = ["network"]
 AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
@@ -33,6 +34,7 @@ BUTTON_SCHEMA = cv.Schema({
     cv.Required(CONF_Y_GRID): cv.int_range(min=0),
     cv.Required(CONF_WIDTH): cv.int_range(min=1),
     cv.Required(CONF_HEIGHT): cv.int_range(min=1),
+    cv.Required(CONF_BUTTON_ID): cv.string,
     # Use validate_automation directly
     cv.Optional(CONF_ON_PRESS): validate_automation(single=True),
 })
@@ -86,7 +88,7 @@ async def to_code(config):
                     button_config[CONF_Y_GRID],
                     button_config[CONF_WIDTH],
                     button_config[CONF_HEIGHT],
-                    button_config[CONF_ID],
+                    button_config[CONF_BUTTON_ID],
                     trigger or cg.nullptr
                 ))
                 print("4Adding button:", button_config[CONF_X_GRID], button_config[CONF_Y_GRID])
