@@ -85,6 +85,7 @@ async def to_code(config):
                 button_config[CONF_BUTTON_ID],
                 trigger or cg.nullptr
             ))
+            print("5Button trigger created:", trigger)
 
     
 
