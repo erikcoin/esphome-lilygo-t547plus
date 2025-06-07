@@ -54,6 +54,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
 //    this->triggers_.push_back(std::move(trig));
 //    return ptr;
 //}
+Trigger<> *make_button_trigger(const std::string &buttonid);
 
 //    Trigger<> *make_button_trigger(buttonid) { return &this->release_trigger_; }
     void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);//{
