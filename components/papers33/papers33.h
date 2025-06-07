@@ -35,8 +35,7 @@ struct ButtonConfig {
     int height;
     std::string buttonid;
     Trigger<> *trigger = nullptr;
-    //Automation<> *on_press_automation; // Pointer to the automation to trigger
-    // Automation<> *on_release_automation; // For future
+
 };
 
 class M5PaperS3DisplayM5GFX : public display::Display {
@@ -52,16 +51,13 @@ Trigger<> *make_button_trigger() {
     auto trig = std::make_unique<Trigger<>>();
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
-    return ptr->release_trigger_;
-    return &this->release_trigger_;
+    return ptr;
+    return release_trigger_;
 }
-//Trigger<> *make_button_trigger();
+
 
    //Trigger<> *make_button_trigger() { return &this->release_trigger_; }
-    void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);//{
- //   ButtonConfig config = {x, y, width, height, id, trigger};
-//    this->buttons_.push_back(config);
-//}
+    void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);
     
     void fill(Color color) override;
     int get_width_internal() override;
@@ -76,8 +72,6 @@ Trigger<> *make_button_trigger() {
     void set_writer(std::function<void(display::Display &)> writer);
     void set_touch_sensor(text_sensor::TextSensor *sensor);
 
-    // Method to add a button from generated code
-    //void add_button(int x, int y, int width, int height, Automation<> *on_press_automation);
 
  protected:
     void update_touch();
@@ -93,7 +87,7 @@ Trigger<> *make_button_trigger() {
     std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
 
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
-    //std::map<int, Trigger<>> on_press_triggers_{};
+
 };
 
 } // namespace m5papers3_display_m5gfx
