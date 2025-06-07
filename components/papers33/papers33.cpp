@@ -378,7 +378,7 @@ void M5PaperS3DisplayM5GFX::loop() {
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
     this->writer_ = writer;
 }
-Trigger<> *make_button_trigger(const std::string &buttonid) {
+Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
     auto trig = std::make_unique<Trigger<>>();
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
