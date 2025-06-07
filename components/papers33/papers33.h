@@ -82,6 +82,8 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
     Trigger<> release_trigger_;
+    std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
+
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
     //std::map<int, Trigger<>> on_press_triggers_{};
 };
