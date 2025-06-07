@@ -52,7 +52,7 @@ Trigger<> *make_button_trigger() {
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
     return ptr;
-    return release_trigger_;
+    
 }
 
 
@@ -83,7 +83,7 @@ Trigger<> *make_button_trigger() {
     std::function<void(display::Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
-    Trigger<> release_trigger_;
+  //  Trigger<> release_trigger_;
     std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
 
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
