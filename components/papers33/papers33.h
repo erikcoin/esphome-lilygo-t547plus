@@ -53,6 +53,7 @@ Trigger<> *make_button_trigger() {
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
     return ptr;
+    return &this->release_trigger_;
 }
 //Trigger<> *make_button_trigger();
 
