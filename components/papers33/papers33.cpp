@@ -382,6 +382,7 @@ Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
     auto trig = std::make_unique<Trigger<>>();
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
+    ESP_LOGD(TAG, "trigger: ",ptr);
     return ptr;
 }
 
