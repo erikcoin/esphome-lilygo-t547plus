@@ -52,7 +52,7 @@ Trigger<> *make_button_trigger() {
     auto trig = std::make_unique<Trigger<>>();
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
-    return ptr;
+    return ptr->release_trigger_;
     return &this->release_trigger_;
 }
 //Trigger<> *make_button_trigger();
