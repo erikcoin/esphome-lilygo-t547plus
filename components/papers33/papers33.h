@@ -47,7 +47,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
-Trigger<> *make_button_trigger(const string buttonid) {
+Trigger<> *make_button_trigger(const std::string &buttonid) {
     auto trig = std::make_unique<Trigger<>>();
     Trigger<> *ptr = trig.get();
     this->triggers_.push_back(std::move(trig));
