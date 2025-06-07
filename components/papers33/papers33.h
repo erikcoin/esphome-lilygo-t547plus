@@ -54,7 +54,7 @@ class M5PaperS3DisplayM5GFX : public display::Display {
 //    this->triggers_.push_back(std::move(trig));
 //    return ptr;
 //}
-Trigger<> *make_button_trigger();
+//Trigger<> *make_button_trigger();
 
 //    Trigger<> *make_button_trigger(buttonid) { return &this->release_trigger_; }
     void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);//{
@@ -88,7 +88,7 @@ Trigger<> *make_button_trigger();
     std::function<void(display::Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
-  //werkt  Trigger<> release_trigger_;
+    Trigger<> release_trigger_;
     std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
 
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
