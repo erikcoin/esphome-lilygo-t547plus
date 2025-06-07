@@ -74,23 +74,19 @@ async def to_code(config):
         for button_config in config[CONF_BUTTONS]:
             trigger = None
             if CONF_ON_PRESS in button_config:
-                trigger = var.make_button_trigger()
-                print("1Created trigger:", trigger)
-                if trigger:
-                    print("2Trigger assigned, running build_automation...")
-                    await build_automation(trigger, [], button_config[CONF_ON_PRESS])
-                    print("2aAutomation built successfully.")
-                else:
-                    print("3Trigger is None, automation will fail!")
-                #await build_automation(trigger, [], button_config[CONF_ON_PRESS])
-                cg.add(var.add_button(
-                    button_config[CONF_X_GRID],
-                    button_config[CONF_Y_GRID],
-                    button_config[CONF_WIDTH],
-                    button_config[CONF_HEIGHT],
-                    button_config[CONF_BUTTON_ID],
-                    trigger or cg.nullptr
-                ))
-                print("4Adding button:", button_config[CONF_X_GRID], button_config[CONF_Y_GRID])
-                print("5Button trigger created:", trigger)
+                raw_trigger = var.make_button_trigger()
+                trigger = cg.new_Pvariable(raw_trigger)
+                await build_automation(trigger, [], button_config[CONF_ON_PRESS])
+
+            cg.add(var.add_button(
+                button_config[CONF_X_GRID],
+                button_config[CONF_Y_GRID],
+                button_config[CONF_WIDTH],
+                button_config[CONF_HEIGHT],
+                button_config[CONF_BUTTON_ID],
+                trigger or cg.nullptr
+            ))
+
+    
+
     cg.add_define("USE_M5PAPER_S3_M5GFX")
