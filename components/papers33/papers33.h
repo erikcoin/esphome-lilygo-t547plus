@@ -48,15 +48,15 @@ class M5PaperS3DisplayM5GFX : public display::Display {
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
-//Trigger<> *make_button_trigger() {
- //   auto trig = std::make_unique<Trigger<>>();
-//    Trigger<> *ptr = trig.get();
-//    this->triggers_.push_back(std::move(trig));
-//    return ptr;
-//}
+Trigger<> *make_button_trigger() {
+    auto trig = std::make_unique<Trigger<>>();
+    Trigger<> *ptr = trig.get();
+    this->triggers_.push_back(std::move(trig));
+    return ptr;
+}
 //Trigger<> *make_button_trigger();
 
-   Trigger<> *make_button_trigger() { return &this->release_trigger_; }
+   //Trigger<> *make_button_trigger() { return &this->release_trigger_; }
     void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);//{
  //   ButtonConfig config = {x, y, width, height, id, trigger};
 //    this->buttons_.push_back(config);
