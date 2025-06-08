@@ -234,6 +234,10 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         ESP_LOGE(TAG, "Canvas not initialized, cannot perform partial update!");
         return;
     }
+int rotated_x = y;
+int rotated_y = gfx_.width() - x - w;
+int rotated_w = h;
+int rotated_h = w;
 
     ESP_LOGD(TAG, "Pushing partial sprite region from main canvas to display...");
     //wellicht hier pushimage() gebruiken.
@@ -242,7 +246,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
     ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
     // This tells the EPD controller to only update the specified rectangle on the physical screen.
     this->gfx_.setRotation(0);
-    this->gfx_.display(x, y, w, h);
+    this->gfx_.display(rotated_x, rotated_y, rotated_w, rotated_h);
     
     ESP_LOGD(TAG, "Partial EPD refresh initiated for region (%d,%d,%d,%d).",x,y,w,h);
 }
