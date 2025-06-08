@@ -1,1 +1,1 @@
-#include "bmi270_sensor.h"
+#include "bmi270.h"
