@@ -1,42 +1,32 @@
 #pragma once
 
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/core/component.h"
-#include <M5Unified.h>
+#include "esphome/components/sensor/sensor.h"
 
 namespace esphome {
 namespace bmi270_sensor {
 
 class BMI270Sensor : public PollingComponent {
  public:
-  sensor::Sensor *accel_x_sensor{nullptr};
-  sensor::Sensor *accel_y_sensor{nullptr};
-  sensor::Sensor *accel_z_sensor{nullptr};
-  sensor::Sensor *gyro_x_sensor{nullptr};
-  sensor::Sensor *gyro_y_sensor{nullptr};
-  sensor::Sensor *gyro_z_sensor{nullptr};
+  void setup() override;
+  void update() override;
 
-  void setup() override {
-    M5.begin();
-    M5.Imu.begin();
-  }
+  void set_accel_x_sensor(sensor::Sensor *s) { this->accel_x_sensor_ = s; }
+  void set_accel_y_sensor(sensor::Sensor *s) { this->accel_y_sensor_ = s; }
+  void set_accel_z_sensor(sensor::Sensor *s) { this->accel_z_sensor_ = s; }
 
-  void update() override {
-    float ax, ay, az;
-    float gx, gy, gz;
+  void set_gyro_x_sensor(sensor::Sensor *s) { this->gyro_x_sensor_ = s; }
+  void set_gyro_y_sensor(sensor::Sensor *s) { this->gyro_y_sensor_ = s; }
+  void set_gyro_z_sensor(sensor::Sensor *s) { this->gyro_z_sensor_ = s; }
 
-    if (M5.Imu.getAccel(&ax, &ay, &az)) {
-      if (accel_x_sensor) accel_x_sensor->publish_state(ax);
-      if (accel_y_sensor) accel_y_sensor->publish_state(ay);
-      if (accel_z_sensor) accel_z_sensor->publish_state(az);
-    }
+ protected:
+  sensor::Sensor *accel_x_sensor_{nullptr};
+  sensor::Sensor *accel_y_sensor_{nullptr};
+  sensor::Sensor *accel_z_sensor_{nullptr};
 
-    if (M5.Imu.getGyro(&gx, &gy, &gz)) {
-      if (gyro_x_sensor) gyro_x_sensor->publish_state(gx);
-      if (gyro_y_sensor) gyro_y_sensor->publish_state(gy);
-      if (gyro_z_sensor) gyro_z_sensor->publish_state(gz);
-    }
-  }
+  sensor::Sensor *gyro_x_sensor_{nullptr};
+  sensor::Sensor *gyro_y_sensor_{nullptr};
+  sensor::Sensor *gyro_z_sensor_{nullptr};
 };
 
 }  // namespace bmi270_sensor
