@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import (
     CONF_ID,
-    UNIT_G, UNIT_DEGREES_PER_SECOND,
+    UNIT_G,
     ICON_ACCELERATION, ICON_ROTATE_3D
 )
 
