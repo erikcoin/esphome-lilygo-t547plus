@@ -2,8 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import (
-    CONF_ID, CONF_ACCELERATION,
-    CONF_GYROSCOPE,
+    CONF_ID,
     UNIT_G, UNIT_DEGREES_PER_SECOND,
     ICON_ACCELERATION, ICON_ROTATE_3D
 )
