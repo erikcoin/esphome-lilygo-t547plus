@@ -1,4 +1,4 @@
-#include "bmi270_sensor.h"
+#include "bmi270.h"
 #include <M5Unified.h>
 
 namespace esphome {
