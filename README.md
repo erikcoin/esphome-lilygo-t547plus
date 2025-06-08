@@ -1,7 +1,5 @@
 This repository contains a Display component for [ESPHome](https://esphome.io/)
-to support the ESP32-S3 [LILYGO T5 4.7" Plus E-paper display](https://www.lilygo.cc/products/t5-4-7-inch-e-paper-v2-3).
-
-(Do not confuse it with the original ESP32-based Lilygo T5 4.7 board.)
+to support the ESP32-S3 [M5PaperS3 ESP32S3](https://shop.m5stack.com/products/m5papers3-esp32s3-development-kit?srsltid=AfmBOop9YrPU-bZLrfjE2Xw-rBs4XxZaDxewgWWLK_s-THUg6zBpm0h6).
 
 For more info in the display components, see the [ESPHome display documentation](https://esphome.io/#display-components)
 
@@ -16,7 +14,7 @@ number of options in your esphome config**:
 
 If you clone this repository, a working example is included:
 
-    git clone https://github.com/nickolay/esphome-lilygo-t547plus.git
+    git clone https://github.com/erikcoin/esphome-lilygo-t547plus.git
     cd esphome-lilygo-t547plus
     esphome run basic.yaml
 
@@ -27,20 +25,25 @@ and adapt the `external_components` configuration as follows:
 # ... required esp32, platformio_options configuration omitted for brevity ...
 
 external_components:
-  - source: github://nickolay/esphome-lilygo-t547plus
-    components: ["t547"]
-
-## for those using ESPHome 2023.6.5 and earlier:
-# external_components:
-#   - source: github://nickolay/esphome-lilygo-t547plus@2023.6.5
-#     components: [t547]
+  - source: github://erikcoin/esphome-lilygo-t547plus
+    components: ["papers33"]
 
 
 display:
-- platform: t547
-  id: t5_display
-  update_interval: 30s
-```
+  - platform: papers33
+    id: m5paper_display
+    rotation: 0
+    update_interval: 30s # How often the main display content redraws
+    touch_coordinates: touch_coordinates # Link to the text_sensor
+    # Define your buttons here
+    buttons:
+      - x_grid: 50
+        y_grid: 100
+        width: 200
+        buttonid: knop1
+        height: 80
+        on_press:
+          #- script.execute: test_button_action
 
 ## Discussion
 
