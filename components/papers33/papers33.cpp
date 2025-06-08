@@ -240,7 +240,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
 
     ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
     // This tells the EPD controller to only update the specified rectangle on the physical screen.
-    this->gfx_.setRotation(1);
+    this->gfx_.setRotation(0);
     this->gfx_.display(x, y, w, h);
     
     ESP_LOGD(TAG, "Partial EPD refresh initiated for region (%d,%d,%d,%d).",x,y,w,h);
