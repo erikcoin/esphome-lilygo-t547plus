@@ -5,25 +5,32 @@ namespace esphome {
 namespace bmi270_sensor {
 
 void BMI270Sensor::setup() {
-  // BMI270 is automatisch geinitialiseerd door M5Unified
+  // BMI270 is automatisch geïnitialiseerd door M5Unified
 }
 
 void BMI270Sensor::update() {
   M5.Imu.update();
 
-  if (this->accel_x_sensor_ != nullptr)
-    this->accel_x_sensor_->publish_state(M5.Imu.accel.x);
-  if (this->accel_y_sensor_ != nullptr)
-    this->accel_y_sensor_->publish_state(M5.Imu.accel.y);
-  if (this->accel_z_sensor_ != nullptr)
-    this->accel_z_sensor_->publish_state(M5.Imu.accel.z);
+  m5::imu_raw_value_t accel;
+  m5::imu_raw_value_t gyro;
 
-  if (this->gyro_x_sensor_ != nullptr)
-    this->gyro_x_sensor_->publish_state(M5.Imu.gyro.x);
-  if (this->gyro_y_sensor_ != nullptr)
-    this->gyro_y_sensor_->publish_state(M5.Imu.gyro.y);
-  if (this->gyro_z_sensor_ != nullptr)
-    this->gyro_z_sensor_->publish_state(M5.Imu.gyro.z);
+  if (M5.Imu.getAccel(&accel)) {
+    if (this->accel_x_sensor_ != nullptr)
+      this->accel_x_sensor_->publish_state(accel.x);
+    if (this->accel_y_sensor_ != nullptr)
+      this->accel_y_sensor_->publish_state(accel.y);
+    if (this->accel_z_sensor_ != nullptr)
+      this->accel_z_sensor_->publish_state(accel.z);
+  }
+
+  if (M5.Imu.getGyro(&gyro)) {
+    if (this->gyro_x_sensor_ != nullptr)
+      this->gyro_x_sensor_->publish_state(gyro.x);
+    if (this->gyro_y_sensor_ != nullptr)
+      this->gyro_y_sensor_->publish_state(gyro.y);
+    if (this->gyro_z_sensor_ != nullptr)
+      this->gyro_z_sensor_->publish_state(gyro.z);
+  }
 }
 
 }  // namespace bmi270_sensor
