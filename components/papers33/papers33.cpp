@@ -91,6 +91,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     }
     this->canvas_->setPsram(true);
     this->canvas_->setColorDepth(4);
+    this->canvas_->setRotation(0); 
     this->canvas_->setPaletteGrayscale();
 
     ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
