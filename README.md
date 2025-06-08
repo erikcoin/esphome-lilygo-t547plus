@@ -26,8 +26,13 @@ and adapt the `external_components` configuration as follows:
 
 external_components:
   - source: github://erikcoin/esphome-lilygo-t547plus
-    components: ["papers33"]
+    components: ["papers33", "battery_sensor"]
 
+sensor:
+  - platform: battery_sensor
+    id: batterij_voltage
+    name: "Battery Voltage"
+    update_interval: 30s
 
 display:
   - platform: papers33
@@ -44,7 +49,34 @@ display:
         height: 80
         on_press:
           #- script.execute: test_button_action
+          - logger.log: "Button 1 Pressed! Triggered directly"
+          - lambda: |-
+               id(m5paper_display).partial_update(50, 100, 200, 80);
+      - x_grid: 300
+        y_grid: 100
+        buttonid: knop2
+        width: 200
+        height: 80
+        on_press:
+          - script.execute: test_button_action
+          #- logger.log: "Button 2 Pressed! Triggered directly"
+          # - switch.turn_on: my_switch
 
+  
+
+    lambda: |-
+      ESP_LOGD("custom_display", "Lambda: Drawing on M5Paper S3");
+      it.fill(id(wit));
+      it.print(10, 10, id(my_font), "Hello ESPHome!");
+      it.print(10, 40, id(my_font), id(zwart), "M5Paper S3 Demo");
+
+      // You could also draw the buttons visually if you want
+      // This would require access to the button definitions or re-defining them here
+      // Example:
+      it.rectangle(50, 100, 200, 80, id(zwart)); // Draw Button 1 outline
+      it.print(60, 120, id(my_font), id(zwart), "Press Me 1");
+      it.rectangle(300, 100, 200, 80, id(zwart)); // Draw Button 2 outline
+      it.print(310, 120, id(my_font), id(zwart), "Action2!");
 ## Discussion
 
 https://github.com/esphome/feature-requests/issues/1960
