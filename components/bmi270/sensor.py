@@ -4,7 +4,6 @@ from esphome.components import sensor
 from esphome.const import CONF_ID
 
 DEPENDENCIES = ['sensor']
-AUTO_LOAD = ['m5unified']
 
 bmi270_ns = cg.esphome_ns.namespace('bmi270_sensor')
 BMI270Sensor = bmi270_ns.class_('BMI270Sensor', cg.PollingComponent)
