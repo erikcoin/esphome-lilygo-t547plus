@@ -78,7 +78,8 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
   //  Trigger<> release_trigger_;
-    std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
+ //   std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
+std::map<std::string, std::unique_ptr<Trigger<>>> button_triggers_;
 
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
 
