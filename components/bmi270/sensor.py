@@ -3,7 +3,6 @@ import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import CONF_ID
 
-AUTO_LOAD = ["m5unified"]
 DEPENDENCIES = ["sensor"]
 
 bmi270_ns = cg.esphome_ns.namespace("bmi270_sensor")
