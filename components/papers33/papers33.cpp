@@ -234,21 +234,28 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
         ESP_LOGE(TAG, "Canvas not initialized, cannot perform partial update!");
         return;
     }
-int rotated_x = y;
-int rotated_y = gfx_.width() - x - w;
-int rotated_w = h;
-int rotated_h = w;
 
-    ESP_LOGD(TAG, "Pushing partial sprite region from main canvas to display...");
-    //wellicht hier pushimage() gebruiken.
-    this->canvas_->pushSprite(0, 0);
+    // ROTATIE aanpassingen
+    int rotated_x = y;
+    int rotated_y = gfx_.width() - x - w;
+    int rotated_w = h;
+    int rotated_h = w;
 
-    ESP_LOGD(TAG, "Triggering display refresh for updated area (display(x,y,w,h))...");
-    // This tells the EPD controller to only update the specified rectangle on the physical screen.
-    //this->gfx_.setRotation(0);
-    this->gfx_.display(rotated_x, rotated_y, rotated_w, rotated_h);
-    
-    ESP_LOGD(TAG, "Partial EPD refresh initiated for region (%d,%d,%d,%d).",x,y,w,h);
+    // Bereken pointer naar het relevante deel van de canvas
+    uint8_t* sprite_buffer = (uint8_t*)canvas_->getBuffer();
+    int bpp = canvas_->bitsPerPixel(); // 4 bij 4bpp
+    int pitch = (canvas_->width() * bpp + 7) / 8;  // aantal bytes per rij
+
+    uint8_t* region_start = sprite_buffer + y * pitch + (x * bpp) / 8;
+
+    ESP_LOGD(TAG, "Pushing partial region from canvas to display via pushImage()...");
+
+    gfx_.pushImage(x, y, w, h, canvas_->getColorDepth(), region_start, pitch);
+
+    ESP_LOGD(TAG, "Triggering display refresh for updated area...");
+    gfx_.display(rotated_x, rotated_y, rotated_w, rotated_h);
+
+    ESP_LOGD(TAG, "Partial EPD refresh initiated for rotated region.");
 }
 
 
