@@ -230,8 +230,8 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  int pitch = (canvas_->width() + 1) /2;      // canvas pitch (bytes per row)
-  int line_pitch = (w + 1) /2;                // width of update region in bytes
+  int pitch = (canvas_->width() + 1) ;      // canvas pitch (bytes per row)
+  int line_pitch = (w + 1) ;                // width of update region in bytes
   auto depth = canvas_->getColorDepth();
   const void* palette = canvas_->getPalette();
 
