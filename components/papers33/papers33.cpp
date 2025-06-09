@@ -226,23 +226,21 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     return false;
 }
 
-//#include <lgfx/v1/pixelcopy.hpp>
-
+//#include 
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  // 4bpp: 2 pixels per byte
+  // 4bpp = 2 pixels per byte
   int pitch = (canvas_->width() + 1) / 2;
   size_t offset = y * pitch + (x / 2);
   const uint8_t* region_ptr = static_cast<const uint8_t*>(canvas_->getBuffer()) + offset;
 
+  auto depth = canvas_->getColorDepth();  // moet palette_4bit zijn
   const void* palette = canvas_->getPalette();
-  auto depth = canvas_->getColorDepth();  // verwacht: color_depth_t::palette_4bit
 
-  // Maak pixelcopy_t aan (brondata, bron diepte, doel diepte, swap_rgb, palet)
   lgfx::v1::pixelcopy_t p(region_ptr, depth, depth, false, palette);
+  p.src_pitch = pitch;
 
-  // pushImage gebruikt pixelcopy om een blok te tekenen
   gfx_.pushImage(x, y, w, h, &p);
 }
 
