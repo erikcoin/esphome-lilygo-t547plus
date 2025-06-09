@@ -226,36 +226,53 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     return false;
 }
 
-// ... (partial_update() remains the same)
+#include <lgfx/v1/pixelcopy.hpp>
+
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
-    ESP_LOGD(TAG, "Performing partial update for region (%d, %d, %d, %d)", x, y, w, h);
+    ESP_LOGD(TAG, "Partial update: input region (%d, %d, %d, %d)", x, y, w, h);
 
     if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Canvas not initialized, cannot perform partial update!");
+        ESP_LOGE(TAG, "Canvas not initialized");
         return;
     }
 
-    // ROTATIE aanpassingen
+    // ROTATIE aanpassen
     int rotated_x = y;
     int rotated_y = gfx_.width() - x - w;
     int rotated_w = h;
     int rotated_h = w;
 
-    // Bereken pointer naar het relevante deel van de canvas
-    uint8_t* sprite_buffer = (uint8_t*)canvas_->getBuffer();
-    int bpp = canvas_->bitsPerPixel(); // 4 bij 4bpp
-    int pitch = (canvas_->width() * bpp + 7) / 8;  // aantal bytes per rij
+    // Bepaal bpp
+    int bpp = 0;
+    auto depth = canvas_->getColorDepth();
+    switch (depth) {
+        case lgfx::v1::color_depth_t::bit_1: bpp = 1; break;
+        case lgfx::v1::color_depth_t::bit_2: bpp = 2; break;
+        case lgfx::v1::color_depth_t::bit_4: bpp = 4; break;
+        case lgfx::v1::color_depth_t::bit_8: bpp = 8; break;
+        case lgfx::v1::color_depth_t::bit_16: bpp = 16; break;
+        default: ESP_LOGE(TAG, "Unsupported color depth"); return;
+    }
 
-    uint8_t* region_start = sprite_buffer + y * pitch + (x * bpp) / 8;
+    // Bereken pitch en pointer naar start van het canvasgebied
+    int pitch = ((canvas_->width() * bpp) + 7) / 8;
+    uint8_t* full_buf = (uint8_t*) canvas_->getBuffer();
+    uint8_t* region_ptr = full_buf + y * pitch + (x * bpp) / 8;
 
-    ESP_LOGD(TAG, "Pushing partial region from canvas to display via pushImage()...");
+    // Zet pixelcopy op
+    lgfx::v1::pixelcopy_t p(region_ptr, depth, canvas_->getPalette(), depth);
+    p.src_x32 = 0;
+    p.src_y = 0;
+    p.src_bitwidth = w;
+    p.src_width = w;
+    p.src_height = h;
+    p.src_pitch = pitch;
 
-    gfx_.pushImage(x, y, w, h, canvas_->getColorDepth(), region_start, pitch);
+    // Push image (alleen het stukje)
+    gfx_.pushImage(x, y, w, h, &p);
 
-    ESP_LOGD(TAG, "Triggering display refresh for updated area...");
+    // Ververs alleen het aangepaste deel op scherm
     gfx_.display(rotated_x, rotated_y, rotated_w, rotated_h);
-
-    ESP_LOGD(TAG, "Partial EPD refresh initiated for rotated region.");
 }
 
 
