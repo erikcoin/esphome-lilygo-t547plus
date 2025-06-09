@@ -239,7 +239,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   std::vector<uint8_t> tempbuf(line_pitch * h);
 
   for (int row = 0; row < h; ++row) {
-    const uint8_t* src = static_cast<const uint8_t*>(canvas_->getBuffer()) + (y + row) * pitch + (x );
+    const uint8_t* src = static_cast<const uint8_t*>(canvas_->getBuffer()) + (y + row) * pitch + (x / 2);
     memcpy(&tempbuf[row * line_pitch], src, line_pitch);
   }
 
