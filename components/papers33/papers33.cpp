@@ -229,52 +229,22 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 //#include <lgfx/v1/pixelcopy.hpp>
 
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
-    ESP_LOGD(TAG, "Partial update: input region (%d, %d, %d, %d)", x, y, w, h);
+  if (!canvas_) return;
 
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Canvas not initialized");
-        return;
-    }
+  // 4bpp: 2 pixels per byte
+  int pitch = (canvas_->width() + 1) / 2;
+  size_t offset = y * pitch + (x / 2);
+  const uint8_t* region_ptr = static_cast<const uint8_t*>(canvas_->getBuffer()) + offset;
 
-    // ROTATIE aanpassen
-    int rotated_x = y;
-    int rotated_y = gfx_.width() - x - w;
-    int rotated_w = h;
-    int rotated_h = w;
+  const void* palette = canvas_->getPalette();
+  auto depth = canvas_->getColorDepth();  // verwacht: color_depth_t::palette_4bit
 
-    // Bepaal bpp
-    int bpp = 0;
-    auto depth = canvas_->getColorDepth();
-    switch (depth) {
-        case lgfx::v1::color_depth_t::bit_1: bpp = 1; break;
-        case lgfx::v1::color_depth_t::bit_2: bpp = 2; break;
-        case lgfx::v1::color_depth_t::bit_4: bpp = 4; break;
-        case lgfx::v1::color_depth_t::bit_8: bpp = 8; break;
-        case lgfx::v1::color_depth_t::bit_16: bpp = 16; break;
-        default: ESP_LOGE(TAG, "Unsupported color depth"); return;
-    }
+  // Maak pixelcopy_t aan (brondata, bron diepte, doel diepte, swap_rgb, palet)
+  lgfx::v1::pixelcopy_t p(region_ptr, depth, depth, false, palette);
 
-    // Bereken pitch en pointer naar start van het canvasgebied
-    int pitch = ((canvas_->width() * bpp) + 7) / 8;
-    uint8_t* full_buf = (uint8_t*) canvas_->getBuffer();
-    uint8_t* region_ptr = full_buf + y * pitch + (x * bpp) / 8;
-
-    // Zet pixelcopy op
-    lgfx::v1::pixelcopy_t p(region_ptr, depth, canvas_->getPalette(), depth);
-    p.src_x32 = 0;
-    p.src_y = 0;
-    p.src_bitwidth = w;
-    p.src_width = w;
-    p.src_height = h;
-    p.src_pitch = pitch;
-
-    // Push image (alleen het stukje)
-    gfx_.pushImage(x, y, w, h, &p);
-
-    // Ververs alleen het aangepaste deel op scherm
-    gfx_.display(rotated_x, rotated_y, rotated_w, rotated_h);
+  // pushImage gebruikt pixelcopy om een blok te tekenen
+  gfx_.pushImage(x, y, w, h, &p);
 }
-
 
 void M5PaperS3DisplayM5GFX::update_touch() {
     TouchPoint tp;
