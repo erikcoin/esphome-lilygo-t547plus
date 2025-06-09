@@ -230,19 +230,23 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  // 4bpp = 2 pixels per byte
-  int pitch = (canvas_->width() + 1) / 2;
-  size_t offset = y * pitch + (x / 2);
-  const uint8_t* region_ptr = static_cast<const uint8_t*>(canvas_->getBuffer()) + offset;
-
-  auto depth = canvas_->getColorDepth();  // moet palette_4bit zijn
+  int pitch = (canvas_->width() + 1) / 2;      // canvas pitch (bytes per row)
+  int line_pitch = (w + 1) / 2;                // width of update region in bytes
+  auto depth = canvas_->getColorDepth();
   const void* palette = canvas_->getPalette();
 
-  lgfx::v1::pixelcopy_t p(region_ptr, depth, depth, false, palette);
-  p.src_pitch = pitch;
+  // Buffer voor updategebied
+  std::vector<uint8_t> tempbuf(line_pitch * h);
 
+  for (int row = 0; row < h; ++row) {
+    const uint8_t* src = static_cast<const uint8_t*>(canvas_->getBuffer()) + (y + row) * pitch + (x / 2);
+    memcpy(&tempbuf[row * line_pitch], src, line_pitch);
+  }
+
+  lgfx::v1::pixelcopy_t p(tempbuf.data(), depth, depth, false, palette);
   gfx_.pushImage(x, y, w, h, &p);
 }
+
 
 void M5PaperS3DisplayM5GFX::update_touch() {
     TouchPoint tp;
