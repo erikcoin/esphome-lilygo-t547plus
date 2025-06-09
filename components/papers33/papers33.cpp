@@ -226,7 +226,7 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
     return false;
 }
 
-#include <lgfx/v1/pixelcopy.hpp>
+//#include <lgfx/v1/pixelcopy.hpp>
 
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
     ESP_LOGD(TAG, "Partial update: input region (%d, %d, %d, %d)", x, y, w, h);
