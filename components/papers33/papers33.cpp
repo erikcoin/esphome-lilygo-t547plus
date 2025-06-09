@@ -181,7 +181,7 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
         // Assuming palette index 15 is white for 4-bit grayscale.
         // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
-        this->canvas_->fillSprite(this->gfx_.color888(255, 255, 255));
+        this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
 
 
         ESP_LOGD(TAG, "Calling writer lambda...");
