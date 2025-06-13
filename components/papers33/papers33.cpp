@@ -235,9 +235,22 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  // Push (x,y,w,h) van de canvas naar het scherm, op dezelfde positie
-  canvas_->pushSprite(&gfx_, x, y, x, y, w, h);
+  // Maak pixelcopy vanaf de canvas, vanaf (x, y), grootte (w, h)
+  lgfx::v1::pixelcopy_t p(canvas_->getBuffer(),
+                          canvas_->getColorDepth(),
+                          canvas_->getColorDepth(),
+                          false,
+                          canvas_->getPalette());
+  
+  // Stel offset in zodat alleen de gewenste regio uit het canvas wordt gekopieerd
+  p.src_x = x;
+  p.src_y = y;
+  p.src_bitwidth = canvas_->width();  // belangrijk: volledige breedte van de sprite (in pixels)
+
+  // Push het canvas-subgebied naar het scherm op locatie (x, y)
+  gfx_.pushImage(x, y, w, h, &p);
 }
+0
 
 
 
