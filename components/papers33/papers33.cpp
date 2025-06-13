@@ -237,7 +237,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
 
   ESP_LOGD(TAG, "Partial update: x=%d y=%d w=%d h=%d", x, y, w, h);
 
-  const int canvas_pitch = canvas_->getScanLineWidth();   // correcte pitch in bytes
+  const int canvas_pitch = canvas_->getScanLine();   // correcte pitch in bytes
   const int region_pitch = (w + 1) / 2;                   // bytes per rij voor 4-bit grijswaarden
   const auto depth = canvas_->getColorDepth();
   const void* palette = canvas_->getPalette();
