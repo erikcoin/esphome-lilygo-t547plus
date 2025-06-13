@@ -52,7 +52,9 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
 
    //Trigger<> *make_button_trigger() { return &this->release_trigger_; }
     void add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger);
-    
+    void draw_button(int index, bool pressed);
+    void press_button_effect(int index, int duration_ms = 150);
+
     void fill(Color color) override;
     int get_width_internal() override;
     int get_height_internal() override;
