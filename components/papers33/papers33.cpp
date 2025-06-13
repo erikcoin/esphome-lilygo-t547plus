@@ -427,6 +427,29 @@ Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttoni
 //Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
 //  return new Trigger<>();
 //}
+void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
+  if (index < 0 || index >= this->buttons_.size()) return;
+  auto &btn = this->buttons_[index];
+
+  int x = btn.x;
+  int y = btn.y;
+  int w = btn.width;
+  int h = btn.height;
+
+  uint16_t fill_color = pressed ? 100 : 200;  // Donkerder als ingedrukt
+  uint16_t border_color = 0; // zwart
+
+  // Teken de knop
+  canvas_->fillRect(x, y, w, h, fill_color);
+  canvas_->drawRect(x, y, w, h, border_color);
+
+  // Eventuele knoptekst (optioneel)
+  canvas_->setTextColor(0);  // zwart
+  canvas_->setTextSize(1);
+  canvas_->setCursor(x + 10, y + h / 2 - 4);
+  canvas_->print("Knop ");
+  canvas_->print(index + 1);
+}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
