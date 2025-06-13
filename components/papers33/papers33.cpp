@@ -416,17 +416,6 @@ Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttoni
   return ptr;
 }
 
-//Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
-//    auto trig = std::make_unique<Trigger<>>();
-//    Trigger<> *ptr = trig.get();
- //   this->triggers_.push_back(std::move(trig));
- //   ESP_LOGD(TAG, "trigger: ",ptr);
- //   return ptr;
-//}
-
-//Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
-//  return new Trigger<>();
-//}
 void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
   if (index < 0 || index >= this->buttons_.size()) return;
   auto &btn = this->buttons_[index];
@@ -450,11 +439,11 @@ void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
   canvas_->print("Knop ");
   canvas_->print(index + 1);
 }
-void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms = 150) {
+void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
   draw_button(index, true);  // Ingedrukte stijl
   canvas_->pushSprite(0, 0); // Laat meteen zien
 
-  App.schedule([this, index]() {
+  App.scheduler([this, index]() {
     draw_button(index, false);  // Herstel knop
     canvas_->pushSprite(0, 0);
   }, duration_ms);
