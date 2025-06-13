@@ -160,12 +160,12 @@ void M5PaperS3DisplayM5GFX::update() {
         // Initial clear/refresh sequence (optional, but can help with ghosting from boot)
         ESP_LOGD(TAG, "Performing initial EPD clear sequence...");
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
-        M5.Display.fillScreen(TFT_WHITE);
-        M5.Display.display();
-        delay(500);
-        M5.Display.fillScreen(TFT_BLACK);
-        M5.Display.display();
-        delay(500);
+      //  M5.Display.fillScreen(TFT_WHITE);
+       // M5.Display.display();
+       // delay(500);
+       // M5.Display.fillScreen(TFT_BLACK);
+       // M5.Display.display();
+       // delay(500);
         M5.Display.fillScreen(TFT_WHITE);
         M5.Display.display();
         delay(500);
