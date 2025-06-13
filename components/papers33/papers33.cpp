@@ -235,23 +235,10 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  lgfx::v1::pixelcopy_t p(
-    canvas_->getBuffer(),                         // bronbuffer van het canvas
-    canvas_->getColorDepth(),                     // bronformaat
-    canvas_->getColorDepth(),                     // doelformaat
-    false,                                        // swapRGB (irrelevant voor grijs)
-    canvas_->getPalette()                         // palet (voor 4-bit)
-  );
-
-  p.src_x = x;
-  p.src_y = y;
-  p.src_bitwidth = canvas_->width();              // hele canvas-breedte nodig ivm offset berekening
-
-  gfx_.pushImage(x, y, w, h, &p);
-ESP_LOGD(TAG, "Partial update: x=%d y=%d w=%d h=%d", x, y, w, h);
-ESP_LOGD(TAG, "Canvas width=%d height=%d pitch=%d", canvas_->width(), canvas_->height(), (canvas_->width() + 1) / 2);
-ESP_LOGD(TAG, "Colordepth: %d", canvas_->getColorDepth());
+  // Push (x,y,w,h) van de canvas naar het scherm, op dezelfde positie
+  canvas_->pushSprite(&gfx_, x, y, x, y, w, h);
 }
+
 
 
 
