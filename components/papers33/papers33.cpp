@@ -235,25 +235,17 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  const int canvas_pitch = (canvas_->width() + 1) / 2;  // bytes per canvas-rij
-  const int region_pitch = (w + 1) / 2;                 // bytes per update-rij
-  const auto depth = canvas_->getColorDepth();
-  const void* palette = canvas_->getPalette();
+  // pixelcopy_t heeft offset-ondersteuning
+  lgfx::v1::pixelcopy_t p(canvas_->getBuffer(), canvas_->getColorDepth(), canvas_->getColorDepth(), false, canvas_->getPalette());
 
-  // Tijdelijke buffer van updategebied, zonder canvas-pitch-padding
-  std::vector<uint8_t> tempbuf(region_pitch * h);
+  // Stel bron-offset in pixels in
+  p.src_x = x;
+  p.src_y = y;
+  p.src_bitwidth = canvas_->width();  // dit is nodig bij gepackte formaten
 
-  const uint8_t* canvas_buf = static_cast<const uint8_t*>(canvas_->getBuffer());
-
-  for (int row = 0; row < h; ++row) {
-    const uint8_t* src = canvas_buf + (y + row) * canvas_pitch + (x / 2);
-    uint8_t* dst = tempbuf.data() + row * region_pitch;
-    memcpy(dst, src, region_pitch);
-  }
-
-  lgfx::v1::pixelcopy_t p(tempbuf.data(), depth, depth, false, palette);
   gfx_.pushImage(x, y, w, h, &p);
 }
+
 
 
 void M5PaperS3DisplayM5GFX::update_touch() {
