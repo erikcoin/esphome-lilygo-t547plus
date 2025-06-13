@@ -381,8 +381,14 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
 }
 void M5PaperS3DisplayM5GFX::loop() {
  //this->update_touch();
-    M5.update(); // Update touch and other inputs
-
+    //M5.update(); // Update touch and other inputs
+static unsigned long last_touch_time = 0;
+unsigned long current_time = millis();
+if (current_time - last_touch_time < 1000) { // Ignore touches within 300ms
+    return;
+}
+last_touch_time = current_time;
+    
     TouchPoint tp;
    if (get_touch(&tp)) {  // Check if touch is detected
         ESP_LOGD(TAG, "Touch from loop detected at x=%d, y=%d", tp.x, tp.y);
