@@ -114,8 +114,10 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Canvas sprite buffer created successfully. Size: %d x %d", this->canvas_->width(), this->canvas_->height());
         ESP_LOGD(TAG, "Canvas sprite buffer created successfully. colordepth: %d rotation: %d", this->canvas_->getColorDepth(), this->canvas_->getRotation());
-        auto depth = static_cast<int>(this->canvas_->getColorDepth());
-ESP_LOGD(TAG, "ColorDepth: %d (0x%X)", depth, depth);
+int raw_depth = this->canvas_->getColorDepth();
+int clean_depth = raw_depth & 0x0F;
+ESP_LOGD(TAG, "Canvas color depth: %d (raw: 0x%X)", clean_depth, raw_depth);
+
         ESP_LOGD(TAG, "Memory after *successful* createSprite:");
         ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
         ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
