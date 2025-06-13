@@ -113,6 +113,7 @@ void M5PaperS3DisplayM5GFX::setup() {
         this->canvas_ = nullptr;
     } else {
         ESP_LOGD(TAG, "Canvas sprite buffer created successfully. Size: %d x %d", this->canvas_->width(), this->canvas_->height());
+        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. colordept: %d rotation: %d", this->canvas_->ColorDept(), this->canvas_->Rotation());
         ESP_LOGD(TAG, "Memory after *successful* createSprite:");
         ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
         ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
