@@ -235,21 +235,28 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  ESP_LOGD(TAG, "Partial update: x=%d y=%d w=%d h=%d", x, y, w, h);
+  const int canvas_width = canvas_->width();
+  const int canvas_height = canvas_->height();
 
-  int canvas_pitch = (canvas_->width() + 1) / 2;
-  canvas_pitch = (canvas_pitch + 3) & ~3;  // align op 4-byte boundaries (vereist door LGFX)
+  // Beveiliging tegen buiten-bereik
+  if (x < 0 || y < 0 || x + w > canvas_width || y + h > canvas_height) {
+    ESP_LOGW(TAG, "partial_update out of bounds: x=%d y=%d w=%d h=%d", x, y, w, h);
+    return;
+  }
 
-  const int region_pitch = (w + 1) / 2;
-  const auto depth = canvas_->getColorDepth();
+  // Interne buffergegevens
+  const uint8_t* buf = static_cast<const uint8_t*>(canvas_->getBuffer());
+  const int canvas_pitch = (((canvas_width + 1) / 2) + 3) & ~3;  // bytes per rij, aligned
+
+  const int region_pitch = (w + 1) / 2;  // bytes per rij in tijdelijke buffer
   const void* palette = canvas_->getPalette();
+  const auto depth = canvas_->getColorDepth();
 
   std::vector<uint8_t> tempbuf(region_pitch * h);
 
-  const uint8_t* canvas_buf = static_cast<const uint8_t*>(canvas_->getBuffer());
-
+  // Rij per rij kopiëren
   for (int row = 0; row < h; ++row) {
-    const uint8_t* src = canvas_buf + (y + row) * canvas_pitch + (x / 2);
+    const uint8_t* src = buf + (y + row) * canvas_pitch + (x / 2);
     uint8_t* dst = tempbuf.data() + row * region_pitch;
     memcpy(dst, src, region_pitch);
   }
