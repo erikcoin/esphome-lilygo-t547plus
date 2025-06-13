@@ -443,7 +443,7 @@ void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
   draw_button(index, true);  // Ingedrukte stijl
   canvas_->pushSprite(0, 0); // Laat meteen zien
 
-  App.scheduler([this, index]() {
+  App.schedule([this, index]() {
     draw_button(index, false);  // Herstel knop
     canvas_->pushSprite(0, 0);
   }, duration_ms);
