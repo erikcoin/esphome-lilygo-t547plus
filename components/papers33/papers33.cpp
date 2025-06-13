@@ -440,13 +440,15 @@ void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
   canvas_->print(index + 1);
 }
 void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
-  draw_button(index, true);  // Ingedrukte stijl
-  canvas_->pushSprite(0, 0); // Laat meteen zien
+  // Teken knop in "pressed" toestand
+  draw_button(index, true);
+  canvas_->pushSprite(0, 0);  // hele canvas opnieuw tonen
 
-  App.scheduler([this, index]() {
-    draw_button(index, false);  // Herstel knop
-    canvas_->pushSprite(0, 0);
-  }, duration_ms);
+  // Tijdelijk effect terugdraaien na korte delay
+  set_timeout(duration_ms, [this, index]() {
+    draw_button(index, false);
+    canvas_->pushSprite(0, 0);  // opnieuw hele canvas tonen
+  });
 }
 
 } // namespace m5papers3_display_m5gfx
