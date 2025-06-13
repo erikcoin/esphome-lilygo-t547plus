@@ -237,12 +237,14 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
 
   ESP_LOGD(TAG, "Partial update: x=%d y=%d w=%d h=%d", x, y, w, h);
 
-  const int canvas_pitch = canvas_->getScanLine();   // correcte pitch in bytes
-  const int region_pitch = (w + 1) / 2;                   // bytes per rij voor 4-bit grijswaarden
+  int canvas_pitch = (canvas_->width() + 1) / 2;
+  canvas_pitch = (canvas_pitch + 3) & ~3;  // align op 4-byte boundaries (vereist door LGFX)
+
+  const int region_pitch = (w + 1) / 2;
   const auto depth = canvas_->getColorDepth();
   const void* palette = canvas_->getPalette();
 
-  std::vector<uint8_t> tempbuf(region_pitch * h);  // tijdelijke buffer zonder padding
+  std::vector<uint8_t> tempbuf(region_pitch * h);
 
   const uint8_t* canvas_buf = static_cast<const uint8_t*>(canvas_->getBuffer());
 
@@ -255,6 +257,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   lgfx::v1::pixelcopy_t p(tempbuf.data(), depth, depth, false, palette);
   gfx_.pushImage(x, y, w, h, &p);
 }
+
 
 
 
