@@ -250,7 +250,7 @@ void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   // Push het canvas-subgebied naar het scherm op locatie (x, y)
   gfx_.pushImage(x, y, w, h, &p);
 }
-0
+
 
 
 
