@@ -235,34 +235,25 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  const int canvas_width = canvas_->width();
-  const int canvas_height = canvas_->height();
+  // Maak een tijdelijke sprite (overlay), die data kopieert uit canvas_
+  lgfx::v1::LGFX_Sprite temp(&gfx_);
+  temp.setColorDepth(4);
+  temp.setPsram(true);
+  temp.setPaletteGrayscale();
+  temp.createSprite(w, h);
 
-  // Beveiliging tegen buiten-bereik
-  if (x < 0 || y < 0 || x + w > canvas_width || y + h > canvas_height) {
-    ESP_LOGW(TAG, "partial_update out of bounds: x=%d y=%d w=%d h=%d", x, y, w, h);
-    return;
+  // Kopieer pixel voor pixel uit canvas_ naar de temp sprite
+  for (int dy = 0; dy < h; ++dy) {
+    for (int dx = 0; dx < w; ++dx) {
+      auto col = canvas_->readPixel(x + dx, y + dy);
+      temp.drawPixel(dx, dy, col);
+    }
   }
 
-  // Interne buffergegevens
-  const uint8_t* buf = static_cast<const uint8_t*>(canvas_->getBuffer());
-  const int canvas_pitch = (((canvas_width + 1) / 2) + 3) & ~3;  // bytes per rij, aligned
+  // Push de temp sprite naar het e-paper scherm op juiste locatie
+  temp.pushSprite(x, y);
 
-  const int region_pitch = (w + 1) / 2;  // bytes per rij in tijdelijke buffer
-  const void* palette = canvas_->getPalette();
-  const auto depth = canvas_->getColorDepth();
-
-  std::vector<uint8_t> tempbuf(region_pitch * h);
-
-  // Rij per rij kopiëren
-  for (int row = 0; row < h; ++row) {
-    const uint8_t* src = buf + (y + row) * canvas_pitch + (x / 2);
-    uint8_t* dst = tempbuf.data() + row * region_pitch;
-    memcpy(dst, src, region_pitch);
-  }
-
-  lgfx::v1::pixelcopy_t p(tempbuf.data(), depth, depth, false, palette);
-  gfx_.pushImage(x, y, w, h, &p);
+  // Sprite wordt automatisch gedealloceerd
 }
 
 
