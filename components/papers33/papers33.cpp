@@ -5,7 +5,7 @@
 #include <cmath>
 #include <algorithm>
 #include <esp_heap_caps.h>
-
+#include "esphome/core/helpers.h"  // voor set_timeout
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
