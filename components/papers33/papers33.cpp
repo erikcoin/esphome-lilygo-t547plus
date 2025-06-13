@@ -235,21 +235,27 @@ bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
 void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
   if (!canvas_) return;
 
-  // Maak pixelcopy vanaf de canvas, vanaf (x, y), grootte (w, h)
-  lgfx::v1::pixelcopy_t p(canvas_->getBuffer(),
-                          canvas_->getColorDepth(),
-                          canvas_->getColorDepth(),
-                          false,
-                          canvas_->getPalette());
-  
-  // Stel offset in zodat alleen de gewenste regio uit het canvas wordt gekopieerd
-  p.src_x = x;
-  p.src_y = y;
-  p.src_bitwidth = canvas_->width();  // belangrijk: volledige breedte van de sprite (in pixels)
+  ESP_LOGD(TAG, "Partial update: x=%d y=%d w=%d h=%d", x, y, w, h);
 
-  // Push het canvas-subgebied naar het scherm op locatie (x, y)
+  const int canvas_pitch = canvas_->getScanLineWidth();   // correcte pitch in bytes
+  const int region_pitch = (w + 1) / 2;                   // bytes per rij voor 4-bit grijswaarden
+  const auto depth = canvas_->getColorDepth();
+  const void* palette = canvas_->getPalette();
+
+  std::vector<uint8_t> tempbuf(region_pitch * h);  // tijdelijke buffer zonder padding
+
+  const uint8_t* canvas_buf = static_cast<const uint8_t*>(canvas_->getBuffer());
+
+  for (int row = 0; row < h; ++row) {
+    const uint8_t* src = canvas_buf + (y + row) * canvas_pitch + (x / 2);
+    uint8_t* dst = tempbuf.data() + row * region_pitch;
+    memcpy(dst, src, region_pitch);
+  }
+
+  lgfx::v1::pixelcopy_t p(tempbuf.data(), depth, depth, false, palette);
   gfx_.pushImage(x, y, w, h, &p);
 }
+
 
 
 
