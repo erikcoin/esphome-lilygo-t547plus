@@ -449,7 +449,7 @@ void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
   this->buttons_[index].is_pressed = true;
   //draw_all_buttons();
     draw_button(index);
-  canvas_->pushSprite(0, 0);
+  canvas_->pushSprite(64, 64);
 
   set_timeout(duration_ms, [this, index]() {
     this->buttons_[index].is_pressed = false;
