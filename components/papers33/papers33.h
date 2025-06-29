@@ -34,6 +34,7 @@ struct ButtonConfig {
     int width;
     int height;
     std::string buttonid;
+    bool is_pressed = false;
     Trigger<> *trigger = nullptr;
 
 };
