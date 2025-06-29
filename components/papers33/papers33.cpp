@@ -191,7 +191,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this); // This is where user draws to the display (this->canvas_)
-   draw_button(3,true);
+        //draw_button(3,true);
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
         this->canvas_->pushSprite(0, 0);
