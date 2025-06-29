@@ -477,7 +477,7 @@ button2Sprite->pushSprite(300, 100); // Push to screen at x=300, y=100
 //  //  draw_button(index);
 //  canvas_->pushSprite(0, 0);
  }
-else return
+else 
  // set_timeout(duration_ms, [this, index]() {
  //   this->buttons_[index].is_pressed = false;
  //   //draw_all_buttons();
