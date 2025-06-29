@@ -93,7 +93,18 @@ void M5PaperS3DisplayM5GFX::setup() {
     this->canvas_->setColorDepth(4);
     this->canvas_->setRotation(0); 
     this->canvas_->setPaletteGrayscale();
+button1Sprite = new LGFX_Sprite(&gfx);
+button1Sprite->setPsram(true);
+button1Sprite->setColorDepth(4);
+button1Sprite->setPaletteGrayscale();
+button1Sprite->createSprite(200, 80);
 
+button2Sprite = new LGFX_Sprite&gfx);
+button2Sprite->setPsram(true);
+button2Sprite->setColorDepth(4);
+button2Sprite->setPaletteGrayscale();
+button2Sprite->createSprite(200, 80); //button width,buttunheight
+    
     ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
@@ -425,6 +436,9 @@ void M5PaperS3DisplayM5GFX::draw_button(int index) {
   uint16_t fill_color = btn.is_pressed ? 0x0000 : 0xFFFF;  // Donkerder als ingedrukt
   uint16_t border_color = 0x0000; // zwart
 
+
+
+    
   // Teken de knop
   canvas_->fillRect(x, y, w, h, fill_color);
   canvas_->drawRect(x, y, w, h, border_color);
@@ -445,7 +459,15 @@ void M5PaperS3DisplayM5GFX::draw_all_buttons() {
 
 void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
   if (index < 0 || index >= this->buttons_.size()) return;
+// To draw/update Button 1
+button1Sprite->fillSprite(10);  // Gray fill
+button1Sprite->drawCenterString("Click", btnWidth/2, btnHeight/2, 2);
+button1Sprite->pushSprite(20, 40);  // Push to screen at x=20, y=40
 
+// To draw/update Button 2
+button2Sprite->fillSprite(5);   // Darker fill
+button2Sprite->drawCenterString("Reset", btnWidth/2, btnHeight/2, 2);
+button2Sprite->pushSprite(140, 40); // Push to screen at x=140, y=40
   this->buttons_[index].is_pressed = true;
   //draw_all_buttons();
     draw_button(index);
