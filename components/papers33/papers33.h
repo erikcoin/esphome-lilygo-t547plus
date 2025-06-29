@@ -59,7 +59,7 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
     int get_width_internal() override;
     int get_height_internal() override;
     void draw_pixel_at(int x, int y, esphome::Color color) override;
-
+    void draw_all_buttons() override;
     display::DisplayType get_display_type() override {
         return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
     }
