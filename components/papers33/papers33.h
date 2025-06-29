@@ -77,6 +77,8 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
 
     int rotation_{0};
     lgfx::v1::LGFX_Sprite *canvas_{nullptr};
+lgfx::v1::LGFX_Sprite* button1Sprite;
+lgfx::v1::LGFX_Sprite* button2Sprite;
     std::function<void(display::Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
