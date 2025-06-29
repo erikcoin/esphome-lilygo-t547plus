@@ -484,7 +484,7 @@ button2Sprite->pushSprite(300, 100); // Push to screen at x=300, y=100
  //     draw_button(index);
  //   canvas_->pushSprite(0, 0);
  // });
-//}
+}
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
