@@ -179,7 +179,7 @@ void M5PaperS3DisplayM5GFX::update() {
         //draw_button(3,true);
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
-        this->canvas_->draw_all_buttons();
+        draw_all_buttons();
         this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
         M5.Display.display(); // Tell the EPD to show what's in its buffer
