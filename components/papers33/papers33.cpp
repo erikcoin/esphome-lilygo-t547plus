@@ -99,7 +99,7 @@ button1Sprite->setColorDepth(4);
 button1Sprite->setPaletteGrayscale();
 button1Sprite->createSprite(200, 80);
 
-button2Sprite = new LGFX_Sprite&gfx);
+button2Sprite = new LGFX_Sprite(&gfx);
 button2Sprite->setPsram(true);
 button2Sprite->setColorDepth(4);
 button2Sprite->setPaletteGrayscale();
