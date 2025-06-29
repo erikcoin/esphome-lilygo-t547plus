@@ -427,7 +427,7 @@ Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttoni
   return ptr;
 }
 
-void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
+void M5PaperS3DisplayM5GFX::draw_button(int index) {
   if (index < 0 || index >= this->buttons_.size()) return;
   auto &btn = this->buttons_[index];
 
@@ -436,15 +436,15 @@ void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
   int w = btn.width;
   int h = btn.height;
 
-  uint16_t fill_color = pressed ? 100 : 200;  // Donkerder als ingedrukt
-  uint16_t border_color = 0; // zwart
+  uint16_t fill_color = btn.is_pressed ? 0x0000 : 0xFFFF;  // Donkerder als ingedrukt
+  uint16_t border_color = 0x0000; // zwart
 
   // Teken de knop
   canvas_->fillRect(x, y, w, h, fill_color);
   canvas_->drawRect(x, y, w, h, border_color);
 
   // Eventuele knoptekst (optioneel)
-  canvas_->setTextColor(0);  // zwart
+  canvas_->setTextColor(btn.is_pressed ? 0xFFFF : 0x0000);
   canvas_->setTextSize(1);
   canvas_->setCursor(x + 10, y + h / 2 - 4);
   canvas_->print("Knop ");
