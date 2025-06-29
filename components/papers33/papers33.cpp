@@ -191,7 +191,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this); // This is where user draws to the display (this->canvas_)
-   draw_button(1,true);
+   draw_button(3,true);
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
         this->canvas_->pushSprite(0, 0);
@@ -289,6 +289,9 @@ last_touch_time = current_time;
         bool within_y = tp.y >= button.y && tp.y <= (button.y + button.height);
         if (within_x && within_y) {
             ESP_LOGI(TAG, "Touch inside button area at (%d, %d, %d, %d)", button.x, button.y, button.width, button.height);
+            // Toggle de status van de knop
+            bool &state = this->button_states_[button.buttonid];
+            state = !state;
             if (button.trigger != nullptr) {
                 ESP_LOGI(TAG, "Triggering button action...");
                 button.trigger->trigger();  // Trigger the action
