@@ -166,9 +166,9 @@ void M5PaperS3DisplayM5GFX::update() {
        // M5.Display.fillScreen(TFT_BLACK);
        // M5.Display.display();
        // delay(500);
-        M5.Display.fillScreen(TFT_WHITE);
-        M5.Display.display();
-        delay(500);
+      //  M5.Display.fillScreen(TFT_WHITE);
+     //   M5.Display.display();
+     //   delay(500);
 //vTaskDelay(pdMS_TO_TICKS(1500));
         ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
