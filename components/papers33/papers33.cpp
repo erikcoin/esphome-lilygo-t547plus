@@ -202,8 +202,9 @@ void M5PaperS3DisplayM5GFX::update() {
     }
 
     ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
+    draw_all_buttons();
 this->update_touch();
-  draw_all_buttons();
+  
 
 }
 
