@@ -82,7 +82,7 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
   //  Trigger<> release_trigger_;
  //   std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
 std::map<std::string, std::unique_ptr<Trigger<>>> button_triggers_;
-
+std::map<std::string, bool> button_states_;
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
 
 };
