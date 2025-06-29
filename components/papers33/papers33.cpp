@@ -174,28 +174,22 @@ void M5PaperS3DisplayM5GFX::update() {
         M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
     }
 
-
     if (this->canvas_ == nullptr) {
         ESP_LOGE(TAG, "Canvas not available in update()!");
         return;
     }
 
-
- 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
         // Assuming palette index 15 is white for 4-bit grayscale.
         // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
         this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
-
-
         ESP_LOGD(TAG, "Calling writer lambda...");
         this->writer_(*this); // This is where user draws to the display (this->canvas_)
         //draw_button(3,true);
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
         this->canvas_->pushSprite(0, 0);
-
         ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
         M5.Display.display(); // Tell the EPD to show what's in its buffer
     } else {
@@ -209,7 +203,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
     ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
 this->update_touch();
-  
+  draw_all_buttons();
 
 }
 
