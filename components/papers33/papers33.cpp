@@ -450,15 +450,24 @@ void M5PaperS3DisplayM5GFX::draw_button(int index, bool pressed) {
   canvas_->print("Knop ");
   canvas_->print(index + 1);
 }
-void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
-  // Teken knop in "pressed" toestand
-  draw_button(index, true);
-  canvas_->pushSprite(0, 0);  // hele canvas opnieuw tonen
 
-  // Tijdelijk effect terugdraaien na korte delay
+void M5PaperS3DisplayM5GFX::draw_all_buttons() {
+  for (int i = 0; i < this->buttons_.size(); i++) {
+    draw_button(i);
+  }
+}
+
+void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
+  if (index < 0 || index >= this->buttons_.size()) return;
+
+  this->buttons_[index].is_pressed = true;
+  draw_all_buttons();
+  canvas_->pushSprite(0, 0);
+
   set_timeout(duration_ms, [this, index]() {
-    draw_button(index, false);
-    canvas_->pushSprite(0, 0);  // opnieuw hele canvas tonen
+    this->buttons_[index].is_pressed = false;
+    draw_all_buttons();
+    canvas_->pushSprite(0, 0);
   });
 }
 
