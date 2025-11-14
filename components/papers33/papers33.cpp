@@ -467,7 +467,7 @@ button1Sprite->fillSprite(10);  // Gray fill
 //button1Sprite->drawCenterString("Click", btnWidth/2, btnHeight/2, 2);
 button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
 button1Sprite->pushSprite(50, 100);  // Push to screen at x=50, y=100
- };
+ }return;
  if (index = 2 ) {
 // To draw/update Button 2
      ESP_LOGD(TAG, "Index 2 gekozen");
