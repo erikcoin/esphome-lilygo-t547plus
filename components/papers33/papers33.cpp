@@ -462,7 +462,7 @@ void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
 
  if (index = 0 )  {
 // To draw/update Button 1  
-     ESP_LOGD(TAG, "Index 0 gekozen";
+     ESP_LOGD(TAG, "Index 0 gekozen");
 button1Sprite->fillSprite(10);  // Gray fill
 //button1Sprite->drawCenterString("Click", btnWidth/2, btnHeight/2, 2);
 button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
