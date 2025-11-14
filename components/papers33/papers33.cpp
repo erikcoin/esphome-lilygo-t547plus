@@ -97,7 +97,7 @@ button1Sprite = new LGFX_Sprite(&gfx);
 button1Sprite->setPsram(true);
 button1Sprite->setColorDepth(4);
 button1Sprite->setPaletteGrayscale();
-button1Sprite->createSprite(200, 80);
+button1Sprite->createSprite(50, 100);
 
 button2Sprite = new LGFX_Sprite(&gfx);
 button2Sprite->setPsram(true);
@@ -458,7 +458,7 @@ void M5PaperS3DisplayM5GFX::draw_all_buttons() {
 }
 
 void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
-  if (index < 0 || index >= this->buttons_.size()) return;
+ // if (index < 0 || index >= this->buttons_.size()) return;
 
  if (index = 0 )  {
 // To draw/update Button 1  
