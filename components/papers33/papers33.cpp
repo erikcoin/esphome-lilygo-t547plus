@@ -46,7 +46,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time
 
     ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
-    delay(500);
+    //delay(500);
     ESP_LOGD(TAG, "Delay finished.");
 
     if (this->touch_coordinates_sensor_ != nullptr) {
