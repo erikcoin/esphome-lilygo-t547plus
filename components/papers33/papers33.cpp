@@ -460,15 +460,15 @@ void M5PaperS3DisplayM5GFX::draw_all_buttons() {
 void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
  // if (index < 0 || index >= this->buttons_.size()) return;
 
- if (index = 1 )  
+ if (index = 1 )  {
 // To draw/update Button 1  
      ESP_LOGD(TAG, "Index 1 gekozen");
 button1Sprite->fillSprite(10);  // Gray fill
 //button1Sprite->drawCenterString("Click", btnWidth/2, btnHeight/2, 2);
 button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
 button1Sprite->pushSprite(50, 100);  // Push to screen at x=50, y=100
- 
- if (index = 2 ) 
+ }
+ if (index = 2 ) {
 // To draw/update Button 2
      ESP_LOGD(TAG, "Index 2 gekozen");
 button2Sprite->fillSprite(5);   // Darker fill
@@ -478,7 +478,7 @@ button2Sprite->pushSprite(300, 100); // Push to screen at x=300, y=100
 //  //draw_all_buttons();
 //  //  draw_button(index);
 //  canvas_->pushSprite(0, 0);
- 
+ }
 
  // set_timeout(duration_ms, [this, index]() {
  //   this->buttons_[index].is_pressed = false;
