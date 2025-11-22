@@ -287,8 +287,8 @@ last_touch_time = current_time;
         if (within_x && within_y) {
             ESP_LOGI(TAG, "Touch inside button area at (%d, %d, %d, %d)", button.x, button.y, button.width, button.height);
             // Toggle de status van de knop
-            bool &state = this->button_states_[button.buttonid];
-            state = !state;
+  ////          bool &state = this->button_states_[button.buttonid];
+  ////          state = !state;
             if (button.trigger != nullptr) {
                 ESP_LOGI(TAG, "Triggering button action...");
                 button.trigger->trigger();  // Trigger the action
@@ -412,15 +412,15 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
     
 //}
 Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
-  auto it = this->button_triggers_.find(buttonid);
-  if (it != this->button_triggers_.end()) {
+////  auto it = this->button_triggers_.find(buttonid);
+////  if (it != this->button_triggers_.end()) {
     return it->second.get();  // Trigger bestaat al
   }
 
   // Nieuwe trigger aanmaken en opslaan
   auto trig = std::make_unique<Trigger<>>();
   Trigger<> *ptr = trig.get();
-  this->button_triggers_[buttonid] = std::move(trig);
+////  this->button_triggers_[buttonid] = std::move(trig);
   return ptr;
 }
 
