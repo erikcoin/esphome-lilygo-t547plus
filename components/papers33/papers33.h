@@ -84,8 +84,8 @@ lgfx::v1::LGFX_Sprite* button2Sprite;
     text_sensor::TextSensor *touch_coordinates_sensor_{nullptr};
   //  Trigger<> release_trigger_;
  //   std::vector<std::unique_ptr<Trigger<>>> triggers_;  // Bewaart alle unieke triggers
-std::map<std::string, std::unique_ptr<Trigger<>>> button_triggers_;
-std::map<std::string, bool> button_states_;
+//std::map<std::string, std::unique_ptr<Trigger<>>> button_triggers_;
+//std::map<std::string, bool> button_states_;
     std::vector<ButtonConfig> buttons_{}; // Vector to store configured buttons
 
 };
