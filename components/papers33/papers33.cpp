@@ -414,8 +414,8 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
 ////  auto it = this->button_triggers_.find(buttonid);
 ////  if (it != this->button_triggers_.end()) {
-    return it->second.get();  // Trigger bestaat al
-  }
+////    return it->second.get();  // Trigger bestaat al
+//  }
 
   // Nieuwe trigger aanmaken en opslaan
   auto trig = std::make_unique<Trigger<>>();
@@ -461,17 +461,17 @@ void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
 
   if (index == 1) {
     ESP_LOGD(TAG, "Index 1 gekozen");
-    button1Sprite->fillSprite(10);  // Gray fill
-    button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
-    button1Sprite->pushSprite(50, 100);
+////    button1Sprite->fillSprite(10);  // Gray fill
+ ////   button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
+ ////   button1Sprite->pushSprite(50, 100);
     return;
   }
 
   if (index == 2) {
     ESP_LOGD(TAG, "Index 2 gekozen");
-    button2Sprite->fillSprite(5);   // Darker fill
-    button2Sprite->drawCenterString("Reset", 200/2, 80/2, 2);
-    button2Sprite->pushSprite(300, 100);
+////    button2Sprite->fillSprite(5);   // Darker fill
+////    button2Sprite->drawCenterString("Reset", 200/2, 80/2, 2);
+////    button2Sprite->pushSprite(300, 100);
     return;
   }
 }
