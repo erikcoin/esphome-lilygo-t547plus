@@ -512,5 +512,40 @@ void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
   }
 }
 
+
+void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
+  int32_t x1 = area->x1;
+  int32_t y1 = area->y1;
+  int32_t x2 = area->x2;
+  int32_t y2 = area->y2;
+  int w = x2 - x1 + 1;
+  int h = y2 - y1 + 1;
+
+  for (int yy = 0; yy < h; yy++) {
+    for (int xx = 0; xx < w; xx++) {
+      lv_color_t c = *color_p++;
+      // Convert LVGL color to your e-paper color:
+      // Assume LV_COLOR_DEPTH = 16 (RGB565)
+      uint16_t c565 = c.full;
+      // Convert to grayscale / your format — this depends on how `papers33` draws pixels
+      // Example: map to 16 gray levels if epaper is 4-bit:
+      uint8_t gray = (( (c565 >> 11) & 0x1F) * 299 + ((c565 >> 5) & 0x3F) * 587 + (c565 & 0x1F) * 114) / (1000 * 8); 
+      // (this is an example — tune to your conversion)
+      uint16_t final_color = gray; // or map to your color type
+
+      // Use your drawing function
+      this->draw_pixel(x1 + xx, y1 + yy, final_color);
+    }
+  }
+
+  // After writing: flush to EPD
+  this->flush(); // or whatever your method is to update the EPD
+
+  // Let LVGL know we’re done
+  lv_disp_flush_ready(&disp_drv_);
+}
+
+
+
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
