@@ -269,81 +269,66 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-  // basic checks
   if (!area || !color_p) {
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // clamp area to display bounds
+  // Clamp area to display bounds
   int32_t x1 = area->x1 < 0 ? 0 : area->x1;
   int32_t y1 = area->y1 < 0 ? 0 : area->y1;
   int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
   int32_t y2 = area->y2 >= (int)this->get_height() ? this->get_height() - 1 : area->y2;
 
-  const int w = x2 - x1 + 1;
-  const int h = y2 - y1 + 1;
-
+  int w = x2 - x1 + 1;
+  int h = y2 - y1 + 1;
   if (w <= 0 || h <= 0) {
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Safety: ensure canvas_ exists
-  if (this->canvas_ == nullptr) {
+  if (!this->canvas_) {
     ESP_LOGE(TAG, "lvgl_flush: canvas_ is null!");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Make sure sprite has correct size (optional)
-  // If your sprite is full-screen already this is not necessary.
-
-  // Iterate rows & columns and write pixels into the LGFX_Sprite.
-  // We convert LVGL's RGB565 to a 4-bit grayscale palette index (0..15).
+  // Write LVGL pixels into canvas_
   lv_color_t *p = color_p;
   for (int yy = 0; yy < h; yy++) {
     for (int xx = 0; xx < w; xx++) {
-      // lv_color_t.full is RGB565 if LV_COLOR_DEPTH == 16
       uint16_t c565 = p->full;
 
-      // Extract rgb components
+      // Convert RGB565 to 8-bit grayscale
       uint8_t r5 = (c565 >> 11) & 0x1F;
       uint8_t g6 = (c565 >> 5) & 0x3F;
       uint8_t b5 = c565 & 0x1F;
 
-      // Expand to 8-bit approx
       uint8_t r8 = (r5 * 527 + 23) >> 6;
       uint8_t g8 = (g6 * 259 + 33) >> 6;
       uint8_t b8 = (b5 * 527 + 23) >> 6;
 
-      // Compute luminance (Rec. 601)
-      uint16_t lum = (uint16_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
+      uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
 
-      // Map 0..255 to 0..15 (4-bit grayscale index)
+      // Map 0..255 -> 0..15 for 4-bit grayscale canvas
       uint8_t gray4 = (lum * 15 + 127) / 255;
 
-      // IMPORTANT: LGFX_Sprite when created with colorDepth=4 and palette set,
-      // typically expects palette indices for drawPixel. Pass gray4 (0..15).
-      // If drawPixel expects 16-bit color instead, we will need to convert to RGB565.
+      // Write pixel to canvas
       this->canvas_->drawPixel(x1 + xx, y1 + yy, gray4);
 
       p++;
     }
   }
 
-  // Push the sprite to the display. pushSprite draws the sprite onto the M5.Display.
-  // This will perform the actual EPD update for that region (or whole screen).
-  // Use 0,0 to overlay entire sprite; if sprite is full-screen that's fine.
-  this->canvas_->pushSprite(0, 0);
+  // Push only the flushed rectangle to the real display
+  // Using pushSprite(x, y) for a small region prevents full-screen DMA allocation
+  // If pushSprite(areaX, areaY) is not supported in your library, you can push in horizontal bands
+  this->canvas_->pushSprite(x1, y1);
 
-  // Alternatively, if you want to only update the flushed window, you could call:
-  // this->canvas_->pushSprite(x1, y1);
-  // depending on the API & desired placement.
-
-  // Tell LVGL we finished flushing
+  // Notify LVGL that flush is done
   lv_disp_flush_ready(&this->disp_drv_);
 }
+
 
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
