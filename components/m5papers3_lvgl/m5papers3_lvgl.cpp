@@ -1,4 +1,4 @@
-#include "papers33.h"
+#include "m5papers3_lvgl.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/color.h"
