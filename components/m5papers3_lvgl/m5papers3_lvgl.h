@@ -59,7 +59,7 @@ private:
   // size of LVGL buffer in lines:
   static constexpr int LV_BUF_LINES = 40;   // tweakable
     int rotation_{0};
-    lgfx::v1::LGFX_Sprite *canvas_{nullptr};
+    //lgfx::v1::LGFX_Sprite *canvas_{nullptr};
     std::function<void(display::Display &)> writer_{nullptr};
     m5gfx::LGFX_Device& gfx_ = M5.Display;
 };
