@@ -69,13 +69,25 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
     void set_touch_sensor(text_sensor::TextSensor *sensor);
+// LVGL-related:
+  void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
 
+  // override to run lv handler
+  void update() override;
 
  protected:
     void update_touch();
     bool get_touch(TouchPoint *point);
     void send_coordinates_and_check_buttons(TouchPoint tp); // Modified to check buttons
+  // LVGL draw buffer
+  lv_disp_draw_buf_t draw_buf_;
+  lv_color_t *lv_buf1_;
+  lv_color_t *lv_buf2_;
 
+  lv_disp_drv_t disp_drv_;
+
+  // size of LVGL buffer in lines:
+  static constexpr int LV_BUF_LINES = 40;   // tweakable
     int rotation_{0};
     lgfx::v1::LGFX_Sprite *canvas_{nullptr};
 lgfx::v1::LGFX_Sprite* button1Sprite;
