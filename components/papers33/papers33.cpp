@@ -393,17 +393,17 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
     
 //}
 Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
-  auto it = this->button_triggers_.find(buttonid);
-  if (it != this->button_triggers_.end()) {
-    return it->second.get();  // Trigger bestaat al
+////  auto it = this->button_triggers_.find(buttonid);
+////  if (it != this->button_triggers_.end()) {
+////    return it->second.get();  // Trigger bestaat al
   }
 
   // Nieuwe trigger aanmaken en opslaan
-  auto trig = std::make_unique<Trigger<>>();
-  Trigger<> *ptr = trig.get();
-  this->button_triggers_[buttonid] = std::move(trig);
-  return ptr;
-}
+////  auto trig = std::make_unique<Trigger<>>();
+////  Trigger<> *ptr = trig.get();
+////  this->button_triggers_[buttonid] = std::move(trig);
+////  return ptr;
+//}
 
 //Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger() {
 //    auto trig = std::make_unique<Trigger<>>();
