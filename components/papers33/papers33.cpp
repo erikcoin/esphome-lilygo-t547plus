@@ -78,7 +78,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
   disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-    auto *self = static_cast<Papers33 *>(drv->user_data);
+    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
     self->lvgl_flush(area, color_p);
   };
   disp_drv_.user_data = this;
