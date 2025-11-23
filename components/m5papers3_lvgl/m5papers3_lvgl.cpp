@@ -80,10 +80,6 @@ void M5PaperS3DisplayM5GFX::update() {
         //M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
     }
 
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Canvas not available in update()!");
-        return;
-    }
 
     if (this->writer_ != nullptr) {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
@@ -114,44 +110,6 @@ void M5PaperS3DisplayM5GFX::update() {
   lv_timer_handler();
 }
 //#include 
-void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
-  if (!canvas_) return;
-
-  // Maak een tijdelijke sprite (overlay), die data kopieert uit canvas_
-  lgfx::v1::LGFX_Sprite temp(&gfx_);
-  temp.setColorDepth(4);
-  temp.setPsram(true);
-  temp.setPaletteGrayscale();
-  temp.createSprite(w, h);
-
-  // Kopieer pixel voor pixel uit canvas_ naar de temp sprite
-  for (int dy = 0; dy < h; ++dy) {
-    for (int dx = 0; dx < w; ++dx) {
-      auto col = canvas_->readPixel(x + dx, y + dy);
-      temp.drawPixel(dx, dy, col);
-    }
-  }
-
-  // Push de temp sprite naar het e-paper scherm op juiste locatie
-  temp.pushSprite(x, y);
-}
-
-void M5PaperS3DisplayM5GFX::dump_config() {
-    LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper (4-bit Grayscale)", this);
-    int display_rotation_deg = 0;
-    // this->rotation_ stores M5GFX 0-3. Convert back for logging.
-    if (this->rotation_ == 1) display_rotation_deg = 90;
-    else if (this->rotation_ == 2) display_rotation_deg = 180;
-    else if (this->rotation_ == 3) display_rotation_deg = 270;
-    ESP_LOGCONFIG(TAG, "  Rotation (applied to M5.Display): %d degrees (M5GFX value %d)", display_rotation_deg, this->rotation_);
-
-    if (this->canvas_) {
-        ESP_LOGCONFIG(TAG, "  Canvas Size: %d x %d (gfx: %dx%d)", this->canvas_->width(), this->canvas_->height(), this->gfx_.width(), this->gfx_.height());
-        ESP_LOGCONFIG(TAG, "  Canvas Color Depth: %d bits", this->canvas_->getColorDepth());
-    } else {
-        ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized (gfx: %dx%d)", this->gfx_.width(), this->gfx_.height());
-    }
-}
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
     if (this->canvas_ != nullptr) {
@@ -172,18 +130,18 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
-     return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
+     return : this->gfx_.width();
 }
 
 int M5PaperS3DisplayM5GFX::get_height_internal() {
-    return (this->canvas_) ? this->canvas_->height() : this->gfx_.height();
+    return this->gfx_.height();
 }
 
 void M5PaperS3DisplayM5GFX::fill(Color color) {
     if (this->canvas_ == nullptr) return;
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
     ESP_LOGV(TAG, "fill() called with RGB888: %x", rgb888_color);
-    this->canvas_->fillSprite(rgb888_color);
+    //this->canvas_->fillSprite(rgb888_color);
 }
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
@@ -193,7 +151,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
         return;
     }
     uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
-    this->canvas_->drawPixel(x, y, rgb888_color);
+   // this->canvas_->drawPixel(x, y, rgb888_color);
 }
 void M5PaperS3DisplayM5GFX::loop() {
     M5.update(); // Update touch and other inputs
