@@ -204,6 +204,12 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
 
 this->m5display_->drawPixel(x, y, c);}
 
+int M5PaperS3DisplayM5GFX::get_width_internal() {
+     return  : this->gfx_.width();
+}
 
+int M5PaperS3DisplayM5GFX::get_height_internal() {
+    return  : this->gfx_.height();
+}
 } // namespace m5papers3_display_m5gfx
 } // namespace esphome
