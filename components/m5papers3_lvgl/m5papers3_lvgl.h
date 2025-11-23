@@ -22,6 +22,8 @@ namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 class M5PaperS3DisplayM5GFX : public display::Display {
+private:
+  uint8_t *epd_buffer_{nullptr};  // 4-bit per pixel framebuffer
  public:
     void setup() override;
     void loop();
