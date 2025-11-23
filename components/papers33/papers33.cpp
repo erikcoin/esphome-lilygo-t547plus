@@ -57,6 +57,41 @@ void M5PaperS3DisplayM5GFX::setup() {
         ESP_LOGD(TAG, "Touch sensor not configured.");
     }
 
+  // === LVGL setup ===
+  lv_init();
+
+  int w = this->get_width();
+  int h = this->get_height();
+  size_t buf_size = w * LV_BUF_LINES;
+
+  // allocate two buffers (double buffering)
+  lv_buf1_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+  lv_buf2_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+  if (!lv_buf1_ || !lv_buf2_) {
+    ESP_LOGE("papers33", "Failed to allocate LVGL buffers");
+  }
+
+  lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
+
+  lv_disp_drv_init(&disp_drv_);
+  disp_drv_.hor_res = w;
+  disp_drv_.ver_res = h;
+  disp_drv_.draw_buf = &draw_buf_;
+  disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+    auto *self = static_cast<Papers33 *>(drv->user_data);
+    self->lvgl_flush(area, color_p);
+  };
+  disp_drv_.user_data = this;
+
+  lv_disp_drv_register(&disp_drv_);
+
+  // Optionally: create a simple LVGL UI element to test
+  lv_obj_t *label = lv_label_create(lv_scr_act());
+  lv_label_set_text(label, "Hello LVGL");
+  lv_obj_center(label);
+
+
+    
     auto &gfx = M5.Display;
     // Apply initial rotation to M5.Display IF it's not done by LovyanGFX automatically
     // This->rotation_ is set via set_rotation which converts degrees to 0-3
@@ -207,7 +242,8 @@ void M5PaperS3DisplayM5GFX::update() {
     
 this->update_touch();
   
-
+  // Call LVGL tasks
+  lv_timer_handler();
 }
 
 
