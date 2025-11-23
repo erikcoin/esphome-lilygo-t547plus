@@ -83,9 +83,6 @@ ESP_LOGD(TAG, "na  drvregister ");
   lv_obj_t *label = lv_label_create(lv_scr_act());
   lv_label_set_text(label, "Hello LVGL");
   lv_obj_center(label);
-
-
-    
     auto &gfx = M5.Display;
     if (this->canvas_ != nullptr) {
         ESP_LOGD(TAG, "Deleting existing canvas_...");
