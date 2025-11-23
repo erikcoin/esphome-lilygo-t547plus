@@ -207,7 +207,7 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-    if (!area || !color_p || !epd_buffer_) {
+    if (!area || !color_p) {
         lv_disp_flush_ready(&this->disp_drv_);
         return;
     }
@@ -225,9 +225,11 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
     }
 
     lv_color_t *p = color_p;
-    int display_width = this->get_width();
 
-    // Copy LVGL strip into framebuffer (4-bit grayscale, 2 pixels per byte)
+    // Temporary line buffer (2 pixels per byte)
+    size_t line_bytes = (w + 1) / 2;
+    std::vector<uint8_t> line_buf(line_bytes * h, 0xFF); // fill white
+
     for (int yy = 0; yy < h; yy++) {
         for (int xx = 0; xx < w; xx++) {
             uint16_t c565 = p->full;
@@ -241,25 +243,24 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
             uint8_t b8 = (b5 * 527 + 23) >> 6;
             uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
 
+            // 4-bit grayscale
             uint8_t gray4 = (lum * 15 + 127) / 255;
 
-            int buf_index = (y1 + yy) * (display_width / 2) + (x1 + xx) / 2;
-            bool high_nibble = ((x1 + xx) & 1) == 0;
-
-            if (high_nibble) {
-                epd_buffer_[buf_index] = (epd_buffer_[buf_index] & 0x0F) | (gray4 << 4);
+            // Pack 2 pixels per byte
+            int byte_index = yy * line_bytes + (xx / 2);
+            if ((xx & 1) == 0) {
+                line_buf[byte_index] = (line_buf[byte_index] & 0x0F) | (gray4 << 4);
             } else {
-                epd_buffer_[buf_index] = (epd_buffer_[buf_index] & 0xF0) | (gray4 & 0x0F);
+                line_buf[byte_index] = (line_buf[byte_index] & 0xF0) | (gray4 & 0x0F);
             }
 
             p++;
         }
     }
 
-    // Push strip to display using pushImage (line-wise)
-    M5.Display.pushImage(x1, y1, w, h, epd_buffer_ + (y1 * display_width + x1)/2);
+    // Push the strip
+    M5.Display.pushImage(x1, y1, w, h, line_buf.data());
 
-    // LVGL flush complete
     lv_disp_flush_ready(&this->disp_drv_);
 }
 
