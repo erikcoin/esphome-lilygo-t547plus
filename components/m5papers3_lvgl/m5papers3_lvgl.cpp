@@ -22,23 +22,30 @@ void M5PaperS3DisplayM5GFX::setup() {
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
     vTaskDelay(pdMS_TO_TICKS(1000));
 
+    // --- Allocate full-screen PSRAM framebuffer (4-bit grayscale) ---
+    epd_buffer_ = (uint8_t*)heap_caps_malloc((this->get_width() * this->get_height()) / 2, MALLOC_CAP_SPIRAM);
+    if (!epd_buffer_) {
+        ESP_LOGE(TAG, "Failed to allocate PSRAM framebuffer!");
+        return;
+    }
+    memset(epd_buffer_, 0xFF, (this->get_width() * this->get_height()) / 2); // fill white
+
     // --- LVGL init ---
     lv_init();
 
     int w = this->get_width();
     int h = this->get_height();
-
     size_t buf_size = w * LV_BUF_LINES;
 
-    // Allocate LVGL double buffers
     lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
     lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
     if (!lv_buf1 || !lv_buf2) {
-        ESP_LOGE(TAG, "Failed to allocate LVGL buffers");
+        ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
         return;
     }
 
     lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
+
     lv_disp_drv_init(&disp_drv_);
     disp_drv_.hor_res = w;
     disp_drv_.ver_res = h;
@@ -50,13 +57,14 @@ void M5PaperS3DisplayM5GFX::setup() {
     disp_drv_.user_data = this;
     lv_disp_drv_register(&disp_drv_);
 
-    // Optional test: simple LVGL label
+    // Optional LVGL label to test
     lv_obj_t *label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Hello LVGL");
     lv_obj_center(label);
 
     ESP_LOGD(TAG, "LVGL setup complete.");
 }
+
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
     static bool first_time = true;
@@ -199,59 +207,62 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-  if (!area || !color_p) {
-    lv_disp_flush_ready(&this->disp_drv_);
-    return;
-  }
-
-  int32_t x1 = area->x1 < 0 ? 0 : area->x1;
-  int32_t y1 = area->y1 < 0 ? 0 : area->y1;
-  int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
-  int32_t y2 = area->y2 >= (int)this->get_height() ? this->get_height() - 1 : area->y2;
-
-  int w = x2 - x1 + 1;
-  int h = y2 - y1 + 1;
-  if (w <= 0 || h <= 0) {
-    lv_disp_flush_ready(&this->disp_drv_);
-    return;
-  }
-
-  lv_color_t *p = color_p;
-
-  // Start SPI batch write to M5.Display
-  M5.Display.startWrite();
-
-  for (int yy = 0; yy < h; yy++) {
-    for (int xx = 0; xx < w; xx++) {
-      uint16_t c565 = p->full;
-
-      // Convert RGB565 -> 8-bit grayscale
-      uint8_t r5 = (c565 >> 11) & 0x1F;
-      uint8_t g6 = (c565 >> 5) & 0x3F;
-      uint8_t b5 = c565 & 0x1F;
-      uint8_t r8 = (r5 * 527 + 23) >> 6;
-      uint8_t g8 = (g6 * 259 + 33) >> 6;
-      uint8_t b8 = (b5 * 527 + 23) >> 6;
-      uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
-
-      // Map 0..255 -> 0..15 (4-bit grayscale)
-      uint8_t gray4 = (lum * 15 + 127) / 255;
-
-      // Convert 4-bit grayscale to RGB565 for display
-      uint8_t gray8 = (gray4 * 255) / 15;
-      uint16_t gray565 = ((gray8 >> 3) << 11) | ((gray8 >> 2) << 5) | (gray8 >> 3);
-
-      M5.Display.drawPixel(x1 + xx, y1 + yy, gray565);
-
-      p++;
+    if (!area || !color_p || !epd_buffer_) {
+        lv_disp_flush_ready(&this->disp_drv_);
+        return;
     }
-  }
 
-  M5.Display.endWrite();
+    int32_t x1 = area->x1 < 0 ? 0 : area->x1;
+    int32_t y1 = area->y1 < 0 ? 0 : area->y1;
+    int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
+    int32_t y2 = area->y2 >= (int)this->get_height() ? this->get_height() - 1 : area->y2;
 
-  // Tell LVGL we are done
-  lv_disp_flush_ready(&this->disp_drv_);
+    int w = x2 - x1 + 1;
+    int h = y2 - y1 + 1;
+    if (w <= 0 || h <= 0) {
+        lv_disp_flush_ready(&this->disp_drv_);
+        return;
+    }
+
+    lv_color_t *p = color_p;
+    int display_width = this->get_width();
+
+    // Copy LVGL strip into framebuffer (4-bit grayscale, 2 pixels per byte)
+    for (int yy = 0; yy < h; yy++) {
+        for (int xx = 0; xx < w; xx++) {
+            uint16_t c565 = p->full;
+
+            // RGB565 -> 8-bit grayscale
+            uint8_t r5 = (c565 >> 11) & 0x1F;
+            uint8_t g6 = (c565 >> 5) & 0x3F;
+            uint8_t b5 = c565 & 0x1F;
+            uint8_t r8 = (r5 * 527 + 23) >> 6;
+            uint8_t g8 = (g6 * 259 + 33) >> 6;
+            uint8_t b8 = (b5 * 527 + 23) >> 6;
+            uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
+
+            uint8_t gray4 = (lum * 15 + 127) / 255;
+
+            int buf_index = (y1 + yy) * (display_width / 2) + (x1 + xx) / 2;
+            bool high_nibble = ((x1 + xx) & 1) == 0;
+
+            if (high_nibble) {
+                epd_buffer_[buf_index] = (epd_buffer_[buf_index] & 0x0F) | (gray4 << 4);
+            } else {
+                epd_buffer_[buf_index] = (epd_buffer_[buf_index] & 0xF0) | (gray4 & 0x0F);
+            }
+
+            p++;
+        }
+    }
+
+    // Push strip to display using pushImage (line-wise)
+    M5.Display.pushImage(x1, y1, w, h, epd_buffer_ + (y1 * display_width + x1)/2);
+
+    // LVGL flush complete
+    lv_disp_flush_ready(&this->disp_drv_);
 }
+
 
 
 
