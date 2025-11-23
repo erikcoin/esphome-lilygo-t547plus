@@ -16,40 +16,25 @@ void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Memory before M5.begin():");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-
     ESP_LOGD(TAG, "Calling M5.config()...");
     auto cfg = M5.config();
-    
     ESP_LOGD(TAG, "Calling M5.begin()...");
     M5.begin(cfg);
     ESP_LOGD(TAG, "M5.begin() finished.");
-
     ESP_LOGD(TAG, "Adding delay after M5.begin()...");
     vTaskDelay(pdMS_TO_TICKS(100));
     ESP_LOGD(TAG, "Delay finished.");
-
     ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
     ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-
     ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
     ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
-
     ESP_LOGD(TAG, "Waiting for EPD to be readable...");
-    // while (!M5.Display.isReadable()) { // This can hang if there's an issue
-    //     ESP_LOGD(TAG, "EPD not readable yet, waiting...");
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    // }
-    // ESP_LOGD(TAG, "EPD is readable.");
-    // Consider a timeout or alternative check if isReadable() causes issues
     vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time
-
     ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
     //delay(500);
     ESP_LOGD(TAG, "Delay finished.");
-
-
 ESP_LOGD(TAG, "voor lvgl setup");
   // === LVGL setup ===
   lv_init();
@@ -57,7 +42,7 @@ ESP_LOGD(TAG, "na lvgl setup");
   int w = this->get_width();
   int h = this->get_height();
   size_t buf_size = w * LV_BUF_LINES;
-
+ESP_LOGD(TAG, "na lvgl setup");
   // allocate two buffers (double buffering)
   lv_buf1_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
   lv_buf2_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
@@ -284,40 +269,80 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-  int32_t x1 = area->x1;
-  int32_t y1 = area->y1;
-  int32_t x2 = area->x2;
-  int32_t y2 = area->y2;
-  int w = x2 - x1 + 1;
-  int h = y2 - y1 + 1;
+  // basic checks
+  if (!area || !color_p) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
 
+  // clamp area to display bounds
+  int32_t x1 = area->x1 < 0 ? 0 : area->x1;
+  int32_t y1 = area->y1 < 0 ? 0 : area->y1;
+  int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
+  int32_t y2 = area->y2 >= (int)this->get_height() ? this->get_height() - 1 : area->y2;
+
+  const int w = x2 - x1 + 1;
+  const int h = y2 - y1 + 1;
+
+  if (w <= 0 || h <= 0) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // Safety: ensure canvas_ exists
+  if (this->canvas_ == nullptr) {
+    ESP_LOGE(TAG, "lvgl_flush: canvas_ is null!");
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // Make sure sprite has correct size (optional)
+  // If your sprite is full-screen already this is not necessary.
+
+  // Iterate rows & columns and write pixels into the LGFX_Sprite.
+  // We convert LVGL's RGB565 to a 4-bit grayscale palette index (0..15).
+  lv_color_t *p = color_p;
   for (int yy = 0; yy < h; yy++) {
     for (int xx = 0; xx < w; xx++) {
-      lv_color_t c = *color_p++;
-      // Convert LVGL color to your e-paper color:
-      // Assume LV_COLOR_DEPTH = 16 (RGB565)
-      uint16_t c565 = c.full;
-      // Convert to grayscale / your format — this depends on how `papers33` draws pixels
-      // Example: map to 16 gray levels if epaper is 4-bit:
-      uint8_t gray = (( (c565 >> 11) & 0x1F) * 299 + ((c565 >> 5) & 0x3F) * 587 + (c565 & 0x1F) * 114) / (1000 * 8); 
-      // (this is an example — tune to your conversion)
-      uint16_t final_color = gray; // or map to your color type
+      // lv_color_t.full is RGB565 if LV_COLOR_DEPTH == 16
+      uint16_t c565 = p->full;
 
-      // Use your drawing function
-        esphome::Color d(final_color, final_color, final_color);   // grayscale
-        this->draw_pixel_at(x1 + xx, y1 + yy, d);
-    // this->draw_pixel_at(x1 + xx, y1 + yy, final_color);
+      // Extract rgb components
+      uint8_t r5 = (c565 >> 11) & 0x1F;
+      uint8_t g6 = (c565 >> 5) & 0x3F;
+      uint8_t b5 = c565 & 0x1F;
+
+      // Expand to 8-bit approx
+      uint8_t r8 = (r5 * 527 + 23) >> 6;
+      uint8_t g8 = (g6 * 259 + 33) >> 6;
+      uint8_t b8 = (b5 * 527 + 23) >> 6;
+
+      // Compute luminance (Rec. 601)
+      uint16_t lum = (uint16_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
+
+      // Map 0..255 to 0..15 (4-bit grayscale index)
+      uint8_t gray4 = (lum * 15 + 127) / 255;
+
+      // IMPORTANT: LGFX_Sprite when created with colorDepth=4 and palette set,
+      // typically expects palette indices for drawPixel. Pass gray4 (0..15).
+      // If drawPixel expects 16-bit color instead, we will need to convert to RGB565.
+      this->canvas_->drawPixel(x1 + xx, y1 + yy, gray4);
+
+      p++;
     }
   }
 
-  // After writing: flush to EPD
-  //this->M5.Display.display(); // or whatever your method is to update the EPD
-   //     this->M5.Display.display();
-  // Let LVGL know we’re done
-this->update();
-    
-    ESP_LOGD(TAG, "voor flushready ");
-  lv_disp_flush_ready(&disp_drv_);
+  // Push the sprite to the display. pushSprite draws the sprite onto the M5.Display.
+  // This will perform the actual EPD update for that region (or whole screen).
+  // Use 0,0 to overlay entire sprite; if sprite is full-screen that's fine.
+  this->canvas_->pushSprite(0, 0);
+
+  // Alternatively, if you want to only update the flushed window, you could call:
+  // this->canvas_->pushSprite(x1, y1);
+  // depending on the API & desired placement.
+
+  // Tell LVGL we finished flushing
+  lv_disp_flush_ready(&this->disp_drv_);
 }
 
 } // namespace m5papers3_display_m5gfx
