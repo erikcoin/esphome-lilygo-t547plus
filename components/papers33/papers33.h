@@ -73,7 +73,7 @@ Trigger<> *make_button_trigger(const std::string &buttonid);
   void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
 
   // override to run lv handler
-  void update() override;
+ // void update() override;
 
  protected:
     void update_touch();
