@@ -208,7 +208,7 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
                  (color.blue >> 3);
 
     // Draw using M5GFX
-    this->gfx_->drawPixel(x, y, c);
+    this->gfx_.drawPixel(x, y, c);
 }
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
