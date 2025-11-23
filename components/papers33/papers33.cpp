@@ -544,7 +544,8 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
   //this->M5.Display.display(); // or whatever your method is to update the EPD
    //     this->M5.Display.display();
   // Let LVGL know we’re done
-this->writer_(*this); 
+this->update();
+    
     ESP_LOGD(TAG, "voor flushready ");
   lv_disp_flush_ready(&disp_drv_);
 }
