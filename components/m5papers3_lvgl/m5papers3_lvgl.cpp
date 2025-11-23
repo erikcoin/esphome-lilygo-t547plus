@@ -231,13 +231,6 @@ void M5PaperS3DisplayM5GFX::dump_config() {
     } else {
         ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized (gfx: %dx%d)", this->gfx_.width(), this->gfx_.height());
     }
-    if (this->touch_coordinates_sensor_ != nullptr) {
-        LOG_TEXT_SENSOR("  ", "Touch Coordinates Sensor", this->touch_coordinates_sensor_);
-    }
-    ESP_LOGCONFIG(TAG, "  Configured Buttons: %d", this->buttons_.size());
-    for(const auto& btn : this->buttons_){
-        ESP_LOGCONFIG(TAG, "    Button: x=%d, y=%d, w=%d, h=%d, action=%s", btn.x, btn.y, btn.width, btn.height, (btn.trigger ? "Yes" : "No"));
-    }
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
@@ -253,7 +246,6 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     if (rotation_degrees == 90) m5gfx_rotation_val = 1;
     else if (rotation_degrees == 180) m5gfx_rotation_val = 2;
     else if (rotation_degrees == 270) m5gfx_rotation_val = 3;
-    
     this->rotation_ = m5gfx_rotation_val; // Store our logical rotation
     ESP_LOGD(TAG, "set_rotation: degrees=%d mapped to M5GFX rotation=%d", rotation_degrees, m5gfx_rotation_val);
 }
@@ -287,9 +279,7 @@ void M5PaperS3DisplayM5GFX::loop() {
     M5.update(); // Update touch and other inputs
     static unsigned long last_touch_time = 0;
 unsigned long current_time = millis();
-if (current_time - last_touch_time < 1000) { // Ignore touches within 300ms
-    return;
-}
+
 }
 
 void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
