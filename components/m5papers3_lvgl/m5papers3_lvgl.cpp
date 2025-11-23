@@ -13,119 +13,50 @@ static const char *const TAG = "m5papers3.display_m5gfx";
 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
-    ESP_LOGD(TAG, "Memory before M5.begin():");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "Calling M5.config()...");
+    ESP_LOGD(TAG, "Setting up M5PaperS3 Display...");
+
+    // --- M5 Display init ---
     auto cfg = M5.config();
-    ESP_LOGD(TAG, "Calling M5.begin()...");
     M5.begin(cfg);
-    ESP_LOGD(TAG, "M5.begin() finished.");
-    ESP_LOGD(TAG, "Adding delay after M5.begin()...");
     vTaskDelay(pdMS_TO_TICKS(100));
-    ESP_LOGD(TAG, "Delay finished.");
-    ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
-    ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
-    ESP_LOGD(TAG, "Waiting for EPD to be readable...");
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time
-    ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
-    //delay(500);
-    ESP_LOGD(TAG, "Delay finished.");
-ESP_LOGD(TAG, "voor lvgl setup");
-  // === LVGL setup ===
-  lv_init();
-ESP_LOGD(TAG, "na lvgl setup");
-  int w = this->get_width();
-  int h = this->get_height();
-  size_t buf_size = w * LV_BUF_LINES;
-ESP_LOGD(TAG, "na lvgl setup");
-  // allocate two buffers (double buffering)
-  lv_buf1_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-  lv_buf2_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-  if (!lv_buf1_ || !lv_buf2_) {
-    ESP_LOGE("papers33", "Failed to allocate LVGL buffers");
-  }
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
-  lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
-ESP_LOGD(TAG, "voor drvinit ");
-  lv_disp_drv_init(&disp_drv_);
-  disp_drv_.hor_res = w;
-  disp_drv_.ver_res = h;
-  disp_drv_.draw_buf = &draw_buf_;
-  disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
-    self->lvgl_flush(area, color_p);
-  };
-  disp_drv_.user_data = this;
-ESP_LOGD(TAG, "na drvinit ");
-  lv_disp_drv_register(&disp_drv_);
-ESP_LOGD(TAG, "na  drvregister ");
-  // Optionally: create a simple LVGL UI element to test
-  lv_obj_t *label = lv_label_create(lv_scr_act());
-  lv_label_set_text(label, "Hello LVGL");
-  lv_obj_center(label);
-    auto &gfx = M5.Display;
-    if (this->canvas_ != nullptr) {
-        ESP_LOGD(TAG, "Deleting existing canvas_...");
-        delete this->canvas_;
-        this->canvas_ = nullptr;
-        ESP_LOGD(TAG, "Existing canvas_ deleted.");
+    // --- LVGL init ---
+    lv_init();
+
+    int w = this->get_width();
+    int h = this->get_height();
+
+    size_t buf_size = w * LV_BUF_LINES;
+
+    // Allocate LVGL double buffers
+    lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+    lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+    if (!lv_buf1 || !lv_buf2) {
+        ESP_LOGE(TAG, "Failed to allocate LVGL buffers");
+        return;
     }
 
-    ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()...");
-    int display_width = gfx.width();
-    int display_height = gfx.height();
-    ESP_LOGD(TAG, "Display dimensions: %d x %d (rotation %d applied to gfx by LovyanGFX)", display_width, display_height, gfx.getRotation());
-    size_t required_bytes = (size_t)display_width * display_height * 4 / 8;
-    ESP_LOGD(TAG, "Estimated memory needed for sprite buffer (4 bit): %u bytes", required_bytes);
-    ESP_LOGD(TAG, "Memory before new LGFX_Sprite:");
-    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
-    ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
-    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx); // Sprite for the main display
-    if (this->canvas_ == nullptr) {
-        ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
-        return; // Cannot proceed
-    }
-    this->canvas_->setPsram(true);
-    this->canvas_->setColorDepth(4);
-    this->canvas_->setRotation(0); 
-    this->canvas_->setPaletteGrayscale();
+    lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
 
-    ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
-    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-    ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height);
+    lv_disp_drv_init(&disp_drv_);
+    disp_drv_.hor_res = w;
+    disp_drv_.ver_res = h;
+    disp_drv_.draw_buf = &draw_buf_;
+    disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+        auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+        self->lvgl_flush(area, color_p);
+    };
+    disp_drv_.user_data = this;
+    lv_disp_drv_register(&disp_drv_);
 
-    bool ok = this->canvas_->createSprite(display_width, display_height);
-    ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
-    ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
+    // Optional test: simple LVGL label
+    lv_obj_t *label = lv_label_create(lv_scr_act());
+    lv_label_set_text(label, "Hello LVGL");
+    lv_obj_center(label);
 
-    if (!ok) {
-        ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
-        ESP_LOGE(TAG, "Sprite allocation requested size: %d x %d", display_width, display_height);
-        ESP_LOGE(TAG, "Memory after *failed* createSprite:");
-        ESP_LOGE(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-        ESP_LOGE(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-        delete this->canvas_;
-        this->canvas_ = nullptr;
-    } else {
-        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. Size: %d x %d", this->canvas_->width(), this->canvas_->height());
-        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. colordepth: %d rotation: %d", this->canvas_->getColorDepth(), this->canvas_->getRotation());
-int raw_depth = this->canvas_->getColorDepth();
-int clean_depth = raw_depth & 0x0F;
-ESP_LOGD(TAG, "Canvas color depth: %d (raw: 0x%X)", clean_depth, raw_depth);
-        ESP_LOGD(TAG, "Memory after *successful* createSprite:");
-        ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-        ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
-        // this->canvas_->fillSprite(15); // Fill white initially
-    }
-
-    ESP_LOGD(TAG, "End of setup().");
+    ESP_LOGD(TAG, "LVGL setup complete.");
 }
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
