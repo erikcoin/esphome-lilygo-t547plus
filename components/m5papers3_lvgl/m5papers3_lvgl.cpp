@@ -274,7 +274,6 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
     return;
   }
 
-  // Clamp area to display bounds
   int32_t x1 = area->x1 < 0 ? 0 : area->x1;
   int32_t y1 = area->y1 < 0 ? 0 : area->y1;
   int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
@@ -287,47 +286,43 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
     return;
   }
 
-  if (!this->canvas_) {
-    ESP_LOGE(TAG, "lvgl_flush: canvas_ is null!");
-    lv_disp_flush_ready(&this->disp_drv_);
-    return;
-  }
-
-  // Write LVGL pixels into canvas_
   lv_color_t *p = color_p;
+
+  // Start SPI batch write to M5.Display
+  M5.Display.startWrite();
+
   for (int yy = 0; yy < h; yy++) {
     for (int xx = 0; xx < w; xx++) {
       uint16_t c565 = p->full;
 
-      // Convert RGB565 to 8-bit grayscale
+      // Convert RGB565 -> 8-bit grayscale
       uint8_t r5 = (c565 >> 11) & 0x1F;
       uint8_t g6 = (c565 >> 5) & 0x3F;
       uint8_t b5 = c565 & 0x1F;
-
       uint8_t r8 = (r5 * 527 + 23) >> 6;
       uint8_t g8 = (g6 * 259 + 33) >> 6;
       uint8_t b8 = (b5 * 527 + 23) >> 6;
-
       uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
 
-      // Map 0..255 -> 0..15 for 4-bit grayscale canvas
+      // Map 0..255 -> 0..15 (4-bit grayscale)
       uint8_t gray4 = (lum * 15 + 127) / 255;
 
-      // Write pixel to canvas
-      this->canvas_->drawPixel(x1 + xx, y1 + yy, gray4);
+      // Convert 4-bit grayscale to RGB565 for display
+      uint8_t gray8 = (gray4 * 255) / 15;
+      uint16_t gray565 = ((gray8 >> 3) << 11) | ((gray8 >> 2) << 5) | (gray8 >> 3);
+
+      M5.Display.drawPixel(x1 + xx, y1 + yy, gray565);
 
       p++;
     }
   }
 
-  // Push only the flushed rectangle to the real display
-  // Using pushSprite(x, y) for a small region prevents full-screen DMA allocation
-  // If pushSprite(areaX, areaY) is not supported in your library, you can push in horizontal bands
-  this->canvas_->pushSprite(x1, y1);
+  M5.Display.endWrite();
 
-  // Notify LVGL that flush is done
+  // Tell LVGL we are done
   lv_disp_flush_ready(&this->disp_drv_);
 }
+
 
 
 } // namespace m5papers3_display_m5gfx
