@@ -534,8 +534,8 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
       uint16_t final_color = gray; // or map to your color type
 
       // Use your drawing function
-        esphome::Color c(final_color, final_color, final_color);   // grayscale
-        this->draw_pixel_at(x1 + xx, y1 + yy, c);
+        esphome::Color d(final_color, final_color, final_color);   // grayscale
+        this->draw_pixel_at(x1 + xx, y1 + yy, d);
     // this->draw_pixel_at(x1 + xx, y1 + yy, final_color);
     }
   }
