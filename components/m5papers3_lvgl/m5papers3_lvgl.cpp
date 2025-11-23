@@ -112,11 +112,7 @@ void M5PaperS3DisplayM5GFX::update() {
 //#include 
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
-    if (this->canvas_ != nullptr) {
-        delete this->canvas_;
-        this->canvas_ = nullptr;
-        ESP_LOGD(TAG, "Canvas deleted safely in destructor.");
-    }
+
 }
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
