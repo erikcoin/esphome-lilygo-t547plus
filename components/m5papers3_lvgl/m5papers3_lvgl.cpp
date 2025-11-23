@@ -39,7 +39,6 @@ void M5PaperS3DisplayM5GFX::setup() {
     }
 
     lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
-
     lv_disp_drv_init(&disp_drv_);
     disp_drv_.hor_res = w;
     disp_drv_.ver_res = h;
@@ -82,14 +81,14 @@ void M5PaperS3DisplayM5GFX::update() {
         ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
         // Assuming palette index 15 is white for 4-bit grayscale.
         // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
-        this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
+       // this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
         ESP_LOGD(TAG, "Calling writer lambda...");
-        this->writer_(*this); // This is where user draws to the display (this->canvas_)
+      //  this->writer_(*this); // This is where user draws to the display (this->canvas_)
      ;
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
         
-        this->canvas_->pushSprite(0, 0);
+   //     this->canvas_->pushSprite(0, 0);
         ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
         M5.Display.display(); // Tell the EPD to show what's in its buffer
     } else {
