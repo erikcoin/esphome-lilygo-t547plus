@@ -9,7 +9,7 @@
 
 #include <M5Unified.h>
 #include <M5GFX.h>
-
+#include <map>
 #include <vector> 
 
 namespace esphome {
