@@ -87,7 +87,7 @@ void M5PaperS3DisplayM5GFX::update() {
         // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
        // this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
         ESP_LOGD(TAG, "Calling writer lambda...");
-      //  this->writer_(*this); // This is where user draws to the display (this->canvas_)
+        this->writer_(*this); // This is where user draws to the display (this->canvas_)
      ;
         ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
         // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
@@ -129,30 +129,6 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 }
 
 
-int M5PaperS3DisplayM5GFX::get_width_internal() {
-     return : this->gfx_.width();
-}
-
-int M5PaperS3DisplayM5GFX::get_height_internal() {
-    return this->gfx_.height();
-}
-
-void M5PaperS3DisplayM5GFX::fill(Color color) {
-    if (this->canvas_ == nullptr) return;
-    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
-    ESP_LOGV(TAG, "fill() called with RGB888: %x", rgb888_color);
-    //this->canvas_->fillSprite(rgb888_color);
-}
-
-void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-    if (this->canvas_ == nullptr) return;
-    // Bounds check should use canvas dimensions
-    if (x < 0 || x >= this->canvas_->width() || y < 0 || y >= this->canvas_->height()) {
-        return;
-    }
-    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
-   // this->canvas_->drawPixel(x, y, rgb888_color);
-}
 void M5PaperS3DisplayM5GFX::loop() {
     M5.update(); // Update touch and other inputs
     static unsigned long last_touch_time = 0;
