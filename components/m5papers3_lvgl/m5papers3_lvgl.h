@@ -27,8 +27,8 @@ private:
  public:
     void setup() override;
     void loop();
-    void dump_config() override;
-    void partial_update(int x, int y, int w, int h);
+  //  void dump_config() override;
+ //   void partial_update(int x, int y, int w, int h);
     float get_setup_priority() const override { return setup_priority::HARDWARE; }
     void update() override;
     ~M5PaperS3DisplayM5GFX();
