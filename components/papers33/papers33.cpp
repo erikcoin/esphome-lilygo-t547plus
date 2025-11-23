@@ -534,12 +534,12 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
       uint16_t final_color = gray; // or map to your color type
 
       // Use your drawing function
-      this->draw_pixel(x1 + xx, y1 + yy, final_color);
+   ////disabled door foutmelding moet weer aan   this->draw_pixel(x1 + xx, y1 + yy, final_color);
     }
   }
 
   // After writing: flush to EPD
-  this->flush(); // or whatever your method is to update the EPD
+  this->M5.Display.display(); // or whatever your method is to update the EPD
 
   // Let LVGL know we’re done
   lv_disp_flush_ready(&disp_drv_);
