@@ -235,6 +235,7 @@ void M5PaperS3DisplayM5GFX::update() {
         // and refresh the display, or do nothing.
         // For now, let's assume if no writer, no explicit update is needed beyond initial clear.
         // However, if there was a partial update, we might want to refresh.
+        lvgl_flush();
         // M5.Display.display(); // Uncomment if you want to refresh even without a writer
     }
 
