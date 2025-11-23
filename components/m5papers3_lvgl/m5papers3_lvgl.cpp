@@ -195,14 +195,21 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
 }
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
-    if (x < 0 || y < 0 || x >= this->width_ || y >= this->height_) return;
+    // bounds check
+    if (x < 0 || y < 0 ||
+        x >= this->get_width() ||
+        y >= this->get_height()) {
+        return;
+    }
 
-    // Convert ESPHome Color → 16-bit RGB565
-    uint16_t c = ((color.red  & 0xF8) << 8) |
+    // Convert ESPHome Color → RGB565
+    uint16_t c = ((color.red & 0xF8) << 8) |
                  ((color.green & 0xFC) << 3) |
-                 ((color.blue  >> 3));
+                 (color.blue >> 3);
 
-this->m5display_->drawPixel(x, y, c);}
+    // Draw using M5GFX
+    this->gfx_->drawPixel(x, y, c);
+}
 
 int M5PaperS3DisplayM5GFX::get_width_internal() {
      return  this->gfx_.width();
