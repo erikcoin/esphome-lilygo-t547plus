@@ -194,7 +194,15 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
     lv_disp_flush_ready(&this->disp_drv_);
 }
 
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
+    if (x < 0 || y < 0 || x >= this->width_ || y >= this->height_) return;
 
+    // Convert ESPHome Color → 16-bit RGB565
+    uint16_t c = ((color.red  & 0xF8) << 8) |
+                 ((color.green & 0xFC) << 3) |
+                 ((color.blue  >> 3));
+
+this->m5display_->drawPixel(x, y, c);}
 
 
 } // namespace m5papers3_display_m5gfx
