@@ -1,144 +1,556 @@
-#include "m5papers3_lvgl.h"
-
+#include "papers33.h"
+#include "esphome/core/log.h"
+#include "esphome/core/application.h"
+#include "esphome/core/color.h"
+#include <cmath>
+#include <algorithm>
+#include <esp_heap_caps.h>
+#include "esphome/core/helpers.h"  // voor set_timeout
 namespace esphome {
-namespace m5papers3_lvgl {
+namespace m5papers3_display_m5gfx {
 
-using namespace std;
+static const char *const TAG = "m5papers3.display_m5gfx";
 
-M5PaperS3LVGL::M5PaperS3LVGL(uint16_t width, uint16_t height, uint16_t buf_lines)
-    : width_(width), height_(height), buf_lines_(buf_lines), buf1_(nullptr) {}
+// ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
+void M5PaperS3DisplayM5GFX::setup() {
+    ESP_LOGD(TAG, "Memory before M5.begin():");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-void M5PaperS3LVGL::setup() {
-  ESP_LOGCONFIG("m5papers3_lvgl", "Setting up M5PaperS3 LVGL component (w=%d h=%d buf_lines=%d)",
-                width_, height_, buf_lines_);
+    ESP_LOGD(TAG, "Calling M5.config()...");
+    auto cfg = M5.config();
+    
+    ESP_LOGD(TAG, "Calling M5.begin()...");
+    M5.begin(cfg);
+    ESP_LOGD(TAG, "M5.begin() finished.");
 
-  // Ensure M5 is started (if you call M5.begin() somewhere else, it's ok)
-  // If your project already calls M5.begin() elsewhere, you can remove this call.
-  // M5.begin();
+    ESP_LOGD(TAG, "Adding delay after M5.begin()...");
+    vTaskDelay(pdMS_TO_TICKS(100));
+    ESP_LOGD(TAG, "Delay finished.");
 
-  // Initialize LVGL library (if not already)
+    ESP_LOGD(TAG, "Memory after M5.begin() + delay:");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+
+    ESP_LOGD(TAG, "Calling M5.Display.setEpdMode()...");
+    M5.Display.setEpdMode(epd_mode_t::epd_quality);
+    ESP_LOGD(TAG, "M5.Display.setEpdMode() finished.");
+
+    ESP_LOGD(TAG, "Waiting for EPD to be readable...");
+    // while (!M5.Display.isReadable()) { // This can hang if there's an issue
+    //     ESP_LOGD(TAG, "EPD not readable yet, waiting...");
+    //     vTaskDelay(pdMS_TO_TICKS(1000));
+    // }
+    // ESP_LOGD(TAG, "EPD is readable.");
+    // Consider a timeout or alternative check if isReadable() causes issues
+    vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time
+
+    ESP_LOGD(TAG, "Adding delay after readable before touch/sprite creation...");
+    //delay(500);
+    ESP_LOGD(TAG, "Delay finished.");
+
+    if (this->touch_coordinates_sensor_ != nullptr) {
+        ESP_LOGD(TAG, "Touch sensor configured, publishing test value...");
+        this->touch_coordinates_sensor_->publish_state("42,84"); // Indicate test
+        ESP_LOGD(TAG, "Test value published.");
+    } else {
+        ESP_LOGD(TAG, "Touch sensor not configured.");
+    }
+ESP_LOGD(TAG, "voor lvgl setup");
+  // === LVGL setup ===
   lv_init();
+ESP_LOGD(TAG, "na lvgl setup");
+  int w = this->get_width();
+  int h = this->get_height();
+  size_t buf_size = w * LV_BUF_LINES;
 
-  // Allocate LVGL buffer
-  size_t buf_size = static_cast<size_t>(width_) * static_cast<size_t>(buf_lines_);
-  buf1_ = (lv_color_t *)malloc(buf_size * sizeof(lv_color_t));
-  if (!buf1_) {
-    ESP_LOGE("m5papers3_lvgl", "Failed to allocate LVGL buffer (size=%d)", (int)buf_size);
-    return;
+  // allocate two buffers (double buffering)
+  lv_buf1_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+  lv_buf2_ = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+  if (!lv_buf1_ || !lv_buf2_) {
+    ESP_LOGE("papers33", "Failed to allocate LVGL buffers");
   }
-  lv_disp_draw_buf_init(&draw_buf_, buf1_, nullptr, buf_size);
 
-  // Initialize display driver structure
+  lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
+ESP_LOGD(TAG, "voor drvinit ");
   lv_disp_drv_init(&disp_drv_);
-  disp_drv_.hor_res = width_;
-  disp_drv_.ver_res = height_;
+  disp_drv_.hor_res = w;
+  disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
-
-  // set the flush callback to a static lambda that calls our instance method
   disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-    auto *self = static_cast<M5PaperS3LVGL *>(drv->user_data);
-    if (self)
-      self->lvgl_flush(area, color_p);
+    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+    self->lvgl_flush(area, color_p);
   };
   disp_drv_.user_data = this;
-
+ESP_LOGD(TAG, "na drvinit ");
   lv_disp_drv_register(&disp_drv_);
-
-  // Optional: create a default test label so users can verify it's working
+ESP_LOGD(TAG, "na  drvregister ");
+  // Optionally: create a simple LVGL UI element to test
   lv_obj_t *label = lv_label_create(lv_scr_act());
-  lv_label_set_text(label, "LVGL -> M5PaperS3");
+  lv_label_set_text(label, "Hello LVGL");
   lv_obj_center(label);
+
+
+    
+    auto &gfx = M5.Display;
+    // Apply initial rotation to M5.Display IF it's not done by LovyanGFX automatically
+    // This->rotation_ is set via set_rotation which converts degrees to 0-3
+    // M5.Display.setRotation(this->rotation_); // Typically LovyanGFX handles this based on its config or calls
+    //this->on_press_triggers_[i] = Trigger<>();
+
+    if (this->canvas_ != nullptr) {
+        ESP_LOGD(TAG, "Deleting existing canvas_...");
+        delete this->canvas_;
+        this->canvas_ = nullptr;
+        ESP_LOGD(TAG, "Existing canvas_ deleted.");
+    }
+
+    ESP_LOGD(TAG, "About to call gfx.width() and gfx.height()...");
+    int display_width = gfx.width();
+    int display_height = gfx.height();
+    ESP_LOGD(TAG, "Display dimensions: %d x %d (rotation %d applied to gfx by LovyanGFX)", display_width, display_height, gfx.getRotation());
+
+
+    size_t required_bytes = (size_t)display_width * display_height * 4 / 8;
+    ESP_LOGD(TAG, "Estimated memory needed for sprite buffer (4 bit): %u bytes", required_bytes);
+
+    ESP_LOGD(TAG, "Memory before new LGFX_Sprite:");
+    ESP_LOGD(TAG, "  Free Internal: %u bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGD(TAG, "  Largest Internal Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+
+    ESP_LOGD(TAG, "Calling new lgfx::v1::LGFX_Sprite(&gfx)...");
+    this->canvas_ = new lgfx::v1::LGFX_Sprite(&gfx); // Sprite for the main display
+    if (this->canvas_ == nullptr) {
+        ESP_LOGE(TAG, "Failed to create LGFX_Sprite object itself (out of internal RAM?)!");
+        return; // Cannot proceed
+    }
+    this->canvas_->setPsram(true);
+    this->canvas_->setColorDepth(4);
+    this->canvas_->setRotation(0); 
+    this->canvas_->setPaletteGrayscale();
+button1Sprite = new LGFX_Sprite(&gfx);
+button1Sprite->setPsram(true);
+button1Sprite->setColorDepth(4);
+button1Sprite->setPaletteGrayscale();
+button1Sprite->createSprite(200, 80);
+
+button2Sprite = new LGFX_Sprite(&gfx);
+button2Sprite->setPsram(true);
+button2Sprite->setColorDepth(4);
+button2Sprite->setPaletteGrayscale();
+button2Sprite->createSprite(200, 80); //button width,buttunheight
+    
+    ESP_LOGD(TAG, "Memory before canvas_->createSprite():");
+    ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+    ESP_LOGD(TAG, "Calling canvas_->createSprite(%d, %d)...", display_width, display_height);
+
+    bool ok = this->canvas_->createSprite(display_width, display_height);
+    ESP_LOGD(TAG, "canvas_->createSprite() finished. Result: %s", ok ? "true" : "false");
+    ESP_LOGD(TAG, "Canvas buffer address: %p", this->canvas_->getBuffer());
+
+    if (!ok) {
+        ESP_LOGE(TAG, "Failed to create canvas sprite buffer! Check memory (PSRAM) and fragmentation.");
+        ESP_LOGE(TAG, "Sprite allocation requested size: %d x %d", display_width, display_height);
+        ESP_LOGE(TAG, "Memory after *failed* createSprite:");
+        ESP_LOGE(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+        ESP_LOGE(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+        delete this->canvas_;
+        this->canvas_ = nullptr;
+    } else {
+        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. Size: %d x %d", this->canvas_->width(), this->canvas_->height());
+        ESP_LOGD(TAG, "Canvas sprite buffer created successfully. colordepth: %d rotation: %d", this->canvas_->getColorDepth(), this->canvas_->getRotation());
+int raw_depth = this->canvas_->getColorDepth();
+int clean_depth = raw_depth & 0x0F;
+ESP_LOGD(TAG, "Canvas color depth: %d (raw: 0x%X)", clean_depth, raw_depth);
+
+        ESP_LOGD(TAG, "Memory after *successful* createSprite:");
+        ESP_LOGD(TAG, "  Free PSRAM: %u bytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+        ESP_LOGD(TAG, "  Largest PSRAM Free Block: %u bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+        // this->canvas_->fillSprite(15); // Fill white initially
+    }
+
+    if (!M5.Touch.isEnabled()) {
+        ESP_LOGW(TAG, "Touchscreen not enabled or GT911 not found.");
+    } else {
+        ESP_LOGI(TAG, "Touchscreen initialized.");
+    }
+    ESP_LOGD(TAG, "End of setup().");
 }
 
-void M5PaperS3LVGL::loop() {
-  // Call LVGL handler periodically. We run it every loop call here.
-  // On e-paper you SHOULD NOT call this extremely frequently — but lv_timer_handler is cheap
-  // if there are no timers/actions; the heavy part is the flush (performed only when needed).
+
+// Method to add a button (called from generated code)
+void M5PaperS3DisplayM5GFX::add_button(int x, int y, int width, int height, const std::string &buttonid, Trigger<> *trigger) {
+    ESP_LOGD(TAG, "Adding button: x=%d, y=%d, w=%d, h=%d, has_action=%s",
+             x, y, width, height, (trigger != nullptr ? "true" : "false"));
+    ButtonConfig button_cfg;
+    button_cfg.x = x;
+    button_cfg.y = y;
+    button_cfg.width = width;
+    button_cfg.height = height;
+    button_cfg.buttonid = buttonid;
+    button_cfg.trigger = trigger;
+    this->buttons_.push_back(button_cfg);
+
+    ESP_LOGD(TAG, "Button trigger assigned? %s", (button_cfg.trigger != nullptr ? "Yes" : "No"));
+}
+
+// ... (update() method remains largely the same)
+void M5PaperS3DisplayM5GFX::update() {
+    static bool first_time = true;
+    if (first_time) {
+        ESP_LOGD(TAG, "Delaying first update for EPD...");
+        delay(1000); // Allow EPD to settle, also good if setup had issues
+        first_time = false;
+
+        // Initial clear/refresh sequence (optional, but can help with ghosting from boot)
+        ESP_LOGD(TAG, "Performing initial EPD clear sequence...");
+        M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
+        ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
+        //M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
+    }
+
+    if (this->canvas_ == nullptr) {
+        ESP_LOGE(TAG, "Canvas not available in update()!");
+        return;
+    }
+
+    if (this->writer_ != nullptr) {
+        ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
+        // Assuming palette index 15 is white for 4-bit grayscale.
+        // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
+        this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
+        ESP_LOGD(TAG, "Calling writer lambda...");
+        this->writer_(*this); // This is where user draws to the display (this->canvas_)
+        //draw_button(3,true);
+        ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
+        // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
+        draw_all_buttons();
+        this->canvas_->pushSprite(0, 0);
+        ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
+        M5.Display.display(); // Tell the EPD to show what's in its buffer
+    } else {
+        ESP_LOGD(TAG, "No writer lambda set, skipping drawing. Pushing current canvas content.");
+        // If no writer, we might still want to push the (potentially empty or old) canvas
+        // and refresh the display, or do nothing.
+        // For now, let's assume if no writer, no explicit update is needed beyond initial clear.
+        // However, if there was a partial update, we might want to refresh.
+        // M5.Display.display(); // Uncomment if you want to refresh even without a writer
+    }
+
+    ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
+    
+this->update_touch();
+  
+  // Call LVGL tasks
   lv_timer_handler();
-
-  // small delay-conscious yield (ESPHome will handle actual task scheduling)
-  delay(1);
 }
 
-void M5PaperS3LVGL::dump_config() {
-  ESP_LOGCONFIG("m5papers3_lvgl", "M5PaperS3 LVGL component:");
-  ESP_LOGCONFIG("m5papers3_lvgl", "  Width: %d  Height: %d  Buf lines: %d", width_, height_, buf_lines_);
+
+bool M5PaperS3DisplayM5GFX::get_touch(TouchPoint *point) {
+    m5::touch_point_t tp[1]; // M5Unified uses m5::touch_point_t
+    // M5.Display.getTouch uses LovyanGFX's touch system
+    // M5.Touch.getDetail() uses M5Unified's direct touch controller interface
+    
+    // Let's try M5.Touch as it's more abstract from M5Unified
+    if (M5.Touch.getCount() > 0) {
+        auto touch_detail = M5.Touch.getDetail(); // Get primary touch point detail
+        // Check if the point is valid (e.g., within screen bounds, if necessary)
+        // The coordinates from M5.Touch should already be mapped to screen rotation
+        point->x = touch_detail.x;
+        point->y = touch_detail.y;
+        ESP_LOGV(TAG, "Touch detected via M5.Touch: x=%d, y=%d, id=%d, size=%d", touch_detail.x, touch_detail.y, touch_detail.id, touch_detail.size);
+        return true;
+    }
+    return false;
 }
 
-inline uint8_t M5PaperS3LVGL::rgb565_to_gray4(uint16_t color565) {
-  // Extract RGB 5/6/5 components
-  uint8_t r5 = (color565 >> 11) & 0x1F;
-  uint8_t g6 = (color565 >> 5) & 0x3F;
-  uint8_t b5 = (color565) & 0x1F;
+//#include 
+void M5PaperS3DisplayM5GFX::partial_update(int x, int y, int w, int h) {
+  if (!canvas_) return;
 
-  // Convert to 8-bit per channel approximations
-  uint8_t r8 = (r5 * 527 + 23) >> 6;   // approximate expansion
-  uint8_t g8 = (g6 * 259 + 33) >> 6;
-  uint8_t b8 = (b5 * 527 + 23) >> 6;
+  // Maak een tijdelijke sprite (overlay), die data kopieert uit canvas_
+  lgfx::v1::LGFX_Sprite temp(&gfx_);
+  temp.setColorDepth(4);
+  temp.setPsram(true);
+  temp.setPaletteGrayscale();
+  temp.createSprite(w, h);
 
-  // Compute luminance (standard Rec. 601)
-  uint16_t lum = (uint16_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
+  // Kopieer pixel voor pixel uit canvas_ naar de temp sprite
+  for (int dy = 0; dy < h; ++dy) {
+    for (int dx = 0; dx < w; ++dx) {
+      auto col = canvas_->readPixel(x + dx, y + dy);
+      temp.drawPixel(dx, dy, col);
+    }
+  }
 
-  // Map 0..255 to 0..15 (4-bit grayscale)
-  uint8_t gray4 = (lum * 15 + 127) / 255;
-  return gray4;  // 0 = black, 15 = white (adjust if your epaper inverts)
+  // Push de temp sprite naar het e-paper scherm op juiste locatie
+  temp.pushSprite(x, y);
+
+  // Sprite wordt automatisch gedealloceerd
 }
 
-void M5PaperS3LVGL::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-  if (!area || !color_p) {
-    lv_disp_flush_ready(&disp_drv_);
+
+
+
+
+
+
+
+void M5PaperS3DisplayM5GFX::update_touch() {
+    TouchPoint tp;
+    if (this->get_touch(&tp)) {
+        ESP_LOGD(TAG, "Touch at x=%d, y=%d", tp.x, tp.y);
+        if (this->touch_coordinates_sensor_ != nullptr) {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "%d,%d", tp.x, tp.y);
+            this->touch_coordinates_sensor_->publish_state(buf);
+        }
+        this->send_coordinates_and_check_buttons(tp);
+    }
+}
+
+void M5PaperS3DisplayM5GFX::send_coordinates_and_check_buttons(TouchPoint tp) {
+static unsigned long last_touch_time = 0;
+unsigned long current_time = millis();
+if (current_time - last_touch_time < 1000) { // Ignore touches within 300ms
+    return;
+}
+last_touch_time = current_time;
+    for (auto &button : this->buttons_) {
+        bool within_x = tp.x >= button.x && tp.x <= (button.x + button.width);
+        bool within_y = tp.y >= button.y && tp.y <= (button.y + button.height);
+        if (within_x && within_y) {
+            ESP_LOGI(TAG, "Touch inside button area at (%d, %d, %d, %d)", button.x, button.y, button.width, button.height);
+            // Toggle de status van de knop
+  ////          bool &state = this->button_states_[button.buttonid];
+  ////          state = !state;
+            if (button.trigger != nullptr) {
+                ESP_LOGI(TAG, "Triggering button action...");
+                button.trigger->trigger();  // Trigger the action
+                ESP_LOGI(TAG, "Trigger execution should be complete.");
+            } else {
+                ESP_LOGW(TAG, "Button has no trigger associated!");
+            }
+            return; // Optional: stop after first matching button
+        }
+    }
+}
+
+
+
+void M5PaperS3DisplayM5GFX::set_touch_sensor(text_sensor::TextSensor *touch_coordinates_sensor) {
+    ESP_LOGD(TAG, "Setting touch_coordinates_sensor...");
+    this->touch_coordinates_sensor_ = touch_coordinates_sensor;
+    ESP_LOGD(TAG, "Touch_coordinates_sensor is set");
+    // Poll for touch at a regular interval
+    this->set_interval("touch_poll", 100, [this]() { this->update_touch(); });
+}
+
+void M5PaperS3DisplayM5GFX::dump_config() {
+    LOG_DISPLAY("", "M5Paper S3 M5GFX E-Paper (4-bit Grayscale)", this);
+    int display_rotation_deg = 0;
+    // this->rotation_ stores M5GFX 0-3. Convert back for logging.
+    if (this->rotation_ == 1) display_rotation_deg = 90;
+    else if (this->rotation_ == 2) display_rotation_deg = 180;
+    else if (this->rotation_ == 3) display_rotation_deg = 270;
+    ESP_LOGCONFIG(TAG, "  Rotation (applied to M5.Display): %d degrees (M5GFX value %d)", display_rotation_deg, this->rotation_);
+
+    if (this->canvas_) {
+        ESP_LOGCONFIG(TAG, "  Canvas Size: %d x %d (gfx: %dx%d)", this->canvas_->width(), this->canvas_->height(), this->gfx_.width(), this->gfx_.height());
+        ESP_LOGCONFIG(TAG, "  Canvas Color Depth: %d bits", this->canvas_->getColorDepth());
+    } else {
+        ESP_LOGCONFIG(TAG, "  Canvas: Not Initialized (gfx: %dx%d)", this->gfx_.width(), this->gfx_.height());
+    }
+    if (this->touch_coordinates_sensor_ != nullptr) {
+        LOG_TEXT_SENSOR("  ", "Touch Coordinates Sensor", this->touch_coordinates_sensor_);
+    }
+    ESP_LOGCONFIG(TAG, "  Configured Buttons: %d", this->buttons_.size());
+    for(const auto& btn : this->buttons_){
+        ESP_LOGCONFIG(TAG, "    Button: x=%d, y=%d, w=%d, h=%d, action=%s", btn.x, btn.y, btn.width, btn.height, (btn.trigger ? "Yes" : "No"));
+    }
+}
+
+M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
+    if (this->canvas_ != nullptr) {
+        delete this->canvas_;
+        this->canvas_ = nullptr;
+        ESP_LOGD(TAG, "Canvas deleted safely in destructor.");
+    }
+}
+
+void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
+    int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
+    if (rotation_degrees == 90) m5gfx_rotation_val = 1;
+    else if (rotation_degrees == 180) m5gfx_rotation_val = 2;
+    else if (rotation_degrees == 270) m5gfx_rotation_val = 3;
+    
+    this->rotation_ = m5gfx_rotation_val; // Store our logical rotation
+    ESP_LOGD(TAG, "set_rotation: degrees=%d mapped to M5GFX rotation=%d", rotation_degrees, m5gfx_rotation_val);
+    
+
+}
+
+
+int M5PaperS3DisplayM5GFX::get_width_internal() {
+     return (this->canvas_) ? this->canvas_->width() : this->gfx_.width();
+}
+
+int M5PaperS3DisplayM5GFX::get_height_internal() {
+    return (this->canvas_) ? this->canvas_->height() : this->gfx_.height();
+}
+
+void M5PaperS3DisplayM5GFX::fill(Color color) {
+    if (this->canvas_ == nullptr) return;
+    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
+    ESP_LOGV(TAG, "fill() called with RGB888: %x", rgb888_color);
+    this->canvas_->fillSprite(rgb888_color);
+}
+
+void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
+    if (this->canvas_ == nullptr) return;
+    // Bounds check should use canvas dimensions
+    if (x < 0 || x >= this->canvas_->width() || y < 0 || y >= this->canvas_->height()) {
+        return;
+    }
+    uint32_t rgb888_color = this->gfx_.color888(color.r, color.g, color.b);
+    this->canvas_->drawPixel(x, y, rgb888_color);
+}
+void M5PaperS3DisplayM5GFX::loop() {
+ //this->update_touch();
+    
+
+    M5.update(); // Update touch and other inputs
+    static unsigned long last_touch_time = 0;
+unsigned long current_time = millis();
+if (current_time - last_touch_time < 1000) { // Ignore touches within 300ms
+    return;
+}
+last_touch_time = current_time;
+    TouchPoint tp;
+   if (get_touch(&tp)) {  // Check if touch is detected
+        ESP_LOGD(TAG, "Touch from loop detected at x=%d, y=%d", tp.x, tp.y);
+        send_coordinates_and_check_buttons(tp); // Process button interactions
+       delay(200);
+    }
+
+    //vTaskDelay(pdMS_TO_TICKS(300)); // Small delay to prevent excessive polling
+}
+
+void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
+    this->writer_ = writer;
+}
+//Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
+//    auto trig = std::make_unique<Trigger<>>();
+ //   Trigger<> *ptr = trig.get();
+//    this->triggers_.push_back(std::move(trig));
+ //   return ptr;
+    
+//}
+Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
+////  auto it = this->button_triggers_.find(buttonid);
+////  if (it != this->button_triggers_.end()) {
+////    return it->second.get();  // Trigger bestaat al
+//  }
+
+  // Nieuwe trigger aanmaken en opslaan
+  auto trig = std::make_unique<Trigger<>>();
+  Trigger<> *ptr = trig.get();
+////  this->button_triggers_[buttonid] = std::move(trig);
+  return ptr;
+}
+
+void M5PaperS3DisplayM5GFX::draw_button(int index) {
+  if (index < 0 || index >= this->buttons_.size()) return;
+  auto &btn = this->buttons_[index];
+
+  int x = btn.x;
+  int y = btn.y;
+  int w = btn.width;
+  int h = btn.height;
+
+  uint16_t fill_color = btn.is_pressed ? 0x0000 : 0xFFFF;  // Donkerder als ingedrukt
+  uint16_t border_color = 0x0000; // zwart
+
+
+
+    
+  // Teken de knop
+  canvas_->fillRect(x, y, w, h, fill_color);
+  canvas_->drawRect(x, y, w, h, border_color);
+
+  // Eventuele knoptekst (optioneel)
+  canvas_->setTextColor(btn.is_pressed ? 0xFFFF : 0x0000);
+  canvas_->setTextSize(1);
+  canvas_->setCursor(x + 10, y + h / 2 - 4);
+  canvas_->print("Knop ");
+  canvas_->print(index + 1);
+}
+
+void M5PaperS3DisplayM5GFX::draw_all_buttons() {
+  for (int i = 0; i < this->buttons_.size(); i++) {
+    draw_button(i);
+  }
+}
+
+void M5PaperS3DisplayM5GFX::press_button_effect(int index, int duration_ms) {
+
+  if (index == 1) {
+    ESP_LOGD(TAG, "Index 1 gekozen");
+////    button1Sprite->fillSprite(10);  // Gray fill
+ ////   button1Sprite->drawCenterString("Click", 200/2, 80/2, 2);
+ ////   button1Sprite->pushSprite(50, 100);
     return;
   }
 
+  if (index == 2) {
+    ESP_LOGD(TAG, "Index 2 gekozen");
+////    button2Sprite->fillSprite(5);   // Darker fill
+////    button2Sprite->drawCenterString("Reset", 200/2, 80/2, 2);
+////    button2Sprite->pushSprite(300, 100);
+    return;
+  }
+}
+
+
+void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
   int32_t x1 = area->x1;
   int32_t y1 = area->y1;
   int32_t x2 = area->x2;
   int32_t y2 = area->y2;
+  int w = x2 - x1 + 1;
+  int h = y2 - y1 + 1;
 
-  if (x1 < 0) x1 = 0;
-  if (y1 < 0) y1 = 0;
-  if (x2 >= (int32_t)width_) x2 = width_ - 1;
-  if (y2 >= (int32_t)height_) y2 = height_ - 1;
-
-  const int w = x2 - x1 + 1;
-  const int h = y2 - y1 + 1;
-
-  // NOTE: Depending on your M5GFX API and display driver, a per-pixel loop might be slow for big areas.
-  // Consider batching with pushImage if available. For now we do per-pixel writes then call display() for e-paper.
   for (int yy = 0; yy < h; yy++) {
     for (int xx = 0; xx < w; xx++) {
-      // lv_color_t .full contains RGB565 if LV_COLOR_DEPTH == 16
-      uint16_t c565 = color_p->full;
-      uint8_t gray4 = rgb565_to_gray4(c565);
+      lv_color_t c = *color_p++;
+      // Convert LVGL color to your e-paper color:
+      // Assume LV_COLOR_DEPTH = 16 (RGB565)
+      uint16_t c565 = c.full;
+      // Convert to grayscale / your format — this depends on how `papers33` draws pixels
+      // Example: map to 16 gray levels if epaper is 4-bit:
+      uint8_t gray = (( (c565 >> 11) & 0x1F) * 299 + ((c565 >> 5) & 0x3F) * 587 + (c565 & 0x1F) * 114) / (1000 * 8); 
+      // (this is an example — tune to your conversion)
+      uint16_t final_color = gray; // or map to your color type
 
-      // Convert 4-bit gray to a 16-level color that M5GFX expects.
-      // M5GFX for e-paper typically expects a 0..15 intensity value when drawing grayscale frames.
-      // But most common simple path: map gray4 to 0..255 and call drawPixel with RGB565 approximated value.
-      // We'll expand gray4 to 8-bit and write an RGB565 grayscale pixel.
-      uint8_t gray8 = (gray4 * 255) / 15;
-      // convert gray8 to RGB565
-      uint16_t gray565 = ((gray8 >> 3) << 11) | ((gray8 >> 2) << 5) | (gray8 >> 3);
-
-      // Use M5.Display to draw pixel:
-      // If your project uses a different instance name (e.g., gfx or display), change this line.
-      M5.Display.drawPixel(x1 + xx, y1 + yy, gray565);
-
-      color_p++;
+      // Use your drawing function
+        esphome::Color d(final_color, final_color, final_color);   // grayscale
+        this->draw_pixel_at(x1 + xx, y1 + yy, d);
+    // this->draw_pixel_at(x1 + xx, y1 + yy, final_color);
     }
   }
 
-  // After drawing the block we must flush/present to the e-paper display.
-  // On e-paper you probably have to call a display() or push update function.
-  // Common M5GFX method is `display()` or `update()`; adjust if different.
-  // Two options:
-  //  - For full update: M5.Display.display();
-  //  - For partial updates / faster: M5.EPD->somePartialUpdate(...)
-  // We'll call display() here (safe but may be heavier).
-  M5.Display.display();
-
-  // Tell LVGL we are ready.
+  // After writing: flush to EPD
+  //this->M5.Display.display(); // or whatever your method is to update the EPD
+   //     this->M5.Display.display();
+  // Let LVGL know we’re done
+this->update();
+    
+    ESP_LOGD(TAG, "voor flushready ");
   lv_disp_flush_ready(&disp_drv_);
 }
 
-}  // namespace m5papers3_lvgl
-}  // namespace esphome
+
+
+} // namespace m5papers3_display_m5gfx
+} // namespace esphome
