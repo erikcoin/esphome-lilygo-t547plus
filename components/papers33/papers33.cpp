@@ -56,10 +56,10 @@ void M5PaperS3DisplayM5GFX::setup() {
     } else {
         ESP_LOGD(TAG, "Touch sensor not configured.");
     }
-
+ESP_LOGD(TAG, "voor lvgl setup");
   // === LVGL setup ===
   lv_init();
-
+ESP_LOGD(TAG, "na lvgl setup");
   int w = this->get_width();
   int h = this->get_height();
   size_t buf_size = w * LV_BUF_LINES;
@@ -72,7 +72,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   }
 
   lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
-
+ESP_LOGD(TAG, "voor drvinit ");
   lv_disp_drv_init(&disp_drv_);
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
@@ -82,9 +82,9 @@ void M5PaperS3DisplayM5GFX::setup() {
     self->lvgl_flush(area, color_p);
   };
   disp_drv_.user_data = this;
-
+ESP_LOGD(TAG, "na drvinit ");
   lv_disp_drv_register(&disp_drv_);
-
+ESP_LOGD(TAG, "na  drvregister ");
   // Optionally: create a simple LVGL UI element to test
   lv_obj_t *label = lv_label_create(lv_scr_act());
   lv_label_set_text(label, "Hello LVGL");
