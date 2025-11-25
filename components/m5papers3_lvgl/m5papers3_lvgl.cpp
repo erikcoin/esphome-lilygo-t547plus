@@ -24,6 +24,14 @@ static inline uint8_t rgb565_to_gray(uint16_t c) {
     // Standard luma
     return (uint8_t)((r * 38 + g * 75 + b * 15) >> 7);
 }
+static inline uint16_t gray4_to_rgb565(uint8_t g4) {
+    // Expand 4-bit to 8-bit
+    uint8_t g8 = (g4 << 4) | g4;
+    uint8_t r = g8 >> 3;
+    uint8_t g = g8 >> 2;
+    uint8_t b = g8 >> 3;
+    return (r << 11) | (g << 5) | b;
+}
 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
@@ -150,10 +158,10 @@ last_refresh = now;
         return;
     }
 
-    int x1 = area->x1;
-    int y1 = area->y1;
-    int x2 = area->x2;
-    int y2 = area->y2;
+    int32_t x1 = area->x1 < 0 ? 0 : area->x1;
+    int32_t y1 = area->y1 < 0 ? 0 : area->y1;
+    int32_t x2 = area->x2 >= get_width()  ? get_width()  - 1 : area->x2;
+    int32_t y2 = area->y2 >= get_height() ? get_height() - 1 : area->y2;
 
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
@@ -163,51 +171,26 @@ last_refresh = now;
         return;
     }
 
-    // 2 line buffers (each w bytes)
-    uint8_t *bufA = (uint8_t*) heap_caps_malloc(w, MALLOC_CAP_SPIRAM);
-    uint8_t *bufB = (uint8_t*) heap_caps_malloc(w, MALLOC_CAP_SPIRAM);
-
-    if (!bufA || !bufB) {
-        ESP_LOGE("lvgl", "Failed to allocate PSRAM line buffers for flush.");
-        if (bufA) heap_caps_free(bufA);
-        if (bufB) heap_caps_free(bufB);
-        lv_disp_flush_ready(&this->disp_drv_);
-        return;
-    }
-
-    uint8_t *cur = bufA;
-    uint8_t *next = bufB;
-
-    lv_color_t *src_line = color_p;
-
-    M5.Display.startWrite();
+    // 2-line double buffer (RGB565)
+    static uint16_t linebuf1[1600];
+    static uint16_t linebuf2[1600];
 
     for (int yy = 0; yy < h; yy++) {
-        // Prepare next line in 'next'
+        uint16_t *buf = (yy & 1) ? linebuf1 : linebuf2;
+
         for (int xx = 0; xx < w; xx++) {
-            next[xx] = rgb565_to_gray(src_line[xx].full);
+            uint16_t c565 = color_p->full;
+
+            // Fast approximate grayscale:
+            uint8_t g6 = (c565 >> 5) & 0x3F;  // use green (6-bit)
+            uint8_t gray4 = g6 >> 2;
+
+            buf[xx] = gray4_to_rgb565(gray4);
+            color_p++;
         }
 
-        // Push the "current" line
-        if (yy > 0) {
-            M5.Display.pushImageGray(x1, y1 + yy - 1, w, 1, cur);
-        }
-
-        // Swap buffers
-        uint8_t *tmp = cur;
-        cur = next;
-        next = tmp;
-
-        src_line += w;
+        M5.Display.pushImage(x1, y1 + yy, w, 1, buf);
     }
-
-    // Push last line
-    M5.Display.pushImageGray(x1, y1 + h - 1, w, 1, cur);
-
-    M5.Display.endWrite();
-
-    heap_caps_free(bufA);
-    heap_caps_free(bufB);
 
     lv_disp_flush_ready(&this->disp_drv_);
 }
