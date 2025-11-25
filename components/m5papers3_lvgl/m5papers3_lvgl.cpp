@@ -55,6 +55,9 @@ void M5PaperS3DisplayM5GFX::setup() {
         self->lvgl_flush(area, color_p);
     };
     disp_drv_.user_data = this;
+    lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
+    disp->driver.user_data = this;   // <-- add this
+
     lv_disp_drv_register(&disp_drv_);
 
     // Optional LVGL label to test
@@ -80,36 +83,14 @@ void M5PaperS3DisplayM5GFX::update() {
         //M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
     }
 
+    // Let LVGL render
+    lv_timer_handler();
 
-    if (this->writer_ != nullptr) {
-        ESP_LOGD(TAG, "Clearing canvas sprite (fill with white)");
-        // Assuming palette index 15 is white for 4-bit grayscale.
-        // Better to use this->gfx_.color565(255,255,255) or equivalent if palette changes.
-       // this->canvas_->fillSprite(this->gfx_.color565(255, 255, 255));
-        ESP_LOGD(TAG, "Calling writer lambda...");
-        this->writer_(*this); // This is where user draws to the display (this->canvas_)
-     ;
-        ESP_LOGD(TAG, "Pushing sprite to display buffer (M5.Display)...");
-        // The canvas (sprite) content is pushed to the actual physical display driver (M5.Display)
-        
-   //     this->canvas_->pushSprite(0, 0);
-        ESP_LOGD(TAG, "Triggering EPD refresh (M5.Display.display())...");
-        M5.Display.display(); // Tell the EPD to show what's in its buffer
-    } else {
-        ESP_LOGD(TAG, "No writer lambda set, skipping drawing. Pushing current canvas content.");
-        // If no writer, we might still want to push the (potentially empty or old) canvas
-        // and refresh the display, or do nothing.
-        // For now, let's assume if no writer, no explicit update is needed beyond initial clear.
-        // However, if there was a partial update, we might want to refresh.
-        // M5.Display.display(); // Uncomment if you want to refresh even without a writer
-    }
-
-    ESP_LOGD(TAG, "EPD refresh process initiated."); // display() is often non-blocking for EPD
-    
-  // Call LVGL tasks
-  lv_timer_handler();
+    // Actual EPD refresh happens automatically after pushImageGray()
+    // but the M5PaperS3 DCS sequence requires display() sometimes:
+    M5.Display.display(); 
 }
-//#include 
+
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
@@ -132,67 +113,84 @@ unsigned long current_time = millis();
 
 }
 
-void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Display &)> writer) {
-    this->writer_ = writer;
+void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
+   static uint32_t last_refresh = 0;
+uint32_t now = millis();
+
+if (now - last_refresh < 1000) {   // at least 120ms between partial updates
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
 }
 
-void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
+last_refresh = now;
+
     if (!area || !color_p) {
         lv_disp_flush_ready(&this->disp_drv_);
         return;
     }
 
-    int32_t x1 = area->x1 < 0 ? 0 : area->x1;
-    int32_t y1 = area->y1 < 0 ? 0 : area->y1;
-    int32_t x2 = area->x2 >= (int)this->get_width() ? this->get_width() - 1 : area->x2;
-    int32_t y2 = area->y2 >= (int)this->get_height() ? this->get_height() - 1 : area->y2;
+    int x1 = area->x1;
+    int y1 = area->y1;
+    int x2 = area->x2;
+    int y2 = area->y2;
 
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
+
     if (w <= 0 || h <= 0) {
         lv_disp_flush_ready(&this->disp_drv_);
         return;
     }
 
-    lv_color_t *p = color_p;
+    // 2 line buffers (each w bytes)
+    uint8_t *bufA = (uint8_t*) heap_caps_malloc(w, MALLOC_CAP_SPIRAM);
+    uint8_t *bufB = (uint8_t*) heap_caps_malloc(w, MALLOC_CAP_SPIRAM);
 
-    // Temporary line buffer (2 pixels per byte)
-    size_t line_bytes = (w + 1) / 2;
-    std::vector<uint8_t> line_buf(line_bytes * h, 0xFF); // fill white
-
-    for (int yy = 0; yy < h; yy++) {
-        for (int xx = 0; xx < w; xx++) {
-            uint16_t c565 = p->full;
-
-            // RGB565 -> 8-bit grayscale
-            uint8_t r5 = (c565 >> 11) & 0x1F;
-            uint8_t g6 = (c565 >> 5) & 0x3F;
-            uint8_t b5 = c565 & 0x1F;
-            uint8_t r8 = (r5 * 527 + 23) >> 6;
-            uint8_t g8 = (g6 * 259 + 33) >> 6;
-            uint8_t b8 = (b5 * 527 + 23) >> 6;
-            uint8_t lum = (uint8_t)((299 * r8 + 587 * g8 + 114 * b8) / 1000);
-
-            // 4-bit grayscale
-            uint8_t gray4 = (lum * 15 + 127) / 255;
-
-            // Pack 2 pixels per byte
-            int byte_index = yy * line_bytes + (xx / 2);
-            if ((xx & 1) == 0) {
-                line_buf[byte_index] = (line_buf[byte_index] & 0x0F) | (gray4 << 4);
-            } else {
-                line_buf[byte_index] = (line_buf[byte_index] & 0xF0) | (gray4 & 0x0F);
-            }
-
-            p++;
-        }
+    if (!bufA || !bufB) {
+        ESP_LOGE("lvgl", "Failed to allocate PSRAM line buffers for flush.");
+        if (bufA) heap_caps_free(bufA);
+        if (bufB) heap_caps_free(bufB);
+        lv_disp_flush_ready(&this->disp_drv_);
+        return;
     }
 
-    // Push the strip
-    M5.Display.pushImage(x1, y1, w, h, line_buf.data());
+    uint8_t *cur = bufA;
+    uint8_t *next = bufB;
+
+    lv_color_t *src_line = color_p;
+
+    M5.Display.startWrite();
+
+    for (int yy = 0; yy < h; yy++) {
+        // Prepare next line in 'next'
+        for (int xx = 0; xx < w; xx++) {
+            next[xx] = rgb565_to_gray(src_line[xx].full);
+        }
+
+        // Push the "current" line
+        if (yy > 0) {
+            M5.Display.pushImageGray(x1, y1 + yy - 1, w, 1, cur);
+        }
+
+        // Swap buffers
+        uint8_t *tmp = cur;
+        cur = next;
+        next = tmp;
+
+        src_line += w;
+    }
+
+    // Push last line
+    M5.Display.pushImageGray(x1, y1 + h - 1, w, 1, cur);
+
+    M5.Display.endWrite();
+
+    heap_caps_free(bufA);
+    heap_caps_free(bufB);
 
     lv_disp_flush_ready(&this->disp_drv_);
 }
+
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, Color color) {
     // bounds check
