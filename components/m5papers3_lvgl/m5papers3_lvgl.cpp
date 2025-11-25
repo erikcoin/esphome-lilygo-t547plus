@@ -199,8 +199,8 @@ last_refresh = now;
     return;
   }
 
-  const int x1 = std::max(area->x1, 0);
-  const int y1 = std::max(area->y1, 0);
+const int x1 = std::max<int>(area->x1, 0);
+const int y1 = std::max<int>(area->y1, 0);
   const int x2 = std::min(area->x2, (int)this->get_width() - 1);
   const int y2 = std::min(area->y2, (int)this->get_height() - 1);
 
