@@ -151,7 +151,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
     // Actual EPD refresh happens automatically after pushImageGray()
     // but the M5PaperS3 DCS sequence requires display() sometimes:
-    M5.Display.display(); 
+   // M5.Display.display(); 
 }
 
 
