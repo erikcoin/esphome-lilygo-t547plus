@@ -141,7 +141,18 @@ void M5PaperS3DisplayM5GFX::loop() {
 unsigned long current_time = millis();
 
 }
+static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+    if (!drv || !drv->user_data) {
+        lv_disp_flush_ready(drv);
+        return;
+    }
 
+    // Convert user_data back to your class instance.
+    auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
+
+    // Call the object method
+    display->lvgl_flush(area, color_p);
+}
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
    static uint32_t last_refresh = 0;
 uint32_t now = millis();
