@@ -10,6 +10,20 @@ namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
+// Fast RGB565 → 8-bit luminance converter
+static inline uint8_t rgb565_to_gray(uint16_t c) {
+    uint8_t r = (c >> 11) & 0x1F;
+    uint8_t g = (c >> 5)  & 0x3F;
+    uint8_t b =  c        & 0x1F;
+
+    // Expand to 8-bit using integer multipliers (no floats)
+    r = (r * 527 + 23) >> 6;
+    g = (g * 259 + 33) >> 6;
+    b = (b * 527 + 23) >> 6;
+
+    // Standard luma
+    return (uint8_t)((r * 38 + g * 75 + b * 15) >> 7);
+}
 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
