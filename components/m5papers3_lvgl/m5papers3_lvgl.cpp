@@ -32,9 +32,9 @@ void M5PaperS3DisplayM5GFX::setup() {
     // --- M5 Display init ---
     auto cfg = M5.config();
     M5.begin(cfg);
-    vTaskDelay(pdMS_TO_TICKS(100));
+    //vTaskDelay(pdMS_TO_TICKS(100));
     M5.Display.setEpdMode(epd_mode_t::epd_quality);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+   // vTaskDelay(pdMS_TO_TICKS(1000));
 
     // --- Allocate full-screen PSRAM framebuffer (4-bit grayscale) ---
     epd_buffer_ = (uint8_t*)heap_caps_malloc((this->get_width() * this->get_height()) / 2, MALLOC_CAP_SPIRAM);
@@ -46,13 +46,20 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     // --- LVGL init ---
     lv_init();
+        // Prepare driver
+    lv_disp_drv_init(&this->disp_drv_);
+    this->disp_drv_.hor_res = this->get_width();
+    this->disp_drv_.ver_res = this->get_height();
+    this->disp_drv_.flush_cb = lvgl_flush_cb;
+    this->disp_drv_.user_data = this;        // <-- correct place!
+    
+    lv_disp_t *disp = lv_disp_drv_register(&this->disp_drv_);
+   //// int w = this->get_width();
+   //// int h = this->get_height();
+   //// size_t buf_size = w * LV_BUF_LINES;
 
-    int w = this->get_width();
-    int h = this->get_height();
-    size_t buf_size = w * LV_BUF_LINES;
-
-    lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-    lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+   //// lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
+  ////  lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
     if (!lv_buf1 || !lv_buf2) {
         ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
         return;
@@ -60,24 +67,24 @@ void M5PaperS3DisplayM5GFX::setup() {
 
     lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
 
-    lv_disp_drv_init(&disp_drv_);
-    disp_drv_.hor_res = w;
-    disp_drv_.ver_res = h;
-    disp_drv_.draw_buf = &draw_buf_;
-    disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-        auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
-        self->lvgl_flush(area, color_p);
-    };
-    disp_drv_.user_data = this;
-    lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
-    disp->driver.user_data = this;   // <-- add this
+   //// lv_disp_drv_init(&disp_drv_);
+   //// disp_drv_.hor_res = w;
+   //// disp_drv_.ver_res = h;
+   //// disp_drv_.draw_buf = &draw_buf_;
+    ////disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+  ////      auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+  ////      self->lvgl_flush(area, color_p);
+ ////   };
+   //// disp_drv_.user_data = this;
+   //// lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
+ ////   disp->driver.user_data = this;   // <-- add this
 
-    lv_disp_drv_register(&disp_drv_);
+////    lv_disp_drv_register(&disp_drv_);
 
     // Optional LVGL label to test
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "Hello LVGL");
-    lv_obj_center(label);
+ ////   lv_obj_t *label = lv_label_create(lv_scr_act());
+ ////   lv_label_set_text(label, "Hello LVGL");
+ ////   lv_obj_center(label);
 
     ESP_LOGD(TAG, "LVGL setup complete.");
 }
