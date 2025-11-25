@@ -45,12 +45,12 @@ void M5PaperS3DisplayM5GFX::setup() {
    // vTaskDelay(pdMS_TO_TICKS(1000));
 
     // --- Allocate full-screen PSRAM framebuffer (4-bit grayscale) ---
-    epd_buffer_ = (uint8_t*)heap_caps_malloc((this->get_width() * this->get_height()) / 2, MALLOC_CAP_SPIRAM);
-    if (!epd_buffer_) {
-        ESP_LOGE(TAG, "Failed to allocate PSRAM framebuffer!");
-        return;
-    }
-    memset(epd_buffer_, 0xFF, (this->get_width() * this->get_height()) / 2); // fill white
+   // epd_buffer_ = (uint8_t*)heap_caps_malloc((this->get_width() * this->get_height()) / 2, MALLOC_CAP_SPIRAM);
+   // if (!epd_buffer_) {
+   //     ESP_LOGE(TAG, "Failed to allocate PSRAM framebuffer!");
+   //     return;
+   // }
+   // memset(epd_buffer_, 0xFF, (this->get_width() * this->get_height()) / 2); // fill white
 
     // --- LVGL init ---
     lv_init();
@@ -71,7 +71,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   //  if (!lv_buf1 || !lv_buf2) {
   //      ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
   //      return;
-    }
+  //  }
 
    // lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
 
