@@ -32,7 +32,18 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
+static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+    if (!drv || !drv->user_data) {
+        lv_disp_flush_ready(drv);
+        return;
+    }
 
+    // Convert user_data back to your class instance.
+    auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
+
+    // Call the object method
+    display->lvgl_flush(area, color_p);
+}
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
     ESP_LOGD(TAG, "Setting up M5PaperS3 Display...");
@@ -141,18 +152,7 @@ void M5PaperS3DisplayM5GFX::loop() {
 unsigned long current_time = millis();
 
 }
-static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-    if (!drv || !drv->user_data) {
-        lv_disp_flush_ready(drv);
-        return;
-    }
 
-    // Convert user_data back to your class instance.
-    auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
-
-    // Call the object method
-    display->lvgl_flush(area, color_p);
-}
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
    static uint32_t last_refresh = 0;
 uint32_t now = millis();
