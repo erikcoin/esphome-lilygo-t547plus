@@ -11,6 +11,25 @@ namespace m5papers3_display_m5gfx {
 
 static const char *const TAG = "m5papers3.display_m5gfx";
 // Fast RGB565 → 8-bit luminance converter
+static inline uint8_t rgb565_to_luma8(uint16_t c) {
+  // fast expand and weighted luma (integer)
+  uint8_t r5 = (c >> 11) & 0x1F;
+  uint8_t g6 = (c >> 5) & 0x3F;
+  uint8_t b5 = c & 0x1F;
+  uint8_t r8 = (r5 * 527 + 23) >> 6;
+  uint8_t g8 = (g6 * 259 + 33) >> 6;
+  uint8_t b8 = (b5 * 527 + 23) >> 6;
+  // approximate luma: (0.299 * r + 0.587 * g + 0.114 * b)
+  return (uint8_t)((r8 * 77 + g8 * 150 + b8 * 29) >> 8); // normalized
+}
+
+static inline uint16_t gray8_to_rgb565(uint8_t g8) {
+  // convert 8-bit gray to rgb565
+  uint16_t r = (g8 >> 3) & 0x1F;
+  uint16_t gg = (g8 >> 2) & 0x3F;
+  uint16_t b = (g8 >> 3) & 0x1F;
+  return (r << 11) | (gg << 5) | b;
+}
 static inline uint8_t rgb565_to_gray(uint16_t c) {
     uint8_t r = (c >> 11) & 0x1F;
     uint8_t g = (c >> 5)  & 0x3F;
@@ -33,79 +52,83 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     return (r << 11) | (g << 5) | b;
 }
 static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-    if (!drv || !drv->user_data) {
-        lv_disp_flush_ready(drv);
-        return;
-    }
-
-    // Convert user_data back to your class instance.
-    auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
-
-    // Call the object method
-    display->lvgl_flush(area, color_p);
+  if (!drv) return;
+  if (!drv->user_data) {
+    // best effort: mark flush ready if LVGL calls us but no userdata
+    lv_disp_flush_ready(drv);
+    return;
+  }
+  auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
+  if (!display) {
+    lv_disp_flush_ready(drv);
+    return;
+  }
+  display->lvgl_flush(area, color_p);
 }
+
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
-    ESP_LOGD(TAG, "Setting up M5PaperS3 Display...");
+  ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
 
-    // --- M5 Display init ---
-    auto cfg = M5.config();
-    M5.begin(cfg);
-    //vTaskDelay(pdMS_TO_TICKS(100));
-    M5.Display.setEpdMode(epd_mode_t::epd_quality);
-   // vTaskDelay(pdMS_TO_TICKS(1000));
+  // M5 init (keep your existing sequence; make sure M5.begin() already ran)
+  auto cfg = M5.config();
+  M5.begin(cfg);
+  vTaskDelay(pdMS_TO_TICKS(100));
 
-    // --- Allocate full-screen PSRAM framebuffer (4-bit grayscale) ---
-   // epd_buffer_ = (uint8_t*)heap_caps_malloc((this->get_width() * this->get_height()) / 2, MALLOC_CAP_SPIRAM);
-   // if (!epd_buffer_) {
-   //     ESP_LOGE(TAG, "Failed to allocate PSRAM framebuffer!");
-   //     return;
-   // }
-   // memset(epd_buffer_, 0xFF, (this->get_width() * this->get_height()) / 2); // fill white
+  // LVGL init
+  lv_init();
 
-    // --- LVGL init ---
-    lv_init();
-        // Prepare driver
-    lv_disp_drv_init(&this->disp_drv_);
-    this->disp_drv_.hor_res = this->get_width();
-    this->disp_drv_.ver_res = this->get_height();
-    this->disp_drv_.flush_cb = lvgl_flush_cb;
-    this->disp_drv_.user_data = this;        // <-- correct place!
-    
-    lv_disp_t *disp = lv_disp_drv_register(&this->disp_drv_);
-   //// int w = this->get_width();
-   //// int h = this->get_height();
-   //// size_t buf_size = w * LV_BUF_LINES;
+  const int w = this->get_width();
+  const int h = this->get_height();
+  ESP_LOGD(TAG, "Display size %d x %d", w, h);
 
-   //// lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-  ////  lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-  //  if (!lv_buf1 || !lv_buf2) {
-  //      ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
-  //      return;
-  //  }
+  // LVGL draw buffers: allocate in PSRAM
+  const int LV_BUF_LINES = 20;  // tune: smaller -> smaller heap usage, more flushes
+  const size_t buf_size = (size_t)w * LV_BUF_LINES;
 
-   // lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
+  ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
+  lv_buf1_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+  lv_buf2_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+  if (!lv_buf1_ || !lv_buf2_) {
+    ESP_LOGE(TAG, "Failed to allocate LVGL buffers in PSRAM! buf1=%p buf2=%p", (void*)lv_buf1_, (void*)lv_buf2_);
+    // free any partial allocations
+    if (lv_buf1_) heap_caps_free(lv_buf1_), lv_buf1_ = nullptr;
+    if (lv_buf2_) heap_caps_free(lv_buf2_), lv_buf2_ = nullptr;
+    return;
+  }
+  lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
 
-   //// lv_disp_drv_init(&disp_drv_);
-   //// disp_drv_.hor_res = w;
-   //// disp_drv_.ver_res = h;
-   //// disp_drv_.draw_buf = &draw_buf_;
-    ////disp_drv_.flush_cb = [](lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-  ////      auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
-  ////      self->lvgl_flush(area, color_p);
- ////   };
-   //// disp_drv_.user_data = this;
-   //// lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
- ////   disp->driver.user_data = this;   // <-- add this
+  // Register LVGL display driver
+  lv_disp_drv_init(&disp_drv_);
+  disp_drv_.hor_res = w;
+  disp_drv_.ver_res = h;
+  disp_drv_.draw_buf = &draw_buf_;
+  disp_drv_.flush_cb = lvgl_flush_cb;
+  disp_drv_.user_data = this;
+  lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
+  if (!disp) {
+    ESP_LOGE(TAG, "lv_disp_drv_register failed");
+    // free buffers before returning
+    heap_caps_free(lv_buf1_); lv_buf1_ = nullptr;
+    heap_caps_free(lv_buf2_); lv_buf2_ = nullptr;
+    return;
+  }
+  // Some LVGL versions keep driver behind disp->driver pointer; ensure user_data mirrored
+  if (disp->driver) disp->driver->user_data = this;
 
-////    lv_disp_drv_register(&disp_drv_);
+  // Allocate two persistent PSRAM line buffers (RGB565 words) — allocated once
+  linebuf_capacity_ = static_cast<size_t>(w); // one uint16_t per pixel per line
+  ESP_LOGD(TAG, "Allocating line buffers in PSRAM: %u pixels", (unsigned)linebuf_capacity_);
+  linebufA_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
+  linebufB_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
+  if (!linebufA_ || !linebufB_) {
+    ESP_LOGE(TAG, "Failed to allocate PSRAM line buffers: A=%p B=%p", (void*)linebufA_, (void*)linebufB_);
+    if (linebufA_) heap_caps_free(linebufA_), linebufA_ = nullptr;
+    if (linebufB_) heap_caps_free(linebufB_), linebufB_ = nullptr;
+    // still continue — flush will guard against null buffers
+  }
 
-    // Optional LVGL label to test
- ////   lv_obj_t *label = lv_label_create(lv_scr_act());
- ////   lv_label_set_text(label, "Hello LVGL");
- ////   lv_obj_center(label);
-
-    ESP_LOGD(TAG, "LVGL setup complete.");
+  ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 }
 
 // ... (update() method remains largely the same)
@@ -164,46 +187,86 @@ if (now - last_refresh < 1000) {   // at least 120ms between partial updates
 
 last_refresh = now;
 
-    if (!area || !color_p) {
-        lv_disp_flush_ready(&this->disp_drv_);
-        return;
-    }
-
-    int32_t x1 = area->x1 < 0 ? 0 : area->x1;
-    int32_t y1 = area->y1 < 0 ? 0 : area->y1;
-    int32_t x2 = area->x2 >= get_width()  ? get_width()  - 1 : area->x2;
-    int32_t y2 = area->y2 >= get_height() ? get_height() - 1 : area->y2;
-
-    int w = x2 - x1 + 1;
-    int h = y2 - y1 + 1;
-
-    if (w <= 0 || h <= 0) {
-        lv_disp_flush_ready(&this->disp_drv_);
-        return;
-    }
-
-    // 2-line double buffer (RGB565)
-    static uint16_t linebuf1[1600];
-    static uint16_t linebuf2[1600];
-
-    for (int yy = 0; yy < h; yy++) {
-        uint16_t *buf = (yy & 1) ? linebuf1 : linebuf2;
-
-        for (int xx = 0; xx < w; xx++) {
-            uint16_t c565 = color_p->full;
-
-            // Fast approximate grayscale:
-            uint8_t g6 = (c565 >> 5) & 0x3F;  // use green (6-bit)
-            uint8_t gray4 = g6 >> 2;
-
-            buf[xx] = gray4_to_rgb565(gray4);
-            color_p++;
-        }
-
-        M5.Display.pushImage(x1, y1 + yy, w, 1, buf);
-    }
-
+//void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
+  // Defensive checks
+  if (!area || !color_p) {
     lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+  if (!disp_drv_.user_data) {
+    ESP_LOGE(TAG, "lvgl_flush: disp_drv_.user_data is NULL");
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  const int x1 = std::max(area->x1, 0);
+  const int y1 = std::max(area->y1, 0);
+  const int x2 = std::min(area->x2, (int)this->get_width() - 1);
+  const int y2 = std::min(area->y2, (int)this->get_height() - 1);
+
+  const int w = x2 - x1 + 1;
+  const int h = y2 - y1 + 1;
+  if (w <= 0 || h <= 0) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // Pick line buffer
+  if (!linebufA_ || !linebufB_) {
+    // fallback: try to allocate small temporary buffer in internal RAM
+    ESP_LOGW(TAG, "lvgl_flush: line buffers not allocated in setup; trying stack allocation (may fail)");
+    // create small stack buffer if w is tiny; otherwise bail
+    if (w > 1024) {
+      ESP_LOGE(TAG, "lvgl_flush: cannot allocate fallback buffer for width %d", w);
+      lv_disp_flush_ready(&this->disp_drv_);
+      return;
+    }
+    uint16_t stackbuf[w]; // VLA - supported by GCC; safe only for small w
+    uint16_t *usebuf = stackbuf;
+    // we will write lines into stackbuf and push
+    lv_color_t *src = color_p;
+    for (int yy = 0; yy < h; yy++) {
+      for (int xx = 0; xx < w; xx++) {
+        uint16_t c565 = src[xx].full;
+        uint8_t lum = rgb565_to_luma8(c565);
+        usebuf[xx] = gray8_to_rgb565(lum);
+      }
+      M5.Display.pushImage(x1, y1 + yy, w, 1, usebuf);
+      src += w;
+    }
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // Use persistent PSRAM buffers (swap A/B)
+  uint16_t *bufA = linebufA_;
+  uint16_t *bufB = linebufB_;
+  uint16_t *cur = bufA;
+  uint16_t *next = bufB;
+
+  lv_color_t *src = color_p;
+
+  // Loop lines: convert each LVGL pixel to RGB565 gray and push a scanline
+  for (int yy = 0; yy < h; yy++) {
+    // convert this line into 'cur'
+    for (int xx = 0; xx < w; xx++) {
+      uint16_t c565 = src[xx].full;
+      uint8_t lum = rgb565_to_luma8(c565);
+      cur[xx] = gray8_to_rgb565(lum);
+    }
+
+    // Push current line as a 1-pixel-high image
+    M5.Display.pushImage(x1, y1 + yy, w, 1, cur);
+
+    // advance source and swap buffers
+    src += w;
+    uint16_t *tmp = cur;
+    cur = next;
+    next = tmp;
+  }
+
+  // All done
+  lv_disp_flush_ready(&this->disp_drv_);
 }
 
 
