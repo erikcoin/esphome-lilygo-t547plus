@@ -68,12 +68,12 @@ void M5PaperS3DisplayM5GFX::setup() {
 
    //// lv_color_t *lv_buf1 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
   ////  lv_color_t *lv_buf2 = (lv_color_t*)malloc(buf_size * sizeof(lv_color_t));
-    if (!lv_buf1 || !lv_buf2) {
-        ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
-        return;
+  //  if (!lv_buf1 || !lv_buf2) {
+  //      ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
+  //      return;
     }
 
-    lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
+   // lv_disp_draw_buf_init(&draw_buf_, lv_buf1, lv_buf2, buf_size);
 
    //// lv_disp_drv_init(&disp_drv_);
    //// disp_drv_.hor_res = w;
