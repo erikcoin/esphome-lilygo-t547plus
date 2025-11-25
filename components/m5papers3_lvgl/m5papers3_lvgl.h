@@ -42,6 +42,16 @@ private:
 
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
+// in M5PaperS3DisplayM5GFX class
+lv_disp_draw_buf_t draw_buf_;
+lv_color_t *lv_buf1_{nullptr};
+lv_color_t *lv_buf2_{nullptr};
+lv_disp_drv_t disp_drv_;
+
+// PSRAM line buffers (allocated in setup)
+uint16_t *linebufA_{nullptr};
+uint16_t *linebufB_{nullptr};
+size_t linebuf_capacity_{0}; // number of pixels each line buffer can hold
 
 // LVGL-related:
   void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
