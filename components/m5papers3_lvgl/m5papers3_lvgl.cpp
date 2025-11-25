@@ -201,8 +201,9 @@ last_refresh = now;
 
 const int x1 = std::max<int>(area->x1, 0);
 const int y1 = std::max<int>(area->y1, 0);
-const int x2 = std::min<int>(area->x2, this->width_ - 1);
-const int y2 = std::min<int>(area->y2, this->height_ - 1);
+const int x2 = std::min<int>(area->x2, this->get_width()  - 1);
+const int y2 = std::min<int>(area->y2, this->get_height() - 1);
+
 
   const int w = x2 - x1 + 1;
   const int h = y2 - y1 + 1;
