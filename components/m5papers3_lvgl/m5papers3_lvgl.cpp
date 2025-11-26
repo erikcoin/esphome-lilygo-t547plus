@@ -77,6 +77,15 @@ void M5PaperS3DisplayM5GFX::setup() {
 
   // LVGL init
   lv_init();
+xTaskCreatePinnedToCore(
+    &M5PaperS3DisplayM5GFX::flush_worker_task_trampoline,
+    "lv_flush_worker",
+    8192,       // stack
+    this,       // parameter
+    1,          // priority
+    &flush_task_handle_,
+    1           // run on core 1
+);
 
   const int w = this->get_width();
   const int h = this->get_height();
@@ -130,20 +139,11 @@ void M5PaperS3DisplayM5GFX::setup() {
 
   ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-xTaskCreatePinnedToCore(
-    &M5PaperS3DisplayM5GFX::flush_worker_task_trampoline,
-    "lv_flush_worker",
-    8192,       // stack
-    this,       // parameter
-    1,          // priority
-    &flush_task_handle_,
-    1           // run on core 1
-);
 
 
-if (r != pdPASS) {
-    ESP_LOGE(TAG, "Failed to create flush worker task!");
-}
+////if (r != pdPASS) {
+////    ESP_LOGE(TAG, "Failed to create flush worker task!");
+////}
 
 
 
