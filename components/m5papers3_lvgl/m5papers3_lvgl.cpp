@@ -143,7 +143,7 @@ xTaskCreatePinnedToCore(
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
-  disp_drv_.flush_cb = lvgl_flush_cb;
+  disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_trampoline;
   disp_drv_.user_data = this;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
   if (!disp) {
@@ -220,8 +220,11 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 }
 
-void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *param) {
-  static_cast<M5PaperS3DisplayM5GFX*>(param)->flush_worker_task();
+void M5PaperS3DisplayM5GFX::lvgl_flush_trampoline(lv_disp_drv_t *drv,
+                                                   const lv_area_t *area,
+                                                   lv_color_t *color_p) {
+    auto *self = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
+    self->lvgl_flush(area, color_p);
 }
 
 void M5PaperS3DisplayM5GFX::flush_worker_task() {
@@ -230,7 +233,10 @@ void M5PaperS3DisplayM5GFX::flush_worker_task() {
     vTaskDelay(pdMS_TO_TICKS(5));  // do NOT use 1ms on S3
   }
 }
-
+void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area,
+                                        lv_color_t *color_p) {
+    // here you can safely access `linebufA_` and `gfx_`
+}
 
 
 
