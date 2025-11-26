@@ -52,6 +52,10 @@ private:
 
  protected:
   static void flush_worker_task_trampoline(void *param);
+void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
+static void lvgl_flush_trampoline(lv_disp_drv_t *drv,
+                                  const lv_area_t *area,
+                                  lv_color_t *color_p);
   void flush_worker_task();
   TaskHandle_t flush_task_handle_ = nullptr;
   // in M5PaperS3DisplayM5GFX class
