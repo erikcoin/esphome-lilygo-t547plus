@@ -51,11 +51,16 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
-void lvgl_flush_cb(lv_disp_drv_t *drv,
-                                          const lv_area_t *area,
-                                          lv_color_t *color_p)
+void esphome::m5papers3_display_m5gfx::lvgl_flush_cb(
+        lv_disp_drv_t *drv,
+        const lv_area_t *area,
+        lv_color_t *color_p)
 {
-    M5PaperS3DisplayM5GFX *d = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
+    auto *d = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
+    if (!d) {
+        lv_disp_flush_ready(drv);
+        return;
+    }
 
     int x1 = area->x1;
     int y1 = area->y1;
@@ -65,22 +70,30 @@ void lvgl_flush_cb(lv_disp_drv_t *drv,
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
 
-    const lv_color_t *src = color_p;
+    // Convert LVGL's color buffer into your two PSRAM line buffers,
+    // THEN refresh ONCE.
+    lv_color_t *src = color_p;
 
-    // 1. Convert all LVGL pixels into your framebuffer (sprite or canvas)
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            uint16_t rgb = src->full;
-            uint8_t gray = convert_rgb565_to_4bit(rgb);
-            d->canvas_.drawPixel(x1 + x, y1 + y, gray);
-            src++;
+    for (int yy = 0; yy < h; yy++) {
+        uint16_t *line = d->linebufA_;   // use one buffer per line
+
+        for (int xx = 0; xx < w; xx++) {
+            uint16_t c565 = src[xx].full;
+            uint8_t lum = rgb565_to_luma8(c565);
+            uint16_t gray565 = gray8_to_rgb565(lum);
+            line[xx] = gray565;
         }
+
+        // Push **one line**, no display() here
+        M5.Display.pushImage(x1, y1 + yy, w, 1, line);
+
+        src += w;
     }
 
-    // 2. Now refresh ONCE
-    d->gfx.display();
+    // 👉 ONLY ONE REFRESH HERE 👈
+    // This removes the slow line-by-line sweeping effect
+    M5.Display.display();  
 
-    // 3. Tell LVGL we're done
     lv_disp_flush_ready(drv);
 }
 
