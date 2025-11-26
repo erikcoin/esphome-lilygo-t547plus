@@ -24,6 +24,8 @@ namespace m5papers3_display_m5gfx {
 class M5PaperS3DisplayM5GFX : public display::Display {
 private:
   uint8_t *epd_buffer_{nullptr};  // 4-bit per pixel framebuffer
+  std::atomic_bool lvgl_busy_{false};   // small reentrancy guard
+  uint32_t lvgl_last_tick_ms_{0};       // throttling timer
  public:
     void setup() override;
     void loop();
