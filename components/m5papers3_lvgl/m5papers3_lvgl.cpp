@@ -133,27 +133,37 @@ void M5PaperS3DisplayM5GFX::setup() {
 
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
-    static bool first_time = true;
-    if (first_time) {
-        ESP_LOGD(TAG, "Delaying first update for EPD...");
-        delay(1000); // Allow EPD to settle, also good if setup had issues
-        first_time = false;
+  // Throttle lv_timer_handler() frequency to avoid overloading LVGL and the CPU
+  const uint32_t LVGL_TICK_INTERVAL_MS = 20; // try 20ms (50Hz). Lower if necessary.
+  uint32_t now = millis();
 
-        // Initial clear/refresh sequence (optional, but can help with ghosting from boot)
-        ESP_LOGD(TAG, "Performing initial EPD clear sequence...");
-        M5.Display.setEpdMode(epd_mode_t::epd_quality); // Ensure quality mode for full clear
-        ESP_LOGD(TAG, "Initial EPD clear sequence finished.");
-        //M5.Display.setEpdMode(epd_mode_t::epd_quality); // Back to desired mode
-    }
+  // run heap/psram diagnostics every ~5s only (avoid spam)
+  static uint32_t last_diag = 0;
+  if (now - last_diag > 5000) {
+    ESP_LOGD(TAG, "Heap internal: %u  PSRAM: %u",
+             heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+             heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    last_diag = now;
+  }
 
-    // Let LVGL render
-    lv_timer_handler();
+  // throttle timer
+  if (now - this->lvgl_last_tick_ms_ < LVGL_TICK_INTERVAL_MS) return;
+  this->lvgl_last_tick_ms_ = now;
 
-    // Actual EPD refresh happens automatically after pushImageGray()
-    // but the M5PaperS3 DCS sequence requires display() sometimes:
-   // M5.Display.display(); 
+  // prevent re-entrancy if previous lv_timer_handler not finished
+  if (this->lvgl_busy_.exchange(true)) {
+    // Another lvgl handler still running; skip this tick
+    ESP_LOGW(TAG, "Skipping lv_timer_handler() because busy");
+    return;
+  }
+
+  // Run LVGL timer handler safely; make sure we catch unexpected issues quickly
+  // (Note: no exceptions in ESP32, but we keep the handler brief)
+  lv_timer_handler();
+
+  // mark not busy
+  this->lvgl_busy_.store(false);
 }
-
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
