@@ -159,10 +159,12 @@ void M5PaperS3DisplayM5GFX::update() {
 
   // Run LVGL timer handler safely; make sure we catch unexpected issues quickly
   // (Note: no exceptions in ESP32, but we keep the handler brief)
+  ESP_LOGD(TAG, "before lv_timer_handler.");
   lv_timer_handler();
-
+ESP_LOGD(TAG, "after  lv_timer_handler.");
   // mark not busy
   this->lvgl_busy_.store(false);
+  ESP_LOGD(TAG, "after  lvgl_busy_.store.");
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
@@ -180,7 +182,12 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 
 
 void M5PaperS3DisplayM5GFX::loop() {
+
+  ESP_LOGD(TAG, "starting loop");
+  lvgl_busy_.store
+  ESP_LOGD(TAG, "in loop after  lvgl_busy_.store. starting update now");
     M5.update(); // Update touch and other inputs
+    ESP_LOGD(TAG, "in loop after update ");
     static unsigned long last_touch_time = 0;
 unsigned long current_time = millis();
 
