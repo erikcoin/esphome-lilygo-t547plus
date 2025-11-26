@@ -23,6 +23,45 @@ static inline uint8_t rgb565_to_luma8(uint16_t c) {
   return (uint8_t)((r8 * 77 + g8 * 150 + b8 * 29) >> 8); // normalized
 }
 
+
+// Build once at startup (e.g., in setup())
+static uint8_t  lut_rgb565_to_luma[1 << 16];
+static uint16_t lut_gray8_to_rgb565[256];
+
+static inline uint8_t rgb565_to_luma(uint16_t c)
+{
+  uint8_t r5 = (c >> 11) & 0x1F;
+  uint8_t g6 = (c >> 5)  & 0x3F;
+  uint8_t b5 =  c        & 0x1F;
+  uint8_t r = (r5 * 527 + 23) >> 6;
+  uint8_t g = (g6 * 259 + 33) >> 6;
+  uint8_t b = (b5 * 527 + 23) >> 6;
+  return (uint8_t)((r * 77 + g * 150 + b * 29) >> 8);
+}
+
+static inline uint16_t gray8_to_rgb565(uint8_t y)
+{
+  uint16_t r5 = (y * 31 + 127) / 255;
+  uint16_t g6 = (y * 63 + 127) / 255;
+  uint16_t b5 = r5;
+  return (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+}
+
+static void init_luts()
+{
+  for (uint32_t c = 0; c < (1u << 16); ++c) {
+    lut_rgb565_to_luma[c] = rgb565_to_luma((uint16_t)c);
+  }
+  for (int y = 0; y < 256; ++y) {
+    lut_gray8_to_rgb565[y] = gray8_to_rgb565((uint8_t)y);
+  }
+}
+
+
+
+
+
+
 static inline uint16_t gray8_to_rgb565(uint8_t g8) {
   // convert 8-bit gray to rgb565
   uint16_t r = (g8 >> 3) & 0x1F;
