@@ -233,10 +233,6 @@ void M5PaperS3DisplayM5GFX::flush_worker_task() {
     vTaskDelay(pdMS_TO_TICKS(5));  // do NOT use 1ms on S3
   }
 }
-void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area,
-                                        lv_color_t *color_p) {
-    // here you can safely access `linebufA_` and `gfx_`
-}
 
 
 
@@ -260,6 +256,7 @@ void M5PaperS3DisplayM5GFX::loop() {
 unsigned long current_time = millis();
 
 }
+
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
   static uint32_t last_refresh = 0;
