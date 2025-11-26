@@ -378,8 +378,10 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
     convert_lines(dma_buf[buf_idx], color_p + processed_rows * pitch, lines_this_chunk);
 
     // Ensure previous DMA completed
-    gfx_.waitDMA();
-
+    //gfx_.waitDMA();
+while (gfx_.dmaBusy()) {
+    vTaskDelay(1); // yield to watchdog
+}
     // Start next DMA transfer
     gfx_.pushImageDMA(x, y + processed_rows, pitch, lines_this_chunk, dma_buf[buf_idx]);
 
@@ -392,8 +394,10 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
   }
 
   // Final DMA completion
-  gfx_.waitDMA();
-
+ // gfx_.waitDMA();
+  while (gfx_.dmaBusy()) {
+        vTaskDelay(1);
+    }
   // If we allocated temporary buffers, free them
   if (linebufA_ != bufA) { if (bufA) heap_caps_free(bufA); }
   if (linebufB_ != bufB) { if (bufB) heap_caps_free(bufB); }
