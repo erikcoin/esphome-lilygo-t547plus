@@ -51,19 +51,37 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
-static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
-  if (!drv) return;
-  if (!drv->user_data) {
-    // best effort: mark flush ready if LVGL calls us but no userdata
+void M5PaperS3DisplayM5GFX::lvgl_flush_cb(lv_disp_drv_t *drv,
+                                          const lv_area_t *area,
+                                          lv_color_t *color_p)
+{
+    M5PaperS3DisplayM5GFX *d = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
+
+    int x1 = area->x1;
+    int y1 = area->y1;
+    int x2 = area->x2;
+    int y2 = area->y2;
+
+    int w = x2 - x1 + 1;
+    int h = y2 - y1 + 1;
+
+    const lv_color_t *src = color_p;
+
+    // 1. Convert all LVGL pixels into your framebuffer (sprite or canvas)
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            uint16_t rgb = src->full;
+            uint8_t gray = convert_rgb565_to_4bit(rgb);
+            d->canvas_.drawPixel(x1 + x, y1 + y, gray);
+            src++;
+        }
+    }
+
+    // 2. Now refresh ONCE
+    d->gfx.display();
+
+    // 3. Tell LVGL we're done
     lv_disp_flush_ready(drv);
-    return;
-  }
-  auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
-  if (!display) {
-    lv_disp_flush_ready(drv);
-    return;
-  }
-  display->lvgl_flush(area, color_p);
 }
 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
