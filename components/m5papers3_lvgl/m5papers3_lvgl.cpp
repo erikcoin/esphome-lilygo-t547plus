@@ -217,7 +217,7 @@ void M5PaperS3DisplayM5GFX::loop() {
 
   ESP_LOGD(TAG, "starting loop, starting update now");
   
-    M5.update(); // Update touch and other inputs
+ //   M5.update(); // Update touch and other inputs
     ESP_LOGD(TAG, "in loop after update ");
     static unsigned long last_touch_time = 0;
 unsigned long current_time = millis();
