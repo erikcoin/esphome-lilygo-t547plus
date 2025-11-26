@@ -219,7 +219,7 @@ void M5PaperS3DisplayM5GFX::update() {
   // Run LVGL timer handler safely; make sure we catch unexpected issues quickly
   // (Note: no exceptions in ESP32, but we keep the handler brief)
   ESP_LOGD(TAG, "before lv_timer_handler.");
-  lv_timer_handler();
+ ///// lv_timer_handler();
 ESP_LOGD(TAG, "after  lv_timer_handler.");
   // mark not busy
   this->lvgl_busy_.store(false);
