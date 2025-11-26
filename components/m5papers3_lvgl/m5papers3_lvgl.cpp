@@ -234,7 +234,14 @@ void M5PaperS3DisplayM5GFX::flush_worker_task() {
   }
 }
 
+void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *arg) {
+    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
+    if (!self) return;
 
+    // Call LVGL flush from this worker task
+    // Note: the real code depends on whether you’re doing double-buffered line flush
+    self->lvgl_flush(self->worker_area_, self->worker_buf_);
+}
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
