@@ -51,50 +51,19 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
-void M5PaperS3DisplayM5GFX::lvgl_flush_cb(
-        lv_disp_drv_t *drv,
-        const lv_area_t *area,
-        lv_color_t *color_p)
-{
-    auto *d = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
-    if (!d) {
-        lv_disp_flush_ready(drv);
-        return;
-    }
-
-    int x1 = area->x1;
-    int y1 = area->y1;
-    int x2 = area->x2;
-    int y2 = area->y2;
-
-    int w = x2 - x1 + 1;
-    int h = y2 - y1 + 1;
-
-    // Convert LVGL's color buffer into your two PSRAM line buffers,
-    // THEN refresh ONCE.
-    lv_color_t *src = color_p;
-
-    for (int yy = 0; yy < h; yy++) {
-        uint16_t *line = d->linebufA_;   // use one buffer per line
-
-        for (int xx = 0; xx < w; xx++) {
-            uint16_t c565 = src[xx].full;
-            uint8_t lum = rgb565_to_luma8(c565);
-            uint16_t gray565 = gray8_to_rgb565(lum);
-            line[xx] = gray565;
-        }
-
-        // Push **one line**, no display() here
-        M5.Display.pushImage(x1, y1 + yy, w, 1, line);
-
-        src += w;
-    }
-
-    // 👉 ONLY ONE REFRESH HERE 👈
-    // This removes the slow line-by-line sweeping effect
-    M5.Display.display();  
-
+static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+  if (!drv) return;
+  if (!drv->user_data) {
+    // best effort: mark flush ready if LVGL calls us but no userdata
     lv_disp_flush_ready(drv);
+    return;
+  }
+  auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
+  if (!display) {
+    lv_disp_flush_ready(drv);
+    return;
+  }
+  display->lvgl_flush(area, color_p);
 }
 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
@@ -143,7 +112,7 @@ xTaskCreatePinnedToCore(
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
-  disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_trampoline;
+  disp_drv_.flush_cb = lvgl_flush_cb;
   disp_drv_.user_data = this;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
   if (!disp) {
@@ -220,11 +189,8 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 }
 
-void M5PaperS3DisplayM5GFX::lvgl_flush_trampoline(lv_disp_drv_t *drv,
-                                                   const lv_area_t *area,
-                                                   lv_color_t *color_p) {
-    auto *self = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
-    self->lvgl_flush(area, color_p);
+void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *param) {
+  static_cast<M5PaperS3DisplayM5GFX*>(param)->flush_worker_task();
 }
 
 void M5PaperS3DisplayM5GFX::flush_worker_task() {
@@ -234,14 +200,8 @@ void M5PaperS3DisplayM5GFX::flush_worker_task() {
   }
 }
 
-void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *arg) {
-    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
-    if (!self) return;
 
-    // Call LVGL flush from this worker task
-    // Note: the real code depends on whether you’re doing double-buffered line flush
-    self->lvgl_flush(self->worker_area_, self->worker_buf_);
-}
+
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
@@ -263,7 +223,6 @@ void M5PaperS3DisplayM5GFX::loop() {
 unsigned long current_time = millis();
 
 }
-
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
   static uint32_t last_refresh = 0;
