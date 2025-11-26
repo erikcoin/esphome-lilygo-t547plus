@@ -177,96 +177,110 @@ unsigned long current_time = millis();
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-   static uint32_t last_refresh = 0;
-uint32_t now = millis();
+  static uint32_t last_refresh = 0;
+  uint32_t now = millis();
 
-if (now - last_refresh < 1000) {   // at least 120ms between partial updates
+  //
+  // Rate-limit partial updates (VERY IMPORTANT for e-paper)
+  //
+  if (now - last_refresh < 1000) {
     lv_disp_flush_ready(&this->disp_drv_);
     return;
-}
+  }
+  last_refresh = now;
 
-last_refresh = now;
-
-//void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
-  // Defensive checks
+  // Defensive
   if (!area || !color_p) {
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
+
   if (!disp_drv_.user_data) {
     ESP_LOGE(TAG, "lvgl_flush: disp_drv_.user_data is NULL");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-const int x1 = std::max<int>(area->x1, 0);
-const int y1 = std::max<int>(area->y1, 0);
-const int x2 = std::min<int>(area->x2, this->get_width()  - 1);
-const int y2 = std::min<int>(area->y2, this->get_height() - 1);
-
+  //
+  // Clip to display area
+  //
+  const int x1 = std::max<int>(area->x1, 0);
+  const int y1 = std::max<int>(area->y1, 0);
+  const int x2 = std::min<int>(area->x2, this->get_width()  - 1);
+  const int y2 = std::min<int>(area->y2, this->get_height() - 1);
 
   const int w = x2 - x1 + 1;
   const int h = y2 - y1 + 1;
+
   if (w <= 0 || h <= 0) {
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Pick line buffer
+  //
+  // --- Fallback when persistent buffers failed ---
+  //
   if (!linebufA_ || !linebufB_) {
-    // fallback: try to allocate small temporary buffer in internal RAM
-    ESP_LOGW(TAG, "lvgl_flush: line buffers not allocated in setup; trying stack allocation (may fail)");
-    // create small stack buffer if w is tiny; otherwise bail
-    if (w > 1024) {
-      ESP_LOGE(TAG, "lvgl_flush: cannot allocate fallback buffer for width %d", w);
+    ESP_LOGW(TAG, "lvgl_flush: fallback stack buffer (no PSRAM buffers)");
+
+    if (w > 512) {  // safe stack limit
+      ESP_LOGE(TAG, "lvgl_flush: fallback buffer too large for stack (w=%d)", w);
       lv_disp_flush_ready(&this->disp_drv_);
       return;
     }
-    uint16_t stackbuf[w]; // VLA - supported by GCC; safe only for small w
-    uint16_t *usebuf = stackbuf;
-    // we will write lines into stackbuf and push
+
+    uint16_t stackbuf[512];   // static max
     lv_color_t *src = color_p;
+
     for (int yy = 0; yy < h; yy++) {
+      // convert 1 line
       for (int xx = 0; xx < w; xx++) {
         uint16_t c565 = src[xx].full;
-        uint8_t lum = rgb565_to_luma8(c565);
-        usebuf[xx] = gray8_to_rgb565(lum);
+        uint8_t lum   = rgb565_to_luma8(c565);
+        stackbuf[xx]  = gray8_to_rgb565(lum);
       }
-      M5.Display.pushImage(x1, y1 + yy, w, 1, usebuf);
+
+      M5.Display.pushImage(x1, y1 + yy, w, 1, stackbuf);
       src += w;
+
+      // Yield to prevent WDT
+      delay(0);
     }
+
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Use persistent PSRAM buffers (swap A/B)
-  uint16_t *bufA = linebufA_;
-  uint16_t *bufB = linebufB_;
-  uint16_t *cur = bufA;
-  uint16_t *next = bufB;
-
+  //
+  // --- Main PSRAM double-buffer pipeline ---
+  //
+  uint16_t *cur  = linebufA_;
+  uint16_t *next = linebufB_;
   lv_color_t *src = color_p;
 
-  // Loop lines: convert each LVGL pixel to RGB565 gray and push a scanline
   for (int yy = 0; yy < h; yy++) {
-    // convert this line into 'cur'
+
+    // convert LVGL → grayscale RGB565
     for (int xx = 0; xx < w; xx++) {
       uint16_t c565 = src[xx].full;
-      uint8_t lum = rgb565_to_luma8(c565);
-      cur[xx] = gray8_to_rgb565(lum);
+      uint8_t lum   = rgb565_to_luma8(c565);
+      cur[xx]       = gray8_to_rgb565(lum);
     }
 
-    // Push current line as a 1-pixel-high image
+    // push 1 scanline
     M5.Display.pushImage(x1, y1 + yy, w, 1, cur);
 
-    // advance source and swap buffers
     src += w;
+
+    // swap buffers
     uint16_t *tmp = cur;
     cur = next;
     next = tmp;
+
+    // IMPORTANT: give LVGL & watchdog time to breathe
+    delay(0);
   }
 
-  // All done
   lv_disp_flush_ready(&this->disp_drv_);
 }
 
