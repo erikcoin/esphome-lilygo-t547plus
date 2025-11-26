@@ -207,6 +207,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
 
   // Defensive
   if (!area || !color_p) {
+    ESP_LOGD(TAG, "lvgl_flush QUEUED; returning to LVGL");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
@@ -229,6 +230,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
   const int h = y2 - y1 + 1;
 
   if (w <= 0 || h <= 0) {
+    ESP_LOGD(TAG, "flush ready regel 233");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
