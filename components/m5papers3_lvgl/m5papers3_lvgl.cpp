@@ -180,7 +180,7 @@ linebuf_capacity_ = (size_t)w * CHUNK_LINES;
 
   ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-
+init_luts();
 
 ////if (r != pdPASS) {
 ////    ESP_LOGE(TAG, "Failed to create flush worker task!");
