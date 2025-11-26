@@ -131,7 +131,7 @@ xTaskCreatePinnedToCore(
   ESP_LOGD(TAG, "Display size %d x %d", w, h);
 
   // LVGL draw buffers: allocate in PSRAM
-  const int LV_BUF_LINES = 20;  // tune: smaller -> smaller heap usage, more flushes
+  const int LV_BUF_LINES = 80;  // tune: smaller -> smaller heap usage, more flushes
   const size_t buf_size = (size_t)w * LV_BUF_LINES;
 
   ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
@@ -151,7 +151,7 @@ xTaskCreatePinnedToCore(
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
   disp_drv_.full_refresh = 1;    // force full-screen redraws (helps on e-paper)
-  disp_drv_.direct_mode = 0;     // stick with buffered rendering
+  disp_drv_.direct_mode = 1;     // stick with buffered rendering
   disp_drv_.draw_buf = &draw_buf_;
   disp_drv_.flush_cb = lvgl_flush_cb;
   disp_drv_.user_data = this;
@@ -195,7 +195,7 @@ init_luts();
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
   // Throttle lv_timer_handler() frequency to avoid overloading LVGL and the CPU
-  const uint32_t LVGL_TICK_INTERVAL_MS = 2000; // try 20ms (50Hz). Lower if necessary.
+  const uint32_t LVGL_TICK_INTERVAL_MS = 20; // try 20ms (50Hz). Lower if necessary.
   uint32_t now = millis();
 
   // run heap/psram diagnostics every ~5s only (avoid spam)
