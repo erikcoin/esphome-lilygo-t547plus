@@ -51,7 +51,7 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
-void esphome::m5papers3_display_m5gfx::lvgl_flush_cb(
+void m5papers3_display_m5gfx::lvgl_flush_cb(
         lv_disp_drv_t *drv,
         const lv_area_t *area,
         lv_color_t *color_p)
