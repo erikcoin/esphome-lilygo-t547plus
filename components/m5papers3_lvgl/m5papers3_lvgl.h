@@ -52,7 +52,7 @@ private:
 
  protected:
   static void flush_worker_task_trampoline(void *param);
-void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
+//void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
 static void lvgl_flush_trampoline(lv_disp_drv_t *drv,
                                   const lv_area_t *area,
                                   lv_color_t *color_p);
