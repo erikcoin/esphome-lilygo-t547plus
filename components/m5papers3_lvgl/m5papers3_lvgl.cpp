@@ -62,13 +62,13 @@ static void init_luts()
 
 
 
-static inline uint16_t gray8_to_rgb565(uint8_t g8) {
+//static inline uint16_t gray8_to_rgb565(uint8_t g8) {
   // convert 8-bit gray to rgb565
-  uint16_t r = (g8 >> 3) & 0x1F;
-  uint16_t gg = (g8 >> 2) & 0x3F;
-  uint16_t b = (g8 >> 3) & 0x1F;
-  return (r << 11) | (gg << 5) | b;
-}
+//  uint16_t r = (g8 >> 3) & 0x1F;
+//  uint16_t gg = (g8 >> 2) & 0x3F;
+//  uint16_t b = (g8 >> 3) & 0x1F;
+//  return (r << 11) | (gg << 5) | b;
+//}
 static inline uint8_t rgb565_to_gray(uint16_t c) {
     uint8_t r = (c >> 11) & 0x1F;
     uint8_t g = (c >> 5)  & 0x3F;
