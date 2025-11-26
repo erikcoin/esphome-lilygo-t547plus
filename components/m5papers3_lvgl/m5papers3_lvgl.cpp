@@ -183,9 +183,8 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 
 void M5PaperS3DisplayM5GFX::loop() {
 
-  ESP_LOGD(TAG, "starting loop");
-  lvgl_busy_.store;
-  ESP_LOGD(TAG, "in loop after  lvgl_busy_.store. starting update now");
+  ESP_LOGD(TAG, "starting loop, starting update now");
+  
     M5.update(); // Update touch and other inputs
     ESP_LOGD(TAG, "in loop after update ");
     static unsigned long last_touch_time = 0;
