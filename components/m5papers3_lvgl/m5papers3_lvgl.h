@@ -66,7 +66,8 @@ lv_disp_draw_buf_t draw_buf_;
 lv_color_t *lv_buf1_{nullptr};
 lv_color_t *lv_buf2_{nullptr};
 lv_disp_drv_t disp_drv_;
-
+    const lv_area_t *worker_area_{nullptr};
+    lv_color_t *worker_buf_{nullptr};
 // PSRAM line buffers (allocated in setup)
 uint16_t *linebufA_{nullptr};
 uint16_t *linebufB_{nullptr};
