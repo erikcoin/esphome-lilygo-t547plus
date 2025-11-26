@@ -47,6 +47,7 @@ private:
 
 // LVGL-related:
   void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
+static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p);
   // override to run lv handler
  // void update() override;
 
