@@ -51,7 +51,9 @@ private:
  // void update() override;
 
  protected:
-
+  static void flush_worker_task_trampoline(void *param);
+  void flush_worker_task();
+  TaskHandle_t flush_task_handle_ = nullptr;
   // in M5PaperS3DisplayM5GFX class
 lv_disp_draw_buf_t draw_buf_;
 lv_color_t *lv_buf1_{nullptr};
