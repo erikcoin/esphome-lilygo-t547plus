@@ -54,7 +54,7 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
 void esphome::m5papers3_display_m5gfx::lvgl_flush_cb(
         lv_disp_drv_t *drv,
         const lv_area_t *area,
-        lv_color_t *color_p)
+        lv_color_t *color_p);
 {
     auto *d = static_cast<M5PaperS3DisplayM5GFX*>(drv->user_data);
     if (!d) {
