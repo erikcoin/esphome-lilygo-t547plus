@@ -47,18 +47,11 @@ private:
 
 // LVGL-related:
   void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
-static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p);
   // override to run lv handler
-static void lvgl_flush_trampoline(lv_disp_drv_t *drv,
-                                  const lv_area_t *area,
-                                  lv_color_t *color_p);
- static void flush_worker_task_trampoline(void *arg);
  // void update() override;
 
  protected:
- // static void flush_worker_task_trampoline(void *param);
-//void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
-
+  static void flush_worker_task_trampoline(void *param);
   void flush_worker_task();
   TaskHandle_t flush_task_handle_ = nullptr;
   // in M5PaperS3DisplayM5GFX class
@@ -66,8 +59,7 @@ lv_disp_draw_buf_t draw_buf_;
 lv_color_t *lv_buf1_{nullptr};
 lv_color_t *lv_buf2_{nullptr};
 lv_disp_drv_t disp_drv_;
-    const lv_area_t *worker_area_{nullptr};
-    lv_color_t *worker_buf_{nullptr};
+
 // PSRAM line buffers (allocated in setup)
 uint16_t *linebufA_{nullptr};
 uint16_t *linebufB_{nullptr};
