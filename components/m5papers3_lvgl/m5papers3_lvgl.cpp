@@ -126,7 +126,9 @@ xTaskCreatePinnedToCore(
   if (disp->driver) disp->driver->user_data = this;
 
   // Allocate two persistent PSRAM line buffers (RGB565 words) — allocated once
-  linebuf_capacity_ = static_cast<size_t>(w); // one uint16_t per pixel per line
+  const int CHUNK_LINES = 80; // tune based on PSRAM
+linebuf_capacity_ = (size_t)w * CHUNK_LINES;
+//  linebuf_capacity_ = static_cast<size_t>(w); // one uint16_t per pixel per line
   ESP_LOGD(TAG, "Allocating line buffers in PSRAM: %u pixels", (unsigned)linebuf_capacity_);
   linebufA_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
   linebufB_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
