@@ -150,6 +150,8 @@ xTaskCreatePinnedToCore(
   lv_disp_drv_init(&disp_drv_);
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
+  disp_drv_.full_refresh = 1;    // force full-screen redraws (helps on e-paper)
+  disp_drv_.direct_mode = 0;     // stick with buffered rendering
   disp_drv_.draw_buf = &draw_buf_;
   disp_drv_.flush_cb = lvgl_flush_cb;
   disp_drv_.user_data = this;
