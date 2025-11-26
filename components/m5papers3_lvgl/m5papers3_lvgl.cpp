@@ -129,6 +129,23 @@ void M5PaperS3DisplayM5GFX::setup() {
   }
 
   ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+
+BaseType_t r = xTaskCreatePinnedToCore(
+    flush_worker_task_trampoline,   // wrapper so we can call class method
+    "lvgl_flush_worker",
+    8192,                           // stack size
+    this,                           // pass 'this' to worker
+    tskIDLE_PRIORITY + 1,           // priority
+    &this->flush_task_handle_,      // handle
+    0                               // RUN ON CORE 0
+);
+
+if (r != pdPASS) {
+    ESP_LOGE(TAG, "Failed to create flush worker task!");
+}
+
+
+
 }
 
 // ... (update() method remains largely the same)
@@ -170,6 +187,23 @@ ESP_LOGD(TAG, "after  lv_timer_handler.");
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 }
+
+void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *arg) {
+    static_cast<M5PaperS3DisplayM5GFX*>(arg)->flush_worker_task();
+}
+
+void M5PaperS3DisplayM5GFX::flush_worker_task() {
+    ESP_LOGI(TAG, "Flush worker started on core %d", xPortGetCoreID());
+
+    for (;;) {
+        // Wait for jobs on queue, process scanlines, etc.
+        // You already have this logic — just keep it here.
+        taskYIELD();
+    }
+}
+
+
+
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
