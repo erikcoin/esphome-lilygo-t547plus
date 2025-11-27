@@ -269,7 +269,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
         uint8_t lum   = rgb565_to_luma8(c565);
         stackbuf[xx]  = gray8_to_rgb565(lum);
       }
-ESP_LOGD(TAG, "Pushing image %d", x);
+      ESP_LOGD(TAG, "Pushing image %d %e", x1,y1);
       M5.Display.pushImage(x1, y1 + yy, w, 1, stackbuf);
       src += w;
 
