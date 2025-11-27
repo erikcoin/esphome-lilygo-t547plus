@@ -90,7 +90,6 @@ xTaskCreatePinnedToCore(
   // LVGL draw buffers: allocate in PSRAM
   const int LV_BUF_LINES = 80;  // tune: smaller -> smaller heap usage, more flushes
   const size_t buf_size = (size_t)w * LV_BUF_LINES;
-
   ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
   lv_buf1_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
   lv_buf2_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
@@ -108,7 +107,7 @@ xTaskCreatePinnedToCore(
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
-  disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_cb;
+  disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline;
   disp_drv_.user_data = this;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
   if (!disp) {
@@ -133,6 +132,15 @@ xTaskCreatePinnedToCore(
     if (linebufB_) heap_caps_free(linebufB_), linebufB_ = nullptr;
   }
   ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+}
+void M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline(
+    lv_disp_drv_t *drv,
+    const lv_area_t *area,
+    lv_color_t *color_p)
+{
+    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+    if (!self) return;
+    self->lvgl_flush_cb(area, color_p);
 }
 
 // ... (update() method remains largely the same)
