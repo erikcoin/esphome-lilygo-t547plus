@@ -53,8 +53,14 @@ private:
  // void update() override;
 
  protected:
-  static void flush_worker_task_trampoline(void *param);
+// Worker job data (protected)
+lv_area_t pending_area_;          // area to flush (copied by value)
+lv_color_t *pending_buf_{nullptr}; // pointer to LVGL buffer for the area (owned by producer)
+SemaphoreHandle_t flush_sem_{nullptr}; // semaphore that signals worker
+  static void flush_worker_task_trampoline(void *arg);
   void flush_worker_task();
+// Helper to draw an area (called by worker)
+void draw_fast_area(const lv_area_t &area, lv_color_t *color_p);
   TaskHandle_t flush_task_handle_ = nullptr;
   // in M5PaperS3DisplayM5GFX class
 lv_disp_draw_buf_t draw_buf_;
