@@ -275,38 +275,46 @@ void M5PaperS3DisplayM5GFX::draw_fast_area(const lv_area_t &area, lv_color_t *co
 }
 
 void M5PaperS3DisplayM5GFX::flush_worker_task() {
-  ESP_LOGI(TAG, "LVGL flush worker started (task)");
+  ESP_LOGI(TAG, "LVGL flush worker started on core %d", xPortGetCoreID());
   while (true) {
-    // Wait until a job is queued
-    if (this->flush_sem_ == nullptr) {
-      vTaskDelay(pdMS_TO_TICKS(100));
-      continue;
-    }
     if (xSemaphoreTake(this->flush_sem_, portMAX_DELAY) == pdTRUE) {
-      // copy pointers (producer already set pending_area_ & pending_buf_)
       lv_area_t area = this->pending_area_;
       lv_color_t *buf = this->pending_buf_;
-      // clear pending pointer to avoid reuse
       this->pending_buf_ = nullptr;
 
       if (buf) {
-        // perform the heavy drawing work (convert & push)
-        this->draw_fast_area(area, buf);
+        const int x1 = std::max<int>(area.x1, 0);
+        const int x2 = std::min<int>(area.x2, this->get_width() - 1);
+        const int w = x2 - x1 + 1;
+        const int h = std::min<int>(area.y2, this->get_height() - 1) - area.y1 + 1;
 
-        // free the LVGL PSRAM buffer that was allocated earlier in lvgl_flush_cb (if you allocated it)
-        // Only free if it was allocated with heap_caps_malloc in lvgl_flush_cb
+        for (int yy = 0; yy < h; ++yy) {
+          // convert line
+          uint16_t *line = this->linebufA_; // ensure capacity >= w
+          lv_color_t *src = buf + yy * w;
+          for (int xx = 0; xx < w; ++xx) {
+            uint16_t c565 = src[xx].full;
+            uint8_t lum = rgb565_to_luma8(c565);
+            line[xx] = gray8_to_rgb565(lum);
+          }
+
+          M5.Display.pushImage(x1, area.y1 + yy, w, 1, line);
+
+          // important: yield a little to keep system responsive
+          vTaskDelay(pdMS_TO_TICKS(1));
+        }
+
         heap_caps_free(buf);
       }
 
-      // Tell LVGL the flush for this area is done
+      // tell LVGL the flush is done
       lv_disp_flush_ready(&this->disp_drv_);
 
-      // yield so other tasks (loopTask, network) can run
-      taskYIELD();
+      // give a small pause before the next job to avoid worker hogging
+      vTaskDelay(pdMS_TO_TICKS(1));
     }
   }
 }
-
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
