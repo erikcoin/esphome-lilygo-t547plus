@@ -138,7 +138,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "Display size %d x %d", w, h);
 
   // LVGL draw buffers: allocate in PSRAM
-  const int LV_BUF_LINES = 80;  // tune: smaller -> smaller heap usage, more flushes
+  const int LV_BUF_LINES = 10;  // tune: smaller -> smaller heap usage, more flushes
   const size_t buf_size = (size_t)w * LV_BUF_LINES;
   ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
   lv_buf1_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
@@ -203,37 +203,15 @@ void M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline(
 
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
-  // Throttle lv_timer_handler() frequency to avoid overloading LVGL and the CPU
-  const uint32_t LVGL_TICK_INTERVAL_MS = 100; // try 20ms (50Hz). Lower if necessary.
+// Intentionally empty so LVGL runs on its dedicated task
+  // Keep this function very short — it's called from loopTask (core 1)
+  // Optionally: tiny diagnostic every few seconds
+  static uint32_t last_log = 0;
   uint32_t now = millis();
-
-  // run heap/psram diagnostics every ~5s only (avoid spam)
-  static uint32_t last_diag = 0;
-  if (now - last_diag > 5000) {
-    ESP_LOGD(TAG, "Heap internal: %u  PSRAM: %u",
-             heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
-             heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    last_diag = now;
+  if (now - last_log > 5000) {
+    ESP_LOGD(TAG, "update() heartbeat");
+    last_log = now;
   }
-
-  // throttle timer
-  if (now - this->lvgl_last_tick_ms_ < LVGL_TICK_INTERVAL_MS) return;
-  this->lvgl_last_tick_ms_ = now;
-
-  // prevent re-entrancy if previous lv_timer_handler not finished
-  if (this->lvgl_busy_.exchange(true)) {
-    // Another lvgl handler still running; skip this tick
-    ESP_LOGW(TAG, "Skipping lv_timer_handler() because busy");
-    return;
-  }
-  // Run LVGL timer handler safely; make sure we catch unexpected issues quickly
-  // (Note: no exceptions in ESP32, but we keep the handler brief)
-  ESP_LOGD(TAG, "before lv_timer_handler.");
-  lv_timer_handler();
-ESP_LOGD(TAG, "after  lv_timer_handler.");
-  // mark not busy
-  this->lvgl_busy_.store(false);
-  ESP_LOGD(TAG, "after  lvgl_busy_.store.");
 }
 
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
