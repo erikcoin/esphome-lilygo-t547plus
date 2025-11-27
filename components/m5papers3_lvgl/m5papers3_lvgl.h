@@ -44,7 +44,7 @@ private:
 
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
-    static void lvgl_flush_impl(disp, area, color_p);
+    
     static void lvgl_flush_wrapper(lv_disp_drv_t *disp,
                                    const lv_area_t *area,
                                    lv_color_t *color_p);
