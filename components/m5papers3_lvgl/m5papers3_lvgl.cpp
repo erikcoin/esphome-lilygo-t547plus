@@ -69,13 +69,10 @@ static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
 // ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
-
   // M5 init (keep your existing sequence; make sure M5.begin() already ran)
   auto cfg = M5.config();
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
-
-  // LVGL init
   lv_init();
 xTaskCreatePinnedToCore(
     &M5PaperS3DisplayM5GFX::flush_worker_task_trampoline,
@@ -92,7 +89,7 @@ xTaskCreatePinnedToCore(
   ESP_LOGD(TAG, "Display size %d x %d", w, h);
 
   // LVGL draw buffers: allocate in PSRAM
-  const int LV_BUF_LINES = 20;  // tune: smaller -> smaller heap usage, more flushes
+  const int LV_BUF_LINES = 80;  // tune: smaller -> smaller heap usage, more flushes
   const size_t buf_size = (size_t)w * LV_BUF_LINES;
 
   ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
@@ -127,8 +124,7 @@ xTaskCreatePinnedToCore(
 
   // Allocate two persistent PSRAM line buffers (RGB565 words) — allocated once
   const int CHUNK_LINES = 80; // tune based on PSRAM
-linebuf_capacity_ = (size_t)w * CHUNK_LINES;
-//  linebuf_capacity_ = static_cast<size_t>(w); // one uint16_t per pixel per line
+  linebuf_capacity_ = (size_t)w * CHUNK_LINES;
   ESP_LOGD(TAG, "Allocating line buffers in PSRAM: %u pixels", (unsigned)linebuf_capacity_);
   linebufA_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
   linebufB_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
@@ -136,19 +132,8 @@ linebuf_capacity_ = (size_t)w * CHUNK_LINES;
     ESP_LOGE(TAG, "Failed to allocate PSRAM line buffers: A=%p B=%p", (void*)linebufA_, (void*)linebufB_);
     if (linebufA_) heap_caps_free(linebufA_), linebufA_ = nullptr;
     if (linebufB_) heap_caps_free(linebufB_), linebufB_ = nullptr;
-    // still continue — flush will guard against null buffers
   }
-
   ESP_LOGD(TAG, "LVGL setup complete. Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-
-
-
-////if (r != pdPASS) {
-////    ESP_LOGE(TAG, "Failed to create flush worker task!");
-////}
-
-
-
 }
 
 // ... (update() method remains largely the same)
@@ -176,7 +161,6 @@ void M5PaperS3DisplayM5GFX::update() {
     ESP_LOGW(TAG, "Skipping lv_timer_handler() because busy");
     return;
   }
-
   // Run LVGL timer handler safely; make sure we catch unexpected issues quickly
   // (Note: no exceptions in ESP32, but we keep the handler brief)
   ESP_LOGD(TAG, "before lv_timer_handler.");
@@ -202,9 +186,6 @@ void M5PaperS3DisplayM5GFX::flush_worker_task() {
   }
 }
 
-
-
-
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
     if (rotation_degrees == 90) m5gfx_rotation_val = 1;
@@ -216,21 +197,18 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 
 
 void M5PaperS3DisplayM5GFX::loop() {
-
-  ESP_LOGD(TAG, "starting loop, starting update now");
-  
+  ESP_LOGD(TAG, "starting loop");
  //   M5.update(); // Update touch and other inputs
-    ESP_LOGD(TAG, "in loop after update ");
-    static unsigned long last_touch_time = 0;
-unsigned long current_time = millis();
+ //   ESP_LOGD(TAG, "in loop after update ");
+ //   static unsigned long last_touch_time = 0;
+//unsigned long current_time = millis();
 
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
   static uint32_t last_refresh = 0;
   uint32_t now = millis();
-
-  //
+//
   // Rate-limit partial updates (VERY IMPORTANT for e-paper)
   //
   if (now - last_refresh < 1000) {
@@ -291,7 +269,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_
         uint8_t lum   = rgb565_to_luma8(c565);
         stackbuf[xx]  = gray8_to_rgb565(lum);
       }
-
+ESP_LOGD(TAG, "Pushing image %d", x);
       M5.Display.pushImage(x1, y1 + yy, w, 1, stackbuf);
       src += w;
 
