@@ -51,12 +51,35 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     uint8_t b = g8 >> 3;
     return (r << 11) | (g << 5) | b;
 }
-void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
-  if (!area || !color_p) {
-    // nothing to do: mark LVGL flush ready
-    lv_disp_flush_ready(&this->disp_drv_);
-    return;
-  }
+void M5PaperS3DisplayM5GFX::lvgl_flush_cb(
+    lv_disp_drv_t *disp,
+    const lv_area_t *area,
+    lv_color_t *color_p)
+{
+    int32_t x1 = area->x1;
+    int32_t y1 = area->y1;
+    int32_t x2 = area->x2;
+    int32_t y2 = area->y2;
+
+    int w = x2 - x1 + 1;
+    int h = y2 - y1 + 1;
+
+    // Push the LVGL-rendered image to M5GFX
+    this->gfx.pushImage(
+        x1,
+        y1,
+        w,
+        h,
+        (uint16_t *)color_p
+    );
+
+    // DO NOT CALL gfx.display() IN PARTIAL FLUSHES!
+    // It must only happen once per full frame.
+
+    // Tell LVGL we are done
+    lv_disp_flush_ready(disp);
+}
+
 
   // Make a PSRAM copy of LVGL's color buffer so worker owns it.
   // LVGL's color_p lives only for the duration of the flush call; we must copy.
