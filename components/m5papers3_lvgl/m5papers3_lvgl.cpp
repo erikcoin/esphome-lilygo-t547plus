@@ -197,7 +197,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline(
 // ... (update() method remains largely the same)
 void M5PaperS3DisplayM5GFX::update() {
   // Throttle lv_timer_handler() frequency to avoid overloading LVGL and the CPU
-  const uint32_t LVGL_TICK_INTERVAL_MS = 2000; // try 20ms (50Hz). Lower if necessary.
+  const uint32_t LVGL_TICK_INTERVAL_MS = 100; // try 20ms (50Hz). Lower if necessary.
   uint32_t now = millis();
 
   // run heap/psram diagnostics every ~5s only (avoid spam)
