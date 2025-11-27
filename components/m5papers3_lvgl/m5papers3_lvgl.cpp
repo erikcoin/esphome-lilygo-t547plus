@@ -57,16 +57,17 @@ static const uint16_t screenHeight = 540;
 
 lv_disp_draw_buf_t draw_buf;
 lv_color_t buf[screenWidth * 10];
-void my_disp_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
+
+void M5PaperS3DisplayM5GFX::my_disp_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
   const u_long h = area->y2 - area->y1 + 1;
 
-  gfx.startWrite();
-  gfx.setAddrWindow(area->x1, area->y1, w, h);
-  gfx.pushColors(static_cast<uint16_t *>(&color_p->full), w * h, true);
-  gfx.endWrite();
+  gfx_.startWrite();
+  gfx_.setAddrWindow(area->x1, area->y1, w, h);
+  gfx_.pushColors(static_cast<uint16_t *>(&color_p->full), w * h, true);
+  gfx_.endWrite();
 
-  ::lv_disp_flush_ready(disp);
+  lv_disp_flush_ready(disp);
 }
 
 
@@ -79,17 +80,17 @@ void M5PaperS3DisplayM5GFX::setup() {
   lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
 
   static lv_disp_drv_t disp_drv;
-  ::lv_disp_drv_init(&disp_drv);
+  M5PaperS3DisplayM5GFX::lv_disp_drv_init(&disp_drv);
   disp_drv.hor_res = screenWidth;
   disp_drv.ver_res = screenHeight;
   disp_drv.flush_cb = M5PaperS3DisplayM5GFX::my_disp_flush;
   disp_drv.draw_buf = &draw_buf;
-  ::lv_disp_drv_register(&disp_drv);
+  M5PaperS3DisplayM5GFX::lv_disp_drv_register(&disp_drv);
 
   /* Create simple label */
-  lv_obj_t *label = ::lv_label_create(::lv_scr_act());
-  ::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
-  ::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_t *label = M5PaperS3DisplayM5GFX::lv_label_create(::lv_scr_act());
+  M5PaperS3DisplayM5GFX::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
+  M5PaperS3DisplayM5GFX::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 }
 
   
