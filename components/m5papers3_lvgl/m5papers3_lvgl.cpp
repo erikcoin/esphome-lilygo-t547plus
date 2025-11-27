@@ -58,9 +58,12 @@ static const uint16_t screenHeight = 540;
 lv_disp_draw_buf_t draw_buf;
 lv_color_t buf[screenWidth * 10];
 
-void M5PaperS3DisplayM5GFX::lvgl_flush_wrapper(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
-    M5PaperS3DisplayM5GFX *self = (M5PaperS3DisplayM5GFX *) disp->user_data;
-    self->lvgl_flush_impl(disp, area, color_p);
+void M5PaperS3DisplayM5GFX::lvgl_flush_wrapper(lv_disp_drv_t *disp,
+                                               const lv_area_t *area,
+                                               lv_color_t *color_p)
+{
+    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(disp->user_data);
+    self->lvgl_flush(disp, area, color_p);
 }
 void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
