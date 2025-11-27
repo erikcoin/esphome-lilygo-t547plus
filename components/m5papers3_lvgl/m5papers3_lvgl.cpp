@@ -83,7 +83,6 @@ void M5PaperS3DisplayM5GFX::setup() {
    auto cfg = M5.config();
    M5.begin(cfg);
    lv_init();
- 
   lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
 
   static lv_disp_drv_t disp_drv;
@@ -92,12 +91,13 @@ void M5PaperS3DisplayM5GFX::setup() {
   disp_drv.ver_res = screenHeight;
   disp_drv.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_wrapper;
   disp_drv.draw_buf = &draw_buf;
-  ::lv_disp_drv_register(&disp_drv);
+  disp_drv.user_data = this;
+  lv_disp_drv_register(&disp_drv);
 
   /* Create simple label */
-  lv_obj_t *label = ::lv_label_create(::lv_scr_act());
-  ::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
-  ::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+//  lv_obj_t *label = ::lv_label_create(::lv_scr_act());
+// ::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
+//  ::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 }
 
   
@@ -130,7 +130,7 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 
 void M5PaperS3DisplayM5GFX::loop() {
   lv_timer_handler();
-  delay(5);
+  delay(105);
 
 }
 
