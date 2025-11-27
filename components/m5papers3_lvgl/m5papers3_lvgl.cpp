@@ -58,14 +58,14 @@ static const uint16_t screenHeight = 540;
 lv_disp_draw_buf_t draw_buf;
 lv_color_t buf[screenWidth * 10];
 
-void lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
+void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
   const u_long h = area->y2 - area->y1 + 1;
 
-  gfx_.startWrite();
-  gfx_.setAddrWindow(area->x1, area->y1, w, h);
-  gfx_.pushColors(static_cast<uint16_t *>(&color_p->full), w * h, true);
-  gfx_.endWrite();
+  M5.Display.startWrite();
+  M5.Display.setAddrWindow(area->x1, area->y1, w, h);
+  M5.Display.pushColors(static_cast<uint16_t *>(&color_p->full), w * h, true);
+  M5.Display.endWrite();
 
   lv_disp_flush_ready(disp);
 }
@@ -88,7 +88,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   ::lv_disp_drv_register(&disp_drv);
 
   /* Create simple label */
-  lv_obj_t *label = :lv_label_create(::lv_scr_act());
+  lv_obj_t *label = ::lv_label_create(::lv_scr_act());
   ::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
   ::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 }
