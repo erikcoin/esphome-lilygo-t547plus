@@ -113,7 +113,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
   // M5 init (keep your existing sequence; make sure M5.begin() already ran)
   auto cfg = M5.config();
- // M5.begin(cfg);
+ M5.begin(cfg);
  // vTaskDelay(pdMS_TO_TICKS(100));
   lv_init();
   BaseType_t rc = xTaskCreatePinnedToCore(
