@@ -138,7 +138,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "Display size %d x %d", w, h);
 
   // LVGL draw buffers: allocate in PSRAM
-  const int LV_BUF_LINES = 10;  // tune: smaller -> smaller heap usage, more flushes
+  const int LV_BUF_LINES = 100;  // tune: smaller -> smaller heap usage, more flushes
   const size_t buf_size = (size_t)w * LV_BUF_LINES;
   ESP_LOGD(TAG, "Allocating LVGL draw buffers in PSRAM: %u pixels each", (unsigned)buf_size);
   lv_buf1_ = (lv_color_t*) heap_caps_malloc(buf_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
