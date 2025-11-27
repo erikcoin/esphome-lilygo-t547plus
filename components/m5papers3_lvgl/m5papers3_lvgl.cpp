@@ -123,7 +123,7 @@ xTaskCreatePinnedToCore(
     this,       // parameter
     1,          // priority
     &flush_task_handle_,
-    1           // run on core 1
+    0           // run on core 1
 );
 
   const int w = this->get_width();
