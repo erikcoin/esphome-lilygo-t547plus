@@ -52,18 +52,9 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     return (r << 11) | (g << 5) | b;
 }
 void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
-  if (!drv) return;
-  if (!drv->user_data) {
-    // best effort: mark flush ready if LVGL calls us but no userdata
-    lv_disp_flush_ready(drv);
-    return;
-  }
-  auto *display = static_cast<esphome::m5papers3_display_m5gfx::M5PaperS3DisplayM5GFX*>(drv->user_data);
-  if (!display) {
-    lv_disp_flush_ready(drv);
-    return;
-  }
-  display->lvgl_flush(area, color_p);
+
+  //display->lvgl_flush(area, color_p);
+  this->lvgl_flush(area, color_p);
 }
 
 void M5PaperS3DisplayM5GFX::setup() {
