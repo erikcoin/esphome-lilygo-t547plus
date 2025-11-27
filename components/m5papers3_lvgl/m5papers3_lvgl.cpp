@@ -88,9 +88,9 @@ void M5PaperS3DisplayM5GFX::setup() {
   ::lv_disp_drv_register(&disp_drv);
 
   /* Create simple label */
-  lv_obj_t *label = M5PaperS3DisplayM5GFX::lv_label_create(::lv_scr_act());
-  M5PaperS3DisplayM5GFX::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
-  M5PaperS3DisplayM5GFX::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_t *label = :lv_label_create(::lv_scr_act());
+  ::lv_label_set_text(label, "Aikatsu! 10th anniversary.");
+  ::lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 }
 
   
