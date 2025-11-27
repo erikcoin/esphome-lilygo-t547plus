@@ -116,15 +116,22 @@ void M5PaperS3DisplayM5GFX::setup() {
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
   lv_init();
-xTaskCreatePinnedToCore(
-    &M5PaperS3DisplayM5GFX::flush_worker_task_trampoline,
-    "lv_flush_worker",
-    8192,       // stack
-    this,       // parameter
-    1,          // priority
-    &flush_task_handle_,
-    0           // run on core 1
-);
+  BaseType_t rc = xTaskCreatePinnedToCore(
+      &M5PaperS3DisplayM5GFX::lvgl_task_trampoline, // function
+      "lvgl_task",            // name
+      4096,                   // stack size (increase if you see stack overflow)
+      this,                   // parameter
+      tskIDLE_PRIORITY + 2,   // priority (slightly above idle)
+      &this->lvgl_task_handle_,
+      0                       // RUN ON CORE 0
+  );
+
+  if (rc != pdPASS) {
+    ESP_LOGE(TAG, "Failed to create lvgl_task");
+    this->lvgl_task_handle_ = nullptr;
+  } else {
+    ESP_LOGD(TAG, "LVGL task created on core 0");
+  }
 
   const int w = this->get_width();
   const int h = this->get_height();
@@ -323,6 +330,28 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     else if (rotation_degrees == 270) m5gfx_rotation_val = 3;
     this->rotation_ = m5gfx_rotation_val; // Store our logical rotation
     ESP_LOGD(TAG, "set_rotation: degrees=%d mapped to M5GFX rotation=%d", rotation_degrees, m5gfx_rotation_val);
+}
+
+// static trampoline -> member
+void M5PaperS3DisplayM5GFX::lvgl_task_trampoline(void *arg) {
+  auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
+  if (!self) {
+    vTaskDelete(NULL);
+    return;
+  }
+  self->lvgl_task();
+}
+
+// The actual LVGL task — runs lv_timer_handler() periodically on core 0
+void M5PaperS3DisplayM5GFX::lvgl_task() {
+  ESP_LOGI(TAG, "LVGL task started on core %d", xPortGetCoreID());
+  const TickType_t interval = pdMS_TO_TICKS(30); // run ~33Hz, tune up/down
+  for (;;) {
+    // run LVGL timers (keep this short)
+    lv_timer_handler();
+    // give other tasks time (worker, wifi, loopTask)
+    vTaskDelay(interval);
+  }
 }
 
 
