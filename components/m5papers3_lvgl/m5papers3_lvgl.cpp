@@ -52,9 +52,12 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     return (r << 11) | (g << 5) | b;
 }
 void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
+    // store flush parameters
+    this->pending_area_ = *area;
+    this->pending_buf_  = color_p;
 
-  //display->lvgl_flush(area, color_p);
-  this->lvgl_flush(area, color_p);
+    // signal worker
+    xSemaphoreGive(this->flush_sem_);
 }
 
 void M5PaperS3DisplayM5GFX::setup() {
@@ -178,10 +181,16 @@ void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *param) {
 }
 
 void M5PaperS3DisplayM5GFX::flush_worker_task() {
-  while (true) {
-    lv_timer_handler();
-    vTaskDelay(pdMS_TO_TICKS(5));  // do NOT use 1ms on S3
-  }
+    while (true) {
+        if (xSemaphoreTake(flush_sem_, portMAX_DELAY)) {
+
+            // Draw rectangle using linebufA_ / linebufB_
+            draw_fast_area(pending_area_, pending_buf_);
+
+            // NOW tell LVGL we are done
+            lv_disp_flush_ready(&this->disp_drv_);
+        }
+    }
 }
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
