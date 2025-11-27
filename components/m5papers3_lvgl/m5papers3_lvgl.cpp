@@ -226,138 +226,112 @@ unsigned long current_time = millis();
 
 }
 
-void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p)
-{
-  const int16_t x = area->x1;
-  const int16_t y = area->y1;
-  const int16_t w = area->x2 - area->x1 + 1;
-  const int16_t h = area->y2 - area->y1 + 1;
+void M5PaperS3DisplayM5GFX::lvgl_flush(const lv_area_t *area, lv_color_t *color_p) {
+  static uint32_t last_refresh = 0;
+  uint32_t now = millis();
+
+  //
+  // Rate-limit partial updates (VERY IMPORTANT for e-paper)
+  //
+  if (now - last_refresh < 1000) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+  last_refresh = now;
+
+  // Defensive
+  if (!area || !color_p) {
+    ESP_LOGD(TAG, "lvgl_flush QUEUED; returning to LVGL");
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  if (!disp_drv_.user_data) {
+    ESP_LOGE(TAG, "lvgl_flush: disp_drv_.user_data is NULL");
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  //
+  // Clip to display area
+  //
+  const int x1 = std::max<int>(area->x1, 0);
+  const int y1 = std::max<int>(area->y1, 0);
+  const int x2 = std::min<int>(area->x2, this->get_width()  - 1);
+  const int y2 = std::min<int>(area->y2, this->get_height() - 1);
+
+  const int w = x2 - x1 + 1;
+  const int h = y2 - y1 + 1;
 
   if (w <= 0 || h <= 0) {
+    ESP_LOGD(TAG, "flush ready regel 233");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Use your existing PSRAM line buffers if available; else fallback to chunk alloc.
-  // Each line buffer holds 'linebuf_capacity_' pixels as defined in your class.
-  const int pitch = w;
+  //
+  // --- Fallback when persistent buffers failed ---
+  //
+  if (!linebufA_ || !linebufB_) {
+    ESP_LOGW(TAG, "lvgl_flush: fallback stack buffer (no PSRAM buffers)");
 
-  // Choose chunk height (tune as needed; 120 is usually good on PSRAM)
-  int chunk_lines = 120;
-
-  // If your line buffers are smaller than one chunk, limit to their capacity
-  size_t max_pixels_per_buf = linebuf_capacity_;  // number of pixels each line buffer can hold
-  if (max_pixels_per_buf > 0) {
-    size_t max_lines_by_buf = max_pixels_per_buf / (size_t)pitch;
-    if (max_lines_by_buf == 0) {
-      // Buffers too small for full width; revert to per-line conversion
-      chunk_lines = 1;
-    } else {
-      chunk_lines = (int)std::min((size_t)chunk_lines, max_lines_by_buf);
+    if (w > 512) {  // safe stack limit
+      ESP_LOGE(TAG, "lvgl_flush: fallback buffer too large for stack (w=%d)", w);
+      lv_disp_flush_ready(&this->disp_drv_);
+      return;
     }
-  }
 
-  // Determine buffers to use
-  uint16_t* bufA = linebufA_;
-  uint16_t* bufB = linebufB_;
-  bool have_double = (bufA != nullptr) && (bufB != nullptr) && (chunk_lines > 0);
+    uint16_t stackbuf[512];   // static max
+    lv_color_t *src = color_p;
 
-  // Fallback: allocate temporary chunks if class buffers are not available
-  auto alloc_fast = [&](size_t bytes) -> uint16_t* {
-    return (uint16_t*)heap_caps_malloc(bytes, MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-  };
-
-  size_t chunk_pixels = (size_t)pitch * (size_t)chunk_lines;
-  size_t chunk_bytes  = chunk_pixels * sizeof(uint16_t);
-
-  if (!have_double) {
-    bufA = alloc_fast(chunk_bytes);
-    bufB = alloc_fast(chunk_bytes);
-    if (!bufA || !bufB) {
-      // Try smaller chunk
-      if (bufA) heap_caps_free(bufA);
-      if (bufB) heap_caps_free(bufB);
-      chunk_lines = 40;
-      chunk_pixels = (size_t)pitch * (size_t)chunk_lines;
-      chunk_bytes  = chunk_pixels * sizeof(uint16_t);
-      bufA = alloc_fast(chunk_bytes);
-      bufB = alloc_fast(chunk_bytes);
-    }
-    have_double = (bufA && bufB);
-  }
-
-  // If we still don't have double buffers, fall back to line-by-line (still LUT-accelerated)
-  if (!have_double) {
-    for (int row = 0; row < h; ++row) {
-      // Convert one line into a small temp
-      uint16_t* line = alloc_fast(pitch * sizeof(uint16_t));
-      if (!line) line = (uint16_t*)malloc(pitch * sizeof(uint16_t));
-      lv_color_t* src = color_p + row * pitch;
-      for (int col = 0; col < pitch; ++col) {
-        uint16_t c565 = src[col].full;
-        uint8_t  lum  = lut_rgb565_to_luma[c565];
-        line[col]     = lut_gray8_to_rgb565[lum];
+    for (int yy = 0; yy < h; yy++) {
+      // convert 1 line
+      for (int xx = 0; xx < w; xx++) {
+        uint16_t c565 = src[xx].full;
+        uint8_t lum   = rgb565_to_luma8(c565);
+        stackbuf[xx]  = gray8_to_rgb565(lum);
       }
-      gfx_.pushImage(x, y + row, pitch, 1, line);  // blocking push when DMA not used
-      if (line) heap_caps_free(line);
-      if ((row & 0x1F) == 0) vTaskDelay(1);
+
+      M5.Display.pushImage(x1, y1 + yy, w, 1, stackbuf);
+      src += w;
+
+      // Yield to prevent WDT
+      delay(0);
     }
+
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
 
-  // Double-buffered DMA path
-  uint16_t* dma_buf[2] = { bufA, bufB };
-  int buf_idx = 0;
+  //
+  // --- Main PSRAM double-buffer pipeline ---
+  //
+  uint16_t *cur  = linebufA_;
+  uint16_t *next = linebufB_;
+  lv_color_t *src = color_p;
 
-  int remaining_rows = h;
-  int processed_rows = 0;
+  for (int yy = 0; yy < h; yy++) {
 
-  // Helper to convert N lines into dst using LUTs
-  auto convert_lines = [&](uint16_t* dst, lv_color_t* src, int lines) {
-    size_t pixels = (size_t)pitch * (size_t)lines;
-    for (size_t i = 0; i < pixels; ++i) {
-      uint16_t c565 = src[i].full;
-      uint8_t  lum  = lut_rgb565_to_luma[c565];
-      dst[i]        = lut_gray8_to_rgb565[lum];
+    // convert LVGL → grayscale RGB565
+    for (int xx = 0; xx < w; xx++) {
+      uint16_t c565 = src[xx].full;
+      uint8_t lum   = rgb565_to_luma8(c565);
+      cur[xx]       = gray8_to_rgb565(lum);
     }
-  };
 
-  // Prepare and kick off first DMA block
-  int lines_this_chunk = std::min(remaining_rows, chunk_lines);
-  convert_lines(dma_buf[buf_idx], color_p + processed_rows * pitch, lines_this_chunk);
-  gfx_.pushImageDMA(x, y + processed_rows, pitch, lines_this_chunk, dma_buf[buf_idx]);
+    // push 1 scanline
+    M5.Display.pushImage(x1, y1 + yy, w, 1, cur);
 
-  remaining_rows -= lines_this_chunk;
-  processed_rows += lines_this_chunk;
-  buf_idx ^= 1;
+    src += w;
 
-  while (remaining_rows > 0) {
-    lines_this_chunk = std::min(remaining_rows, chunk_lines);
+    // swap buffers
+    uint16_t *tmp = cur;
+    cur = next;
+    next = tmp;
 
-    // Convert next chunk while previous DMA is in-flight
-    convert_lines(dma_buf[buf_idx], color_p + processed_rows * pitch, lines_this_chunk);
-
-    // Ensure previous DMA completed
-    gfx_.waitDMA();
-
-    // Start next DMA transfer
-    gfx_.pushImageDMA(x, y + processed_rows, pitch, lines_this_chunk, dma_buf[buf_idx]);
-
-    remaining_rows -= lines_this_chunk;
-    processed_rows += lines_this_chunk;
-    buf_idx ^= 1;
-
-    // Keep system responsive
-    vTaskDelay(1);
+    // IMPORTANT: give LVGL & watchdog time to breathe
+    delay(0);
   }
-
-  // Final DMA completion
-  gfx_.waitDMA();
-
-  // If we allocated temporary buffers, free them
-  if (linebufA_ != bufA) { if (bufA) heap_caps_free(bufA); }
-  if (linebufB_ != bufB) { if (bufB) heap_caps_free(bufB); }
 
   lv_disp_flush_ready(&this->disp_drv_);
 }
