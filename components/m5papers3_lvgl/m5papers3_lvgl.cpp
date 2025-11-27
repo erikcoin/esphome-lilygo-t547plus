@@ -52,12 +52,61 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
     return (r << 11) | (g << 5) | b;
 }
 void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
-    // store flush parameters
-    this->pending_area_ = *area;
-    this->pending_buf_  = color_p;
+  if (!area || !color_p) {
+    // nothing to do: mark LVGL flush ready
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
 
-    // signal worker
-    xSemaphoreGive(this->flush_sem_);
+  // Make a PSRAM copy of LVGL's color buffer so worker owns it.
+  // LVGL's color_p lives only for the duration of the flush call; we must copy.
+  const int x1 = std::max<int>(area->x1, 0);
+  const int x2 = std::min<int>(area->x2, this->get_width() - 1);
+  const int w = x2 - x1 + 1;
+  const int h = std::min<int>(area->y2, this->get_height() - 1) - area->y1 + 1;
+  const size_t pixels = (size_t)w * (size_t)h;
+
+  // Allocate a PSRAM buffer to hold LVGL's RGB565 pixel data for the whole area.
+  lv_color_t *ps_buf = (lv_color_t*) heap_caps_malloc(pixels * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+  if (!ps_buf) {
+    ESP_LOGE(TAG, "lvgl_flush_cb: failed to alloc PSRAM for region %dx%d", w, h);
+    // fallback: do synchronous small push (may block) - convert direct here
+    lv_color_t *src = color_p;
+    uint16_t stack_line[w > 512 ? 512 : w];
+    for (int yy = 0; yy < h; ++yy) {
+      for (int xx = 0; xx < w; ++xx) {
+        uint16_t c565 = src[xx].full;
+        uint8_t lum = rgb565_to_luma8(c565);
+        stack_line[xx] = gray8_to_rgb565(lum);
+      }
+      M5.Display.pushImage(x1, area->y1 + yy, w, 1, stack_line);
+      src += w;
+    }
+    // Tell LVGL we're done
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // Copy LVGL pixels into psram buffer
+  // color_p is row-major w*x h
+  for (size_t i = 0; i < pixels; ++i) ps_buf[i] = color_p[i];
+
+  // Store job data (pending_area_ is a lv_area_t copy)
+  this->pending_area_ = *area;
+  this->pending_buf_ = (lv_color_t*) ps_buf;
+
+  // signal worker
+  if (this->flush_sem_) xSemaphoreGive(this->flush_sem_);
+  else {
+    // No worker available — do synchronous fallback
+    ESP_LOGW(TAG, "lvgl_flush_cb: worker not present, doing sync flush");
+    this->draw_fast_area(this->pending_area_, this->pending_buf_);
+    heap_caps_free(this->pending_buf_);
+    this->pending_buf_ = nullptr;
+    lv_disp_flush_ready(&this->disp_drv_);
+  }
+
+  // IMPORTANT: return immediately — worker will call lv_disp_flush_ready() when done
 }
 
 void M5PaperS3DisplayM5GFX::setup() {
@@ -120,6 +169,14 @@ xTaskCreatePinnedToCore(
   ESP_LOGD(TAG, "Allocating line buffers in PSRAM: %u pixels", (unsigned)linebuf_capacity_);
   linebufA_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
   linebufB_ = (uint16_t*) heap_caps_malloc(linebuf_capacity_ * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
+  // After allocating linebufA_/linebufB_
+this->flush_sem_ = xSemaphoreCreateBinary();
+if (!this->flush_sem_) {
+  ESP_LOGE(TAG, "Failed to create flush semaphore");
+} else {
+  // If you created the task already, it will block on this semaphore.
+  ESP_LOGD(TAG, "Flush semaphore created");
+}
   if (!linebufA_ || !linebufB_) {
     ESP_LOGE(TAG, "Failed to allocate PSRAM line buffers: A=%p B=%p", (void*)linebufA_, (void*)linebufB_);
     if (linebufA_) heap_caps_free(linebufA_), linebufA_ = nullptr;
@@ -176,22 +233,80 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 }
 
-void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *param) {
-  static_cast<M5PaperS3DisplayM5GFX*>(param)->flush_worker_task();
+void M5PaperS3DisplayM5GFX::flush_worker_task_trampoline(void *arg) {
+  auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
+  if (!self) {
+    vTaskDelete(NULL);
+    return;
+  }
+  self->flush_worker_task();
+}
+void M5PaperS3DisplayM5GFX::draw_fast_area(const lv_area_t &area, lv_color_t *color_p) {
+  // Defensive bounds & sizes
+  const int x1 = std::max<int>(area.x1, 0);
+  const int y1 = std::max<int>(area.y1, 0);
+  const int x2 = std::min<int>(area.x2, this->get_width()  - 1);
+  const int y2 = std::min<int>(area.y2, this->get_height() - 1);
+  const int w = x2 - x1 + 1;
+  const int h = y2 - y1 + 1;
+  if (w <= 0 || h <= 0) return;
+  if (!color_p) return;
+
+  // Use your line buffer (linebufA_) per-scanline
+  for (int yy = 0; yy < h; ++yy) {
+    uint16_t *line = this->linebufA_; // must be at least 'w' entries
+    lv_color_t *src = color_p + yy * w;
+
+    for (int xx = 0; xx < w; ++xx) {
+      uint16_t c565 = src[xx].full;
+      uint8_t lum = rgb565_to_luma8(c565);
+      line[xx] = gray8_to_rgb565(lum);
+    }
+
+    // push a single scanline into the device framebuffer
+    M5.Display.pushImage(x1, y1 + yy, w, 1, line);
+
+    // Yield to keep system responsive
+    delay(0);
+  }
+
+  // Do NOT call M5.Display.display() here — worker will do lv_disp_flush_ready() and
+  // caller (LVGL) can decide whether to trigger a refresh in higher-level code.
 }
 
 void M5PaperS3DisplayM5GFX::flush_worker_task() {
-    while (true) {
-        if (xSemaphoreTake(flush_sem_, portMAX_DELAY)) {
-
-            // Draw rectangle using linebufA_ / linebufB_
-            draw_fast_area(pending_area_, pending_buf_);
-
-            // NOW tell LVGL we are done
-            lv_disp_flush_ready(&this->disp_drv_);
-        }
+  ESP_LOGI(TAG, "LVGL flush worker started (task)");
+  while (true) {
+    // Wait until a job is queued
+    if (this->flush_sem_ == nullptr) {
+      vTaskDelay(pdMS_TO_TICKS(100));
+      continue;
     }
+    if (xSemaphoreTake(this->flush_sem_, portMAX_DELAY) == pdTRUE) {
+      // copy pointers (producer already set pending_area_ & pending_buf_)
+      lv_area_t area = this->pending_area_;
+      lv_color_t *buf = this->pending_buf_;
+      // clear pending pointer to avoid reuse
+      this->pending_buf_ = nullptr;
+
+      if (buf) {
+        // perform the heavy drawing work (convert & push)
+        this->draw_fast_area(area, buf);
+
+        // free the LVGL PSRAM buffer that was allocated earlier in lvgl_flush_cb (if you allocated it)
+        // Only free if it was allocated with heap_caps_malloc in lvgl_flush_cb
+        heap_caps_free(buf);
+      }
+
+      // Tell LVGL the flush for this area is done
+      lv_disp_flush_ready(&this->disp_drv_);
+
+      // yield so other tasks (loopTask, network) can run
+      taskYIELD();
+    }
+  }
 }
+
 
 void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
     int m5gfx_rotation_val = 0; // 0: 0, 1: 90, 2: 180, 3: 270
