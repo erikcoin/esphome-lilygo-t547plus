@@ -45,7 +45,9 @@ private:
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
     
-
+    static void lvgl_flush_wrapper(lv_disp_drv_t *disp,
+                                   const lv_area_t *area,
+                                   lv_color_t *color_p);
 
 // LVGL-related:
 void lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
@@ -63,7 +65,7 @@ SemaphoreHandle_t flush_sem_{nullptr}; // semaphore that signals worker
 // Helper to draw an area (called by worker)
 void draw_fast_area(const lv_area_t &area, lv_color_t *color_p);
   static void lvgl_task_trampoline(void *arg);
-static void lvgl_flush_wrapper(void *arg);
+
   void lvgl_task();              // actual member that runs lv_timer_handler()
   TaskHandle_t lvgl_task_handle_{nullptr};
   // in M5PaperS3DisplayM5GFX class
