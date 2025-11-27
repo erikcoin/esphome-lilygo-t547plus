@@ -8,7 +8,7 @@
 #include "esphome/core/helpers.h"  // voor set_timeout
 namespace esphome {
 namespace m5papers3_display_m5gfx {
-bool M5PaperS3DisplayM5GFX::use_lvgl_ = true;
+//bool M5PaperS3DisplayM5GFX::use_lvgl_ = true;
 static const char *const TAG = "m5papers3.display_m5gfx";
 // Fast RGB565 → 8-bit luminance converter
 static inline uint8_t rgb565_to_luma8(uint16_t c) {
