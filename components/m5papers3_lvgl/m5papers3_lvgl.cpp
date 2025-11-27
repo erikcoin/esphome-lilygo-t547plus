@@ -83,7 +83,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   lv_disp_drv_init(&disp_drv);
   disp_drv.hor_res = screenWidth;
   disp_drv.ver_res = screenHeight;
-  disp_drv.flush_cb = M5PaperS3DisplayM5GFX::my_disp_flush;
+  disp_drv.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush;
   disp_drv.draw_buf = &draw_buf;
   ::lv_disp_drv_register(&disp_drv);
 
