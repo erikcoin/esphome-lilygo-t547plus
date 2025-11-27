@@ -58,7 +58,7 @@ static const uint16_t screenHeight = 540;
 lv_disp_draw_buf_t draw_buf;
 lv_color_t buf[screenWidth * 10];
 
-void M5PaperS3DisplayM5GFX::lv_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
+void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
   const u_long h = area->y2 - area->y1 + 1;
 
