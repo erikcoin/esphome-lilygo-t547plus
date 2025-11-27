@@ -173,18 +173,7 @@ void M5PaperS3DisplayM5GFX::setup() {
     if (lv_buf2_) heap_caps_free(lv_buf2_), lv_buf2_ = nullptr;
     return;
   }
-  int fb_size = width_ * height_;  // full framebuffer
-
-draw_buf_1 = (lv_color_t *) heap_caps_malloc(
-    fb_size * sizeof(lv_color_t),
-    MALLOC_CAP_SPIRAM
-);
-ESP_LOGI(TAG, "Allocated full LVGL buffer: %d bytes", fb_size * sizeof(lv_color_t));
-
-// no second buffer needed for full-refresh
-lv_disp_draw_buf_init(&draw_buf, draw_buf_1, NULL, fb_size);
-
- 
+  lv_disp_draw_buf_init(&draw_buf_, lv_buf1_, lv_buf2_, buf_size);
 
   // Register LVGL display driver
   lv_disp_drv_init(&disp_drv_);
@@ -361,9 +350,6 @@ void M5PaperS3DisplayM5GFX::lvgl_task() {
   for (;;) {
     // run LVGL timers (keep this short)
     lv_timer_handler();
-    if (lv_disp_flush_is_last(disp_drv)) {
-    this->gfx.display();   // ONE e-paper refresh
-}
     // give other tasks time (worker, wifi, loopTask)
     vTaskDelay(interval);
   }
