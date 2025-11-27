@@ -44,7 +44,13 @@ private:
 
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
+    void lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p);
 
+    // Static trampoline (LVGL calls this)
+    static void lvgl_flush_cb_trampoline(
+        lv_disp_drv_t *drv,
+        const lv_area_t *area,
+        lv_color_t *color_p);
 // LVGL-related:
   void lvgl_flush(const lv_area_t *area, lv_color_t *color_p);
   // override to run lv handler
