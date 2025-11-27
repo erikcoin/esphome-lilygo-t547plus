@@ -66,7 +66,6 @@ static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
   display->lvgl_flush(area, color_p);
 }
 
-// ... (M5PaperS3DisplayM5GFX::setup() remains largely the same, ensure logging is as you need it)
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
   // M5 init (keep your existing sequence; make sure M5.begin() already ran)
@@ -109,7 +108,7 @@ xTaskCreatePinnedToCore(
   disp_drv_.hor_res = w;
   disp_drv_.ver_res = h;
   disp_drv_.draw_buf = &draw_buf_;
-  disp_drv_.flush_cb = lvgl_flush_cb;
+  disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_cb;
   disp_drv_.user_data = this;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv_);
   if (!disp) {
