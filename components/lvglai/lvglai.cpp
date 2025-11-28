@@ -26,9 +26,8 @@ void M5PaperS3DisplayM5GFX::setup() {
   // Initialize M5 hardware as you had before
   auto cfg = M5.config();
   M5.begin(cfg);
-   vTaskDelay(pdMS_TO_TICKS(100));
-M5.Touch.begin(&M5.Display);
-ESP_LOGI("touch", "GT911 Touch initialised");
+  vTaskDelay(pdMS_TO_TICKS(100));
+
   // create canvas now
   this->ensure_canvas_created();
   if (!this->canvas_) {
@@ -37,11 +36,6 @@ ESP_LOGI("touch", "GT911 Touch initialised");
     return;
   }
 
-      if (!M5.Touch.isEnabled()) {
-        ESP_LOGW(TAG, "Touchscreen not enabled or GT911 not found.");
-    } else {
-        ESP_LOGI(TAG, "Touchscreen initialized.");
-    }
   // Fill canvas white initially (palette index 15 assumed white)
   this->canvas_->fillSprite(0x0F);
 
@@ -154,26 +148,5 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
   ESP_LOGD(TAG, "Display refresh requested.");
 }
 
-bool M5PaperS3DisplayM5GFX::read_touch(touchscreen::TouchPoint *tp) {
-    if (!M5.Touch.isEnabled()) {
-       // tp->state = touchscreen::TouchPointState::RELEASED;
-        return false;
-    }
-    auto t = M5.Touch.getDetail();
-    if (!t.isPressed()) {
-      //  tp->state = touchscreen::TouchPointState::RELEASED;
-        return false;
-    }
-    tp->x = t.x;
-    tp->y = t.y;
-   // tp->state = touchscreen::TouchPointState::PRESSED;
-    return true;
-}
-void loop() {
-  auto t = M5.Touch.getDetail();
-  if (t.isPressed()) {
-    ESP_LOGI("touch", "Touch: %d, %d", t.x, t.y);
-  }
-}
 }  // namespace m5papers3_display_m5gfx
 }  // namespace esphome
