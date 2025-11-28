@@ -156,20 +156,20 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 
 bool M5PaperS3DisplayM5GFX::read_touch(touchscreen::TouchPoint *tp) {
     if (!M5.Touch.isEnabled()) {
-        tp->state = touchscreen::TouchPointState::RELEASED;
+       // tp->state = touchscreen::TouchPointState::RELEASED;
         return false;
     }
 
     auto t = M5.Touch.getDetail();
 
     if (!t.isPressed()) {
-        tp->state = touchscreen::TouchPointState::RELEASED;
+      //  tp->state = touchscreen::TouchPointState::RELEASED;
         return false;
     }
 
     tp->x = t.x;
     tp->y = t.y;
-    tp->state = touchscreen::TouchPointState::PRESSED;
+   // tp->state = touchscreen::TouchPointState::PRESSED;
     return true;
 }
 void loop() {
