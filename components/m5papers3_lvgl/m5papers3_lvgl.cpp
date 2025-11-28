@@ -62,18 +62,21 @@ void M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline(lv_disp_drv_t *drv, const l
   if (!drv) return;
   auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
   if (!self) {
+    ESP_LOGD(TAG, "trampoline flush ready");
     lv_disp_flush_ready(drv);
     return;
   }
+  ESP_LOGD(TAG, "trampoline start");
   self->lvgl_flush_cb(area, color_p);
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
   if (!area || !color_p) {
+    ESP_LOGD(TAG, "lvgl_flush_cb startflushready");
     lv_disp_flush_ready(&this->disp_drv_);
     return;
   }
-
+ESP_LOGD(TAG, "lvgl_flush_cb start");
   // clip safely
   const int x1 = std::max<int>(area->x1, 0);
   const int y1 = std::max<int>(area->y1, 0);
@@ -98,7 +101,7 @@ void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *col
 void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
   const u_long h = area->y2 - area->y1 + 1;
-
+ESP_LOGD(TAG, "lvgl_flush start");
   M5.Display.startWrite();
   M5.Display.setAddrWindow(area->x1, area->y1, w, h);
   M5.Display.pushColors(static_cast<uint16_t *>(&color_p->full), w * h, true);
@@ -110,16 +113,19 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* are
 void M5PaperS3DisplayM5GFX::lvgl_task_trampoline(void *arg) {
   auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
   if (!self) { vTaskDelete(NULL); return; }
+  ESP_LOGD(TAG, "lvgl_task_trampoline start");
   self->lvgl_task();
 }
 
 void M5PaperS3DisplayM5GFX::lvgl_task() {
   const TickType_t interval = pdMS_TO_TICKS(30); // tune 20-50 ms
   for (;;) {
+     ESP_LOGD(TAG, "lvgl_task timerhandlerstart");
     lv_timer_handler();               // causes LVGL to render and fire flushes
     M5.Display.display();             // present the frame once per timer run
     vTaskDelay(interval);
-  }
+  } 
+  ESP_LOGD(TAG, "lvgl_task start");
 }
 
 
