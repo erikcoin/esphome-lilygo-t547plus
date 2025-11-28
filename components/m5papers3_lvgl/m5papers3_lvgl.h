@@ -80,8 +80,8 @@ SemaphoreHandle_t flush_sem_{nullptr}; // semaphore that signals worker
 // Helper to draw an area (called by worker)
 void draw_fast_area(const lv_area_t &area, lv_color_t *color_p);
 
-  void lvgl_task();              // actual member that runs lv_timer_handler()
-  TaskHandle_t lvgl_task_handle_{nullptr};
+ // void lvgl_task();              // actual member that runs lv_timer_handler()
+//  TaskHandle_t lvgl_task_handle_{nullptr};
   // in M5PaperS3DisplayM5GFX class
 ///lv_disp_draw_buf_t draw_buf_;
 ///lv_color_t *lv_buf1_{nullptr};
