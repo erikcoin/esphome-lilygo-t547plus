@@ -19,6 +19,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
   void setup() override;
   void update() override;
   ~M5PaperS3DisplayM5GFX(); //override;
+void poll_touch();
 int last_touch_x_{0};
 int last_touch_y_{0};
 bool last_touch_pressed_{false};
