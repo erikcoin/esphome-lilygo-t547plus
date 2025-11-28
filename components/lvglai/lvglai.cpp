@@ -159,8 +159,7 @@ bool M5PaperS3DisplayM5GFX::read_touch(esphome::touchscreen::TouchPoint *tp) {
     tp->x = t.x;
     tp->y = t.y;
     tp->id = 0;
-    tp->state = esphome::touchscreen::TOUCH_POINT_STATE_PRESSED;
-
+tp->state = esphome::touchscreen::TouchPointState::PRESSED;
     return true;
 }
 void loop() {
