@@ -2,7 +2,7 @@
 
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
-#include <lgfx/v1.h>         // LGFX Sprite type
+//#include <lgfx/v1.h>         // LGFX Sprite type
 #include <atomic>
 
 namespace esphome {
