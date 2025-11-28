@@ -4,9 +4,9 @@
 
 // LovyanGFX forward (we include proper header in cpp)
 namespace lgfx {
-namespace v1 {
+//namespace v1 {
 class LGFX_Sprite;
-}
+//}
 }
 
 namespace esphome {
