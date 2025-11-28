@@ -203,8 +203,8 @@ void M5PaperS3DisplayM5GFX::set_rotation(int rotation_degrees) {
 }
 
 void M5PaperS3DisplayM5GFX::loop() {
-  lv_timer_handler();
-  delay(105);
+ // lv_timer_handler();
+ // delay(105);
 
 }
 
