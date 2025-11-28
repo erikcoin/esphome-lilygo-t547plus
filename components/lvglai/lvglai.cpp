@@ -159,14 +159,11 @@ bool M5PaperS3DisplayM5GFX::read_touch(touchscreen::TouchPoint *tp) {
        // tp->state = touchscreen::TouchPointState::RELEASED;
         return false;
     }
-
     auto t = M5.Touch.getDetail();
-
     if (!t.isPressed()) {
       //  tp->state = touchscreen::TouchPointState::RELEASED;
         return false;
     }
-
     tp->x = t.x;
     tp->y = t.y;
    // tp->state = touchscreen::TouchPointState::PRESSED;
