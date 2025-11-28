@@ -149,6 +149,20 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
   M5.Display.display();
   ESP_LOGD(TAG, "Display refresh requested.");
 }
+
+bool M5PaperS3DisplayM5GFX::read_touch(esphome::touchscreen::TouchPoint *tp) {
+    auto t = M5.Touch.getDetail();
+    if (!t.isPressed()) {
+        return false;
+    }
+
+    tp->x = t.x;
+    tp->y = t.y;
+    tp->id = 0;
+    tp->state = esphome::touchscreen::TOUCH_POINT_STATE_PRESSED;
+
+    return true;
+}
 void loop() {
   auto t = M5.Touch.getDetail();
   if (t.isPressed()) {
