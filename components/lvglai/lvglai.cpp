@@ -170,5 +170,6 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     this->last_touch_y_ = p.y;
     this->last_touch_pressed_ = p.isPressed();
   }
+}
 }  // namespace m5papers3_display_m5gfx
 }  // namespace esphome
