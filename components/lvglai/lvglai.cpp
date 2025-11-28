@@ -159,16 +159,19 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 void M5PaperS3DisplayM5GFX::poll_touch() {
   if (!M5.Touch.isEnabled()) return;
 
-  auto points = M5.Touch.getDetail();
-  if (points.size() > 0) {
-    auto &p = points[0];
+  // Check how many touch points are active
+  uint8_t count = M5.Touch.getCount();
+  if (count > 0) {
+    // Get the first touch point
+    auto p = M5.Touch.getDetail(0);
+
     ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
 
-    // Here you can forward to ESPHome touchscreen component or LVGL later
-    // For now just log or store internally
     this->last_touch_x_ = p.x;
     this->last_touch_y_ = p.y;
     this->last_touch_pressed_ = p.isPressed();
+  } else {
+    this->last_touch_pressed_ = false;
   }
 }
 }  // namespace m5papers3_display_m5gfx
