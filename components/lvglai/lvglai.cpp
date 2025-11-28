@@ -1,8 +1,8 @@
-#include "lvglai.h"
+#include "m5papers3_lvgl.h"
 
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
-//#include <lgfx/v1.h>         // LGFX Sprite type
+#include <lgfx/v1.h>         // LGFX Sprite type
 #include <atomic>
 
 namespace esphome {
@@ -26,10 +26,8 @@ void M5PaperS3DisplayM5GFX::setup() {
   // Initialize M5 hardware as you had before
   auto cfg = M5.config();
   M5.begin(cfg);
-  
   vTaskDelay(pdMS_TO_TICKS(100));
-M5.Touch.begin(&M5.Display);
-ESP_LOGI("touch", "GT911 Touch initialised");
+
   // create canvas now
   this->ensure_canvas_created();
   if (!this->canvas_) {
@@ -149,11 +147,6 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
   M5.Display.display();
   ESP_LOGD(TAG, "Display refresh requested.");
 }
-void loop() {
-  auto t = M5.Touch.getDetail();
-  if (t.isPressed()) {
-    ESP_LOGI("touch", "Touch: %d, %d", t.x, t.y);
-  }
-}
+
 }  // namespace m5papers3_display_m5gfx
 }  // namespace esphome
