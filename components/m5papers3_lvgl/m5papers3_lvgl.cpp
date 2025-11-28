@@ -55,16 +55,46 @@ static inline uint16_t gray4_to_rgb565(uint8_t g4) {
 static const uint16_t screenWidth  = 960;
 static const uint16_t screenHeight = 540;
 
-lv_disp_draw_buf_t draw_buf;
-lv_color_t buf[screenWidth * 10];
+//lv_disp_draw_buf_t draw_buf;
+//lv_color_t buf[screenWidth * 10];
 
-void M5PaperS3DisplayM5GFX::lvgl_flush_wrapper(lv_disp_drv_t *disp,
-                                               const lv_area_t *area,
-                                               lv_color_t *color_p)
-{
-    auto *self = static_cast<M5PaperS3DisplayM5GFX *>(disp->user_data);
-    self->lvgl_flush(disp, area, color_p);
+void M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p) {
+  if (!drv) return;
+  auto *self = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+  if (!self) {
+    lv_disp_flush_ready(drv);
+    return;
+  }
+  self->lvgl_flush_cb(area, color_p);
 }
+
+void M5PaperS3DisplayM5GFX::lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p) {
+  if (!area || !color_p) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // clip safely
+  const int x1 = std::max<int>(area->x1, 0);
+  const int y1 = std::max<int>(area->y1, 0);
+  const int x2 = std::min<int>(area->x2, this->get_width() - 1);
+  const int y2 = std::min<int>(area->y2, this->get_height() - 1);
+
+  const int w = x2 - x1 + 1;
+  const int h = y2 - y1 + 1;
+  if (w <= 0 || h <= 0) {
+    lv_disp_flush_ready(&this->disp_drv_);
+    return;
+  }
+
+  // color_p points into lv_framebuf_ (LVGL owns it). Push that rectangle to the device buffer:
+  M5.Display.pushImage(x1, y1, w, h, (uint16_t *)color_p);
+
+  // IMPORTANT: do not call M5.Display.display() here for every flush.
+  // The LVGL task or update loop should call display() once per finished frame.
+  lv_disp_flush_ready(&this->disp_drv_);
+}
+
 void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p) {
   const u_long w = area->x2 - area->x1 + 1;
   const u_long h = area->y2 - area->y1 + 1;
@@ -77,22 +107,60 @@ void M5PaperS3DisplayM5GFX::lvgl_flush(lv_disp_drv_t* disp, const lv_area_t* are
   lv_disp_flush_ready(disp);
 }
 
+void M5PaperS3DisplayM5GFX::lvgl_task_trampoline(void *arg) {
+  auto *self = static_cast<M5PaperS3DisplayM5GFX *>(arg);
+  if (!self) { vTaskDelete(NULL); return; }
+  self->lvgl_task();
+}
+
+void M5PaperS3DisplayM5GFX::lvgl_task() {
+  const TickType_t interval = pdMS_TO_TICKS(30); // tune 20-50 ms
+  for (;;) {
+    lv_timer_handler();               // causes LVGL to render and fire flushes
+    M5.Display.display();             // present the frame once per timer run
+    vTaskDelay(interval);
+  }
+}
+
 
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
    auto cfg = M5.config();
    M5.begin(cfg);
    lv_init();
-  lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
+ // lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
 
-  static lv_disp_drv_t disp_drv;
-  lv_disp_drv_init(&disp_drv);
-  disp_drv.hor_res = screenWidth;
-  disp_drv.ver_res = screenHeight;
-  disp_drv.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_wrapper;
-  disp_drv.draw_buf = &draw_buf;
-  disp_drv.user_data = this;
-  lv_disp_drv_register(&disp_drv);
+  
+// allocate full framebuffer in PSRAM (recommended)
+const int w = this->get_width();
+const int h = this->get_height();
+size_t fb_pixels = (size_t)w * (size_t)h;
+this->lv_framebuf_ = (lv_color_t*) heap_caps_malloc(fb_pixels * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+if (!this->lv_framebuf_) {
+  ESP_LOGE(TAG, "LVGL PSRAM allocation failed");
+  return;
+}
+lv_disp_draw_buf_init(&this->draw_buf_, this->lv_framebuf_, nullptr, (int)fb_pixels);
+
+// register driver (store disp_drv_ as member)
+lv_disp_drv_init(&this->disp_drv_);
+this->disp_drv_.hor_res = w;
+this->disp_drv_.ver_res = h;
+this->disp_drv_.draw_buf = &this->draw_buf_;
+this->disp_drv_.flush_cb = M5PaperS3DisplayM5GFX::lvgl_flush_cb_trampoline;
+this->disp_drv_.user_data = this;
+lv_disp_t *disp = lv_disp_drv_register(&this->disp_drv_);
+if (!disp) {
+  ESP_LOGE(TAG, "lv_disp_drv_register failed");
+  heap_caps_free(this->lv_framebuf_);
+  this->lv_framebuf_ = nullptr;
+  return;
+}
+  xTaskCreatePinnedToCore(&M5PaperS3DisplayM5GFX::lvgl_task_trampoline,
+                        "lvgl_task", 4096, this,
+                        tskIDLE_PRIORITY + 2, &this->lvgl_task_handle_, 0);
+
+if (disp->driver) disp->driver->user_data = this; // some LVGL builds use this indirection
 
   /* Create simple label */
 lv_obj_t *label = lv_label_create(lv_scr_act());
