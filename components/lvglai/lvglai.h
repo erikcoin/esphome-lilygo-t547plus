@@ -22,7 +22,10 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
 
   // Required by Display base class
   void draw_pixel_at(int x, int y, esphome::Color color) override;
-
+    // NEW REQUIRED OVERRIDES
+  DisplayType get_display_type() override { return DisplayType::DISPLAY_TYPE_BINARY; }
+  int get_width_internal() override { return 540; }   // your panel width
+  int get_height_internal() override { return 960; }  // your panel height
  protected:
   // Canvas (LGFX sprite) allocated in setup
   lgfx::v1::LGFX_Sprite *canvas_{nullptr};
