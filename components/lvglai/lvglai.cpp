@@ -151,15 +151,21 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 }
 
 bool M5PaperS3DisplayM5GFX::read_touch(esphome::touchscreen::TouchPoint *tp) {
+    if (!M5.Touch.isEnabled()) {
+        tp->state = esphome::touchscreen::TouchPointState::RELEASED;
+        return false;
+    }
+
     auto t = M5.Touch.getDetail();
+
     if (!t.isPressed()) {
+        tp->state = esphome::touchscreen::TouchPointState::RELEASED;
         return false;
     }
 
     tp->x = t.x;
     tp->y = t.y;
-    tp->id = 0;
-tp->state = esphome::touchscreen::TouchPointState::PRESSED;
+    tp->state = esphome::touchscreen::TouchPointState::PRESSED;
     return true;
 }
 void loop() {
