@@ -1,6 +1,8 @@
 #pragma once
 
 #include "esphome.h"
+#include <M5Unified.h>
+#include <M5GFX.h>
 
 // LovyanGFX forward (we include proper header in cpp)
 namespace lgfx {
