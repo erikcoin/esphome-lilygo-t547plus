@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.components.display as display
-from esphome.components import text_sensor, touchscreen
+from esphome.components import text_sensor
 # Corrected import for automation helpers:
 from esphome.automation import validate_automation, build_automation
 import esphome.config_validation as cv
@@ -19,7 +19,7 @@ AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
 m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
 
 M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.Component, display.Display, touchscreen.Touchscreen
+    "M5PaperS3DisplayM5GFX", cg.Component, display.Display
 )
 
 BUTTON_SCHEMA = cv.Schema({
@@ -35,17 +35,14 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
 
         }
-    )
-    .extend(touchscreen.TOUCHSCREEN_SCHEMA)
-    .extend(cv.COMPONENT_SCHEMA),
+    ).extend(cv.COMPONENT_SCHEMA),
 )
 
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    # await cg.register_component(var, config)
     await display.register_display(var, config)
-    # await touchscreen.register_touchscreen(var, config)
+
     if CONF_LAMBDA in config:
         lambda_ = await cg.process_lambda(
             config[CONF_LAMBDA], [(display.DisplayRef, "it")], return_type=cg.void
