@@ -41,6 +41,21 @@ private:
     display::DisplayType get_display_type() override {
         return display::DisplayType::DISPLAY_TYPE_GRAYSCALE;
     }
+// LVGL full-frame (or partial) buffer — must be a class member, allocated in setup()
+lv_color_t *lv_framebuf_{nullptr};         // full-frame option (recommended)
+
+// LVGL structs must be members (not local variables)
+lv_disp_draw_buf_t draw_buf_;
+lv_disp_drv_t disp_drv_;
+
+// LVGL trampoline + member flush
+static void lvgl_flush_cb_trampoline(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p);
+void lvgl_flush_cb(const lv_area_t *area, lv_color_t *color_p);
+
+// If you run LVGL on separate task
+static void lvgl_task_trampoline(void *arg);
+void lvgl_task();
+TaskHandle_t lvgl_task_handle_{nullptr};
 
     void set_rotation(int rotation);
     void set_writer(std::function<void(display::Display &)> writer);
