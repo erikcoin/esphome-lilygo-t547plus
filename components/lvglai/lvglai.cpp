@@ -150,7 +150,7 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
   ESP_LOGD(TAG, "Display refresh requested.");
 }
 
-bool M5PaperS3DisplayM5GFX::read_touch(touchscreen::TouchPoint *tp) {
+bool M5PaperS3DisplayM5GFX::read_touch(esphome::touchscreen::TouchPoint *tp) {
     if (!M5.Touch.isEnabled()) {
         tp->state = touchscreen::TouchPointState::RELEASED;
         return false;
