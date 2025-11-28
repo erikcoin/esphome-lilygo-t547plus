@@ -64,7 +64,7 @@ void M5PaperS3DisplayM5GFX::update() {
     flush_canvas_to_display();
   }
    // Poll touch here
-  this->poll_touch();
+  poll_touch();
 }
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
