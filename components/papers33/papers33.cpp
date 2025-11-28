@@ -392,7 +392,7 @@ void M5PaperS3DisplayM5GFX::set_writer(std::function<void(esphome::display::Disp
  //   return ptr;
     
 //}
-Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
+//Trigger<> *M5PaperS3DisplayM5GFX::make_button_trigger(const std::string &buttonid) {
 ////  auto it = this->button_triggers_.find(buttonid);
 ////  if (it != this->button_triggers_.end()) {
 ////    return it->second.get();  // Trigger bestaat al
