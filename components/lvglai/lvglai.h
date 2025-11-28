@@ -19,7 +19,7 @@ class M5PaperS3DisplayM5GFX : public esphome::Component, public esphome::display
   void setup() override;
   void update() override;
   ~M5PaperS3DisplayM5GFX(); //override;
-bool read_touch(esphome::touchscreen::TouchPoint *tp) override;
+bool read_touch(esphome::touchscreen::TouchPoint *tp); # override;
   // Required by Display base class
   void draw_pixel_at(int x, int y, esphome::Color color) override;
     // NEW REQUIRED OVERRIDES
