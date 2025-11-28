@@ -14,12 +14,12 @@ class LGFX_Sprite;
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-class M5PaperS3DisplayM5GFX : public esphome::display::Display {
+class M5PaperS3DisplayM5GFX : public esphome::display::Display, public esphome::touchscreen::Touchscreen {
  public:
   void setup() override;
   void update() override;
   ~M5PaperS3DisplayM5GFX(); //override;
-
+bool read_touch(esphome::touchscreen::TouchPoint *tp) override;
   // Required by Display base class
   void draw_pixel_at(int x, int y, esphome::Color color) override;
     // NEW REQUIRED OVERRIDES
