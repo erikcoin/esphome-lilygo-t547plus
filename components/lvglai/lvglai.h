@@ -16,7 +16,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display {
  public:
   void setup() override;
   void update() override;
-  ~M5PaperS3DisplayM5GFX() override;
+  ~M5PaperS3DisplayM5GFX(); 
 
   // Required by Display base class
   void draw_pixel_at(int x, int y, esphome::Color color) override;
