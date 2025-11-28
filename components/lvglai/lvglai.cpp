@@ -174,5 +174,16 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     this->last_touch_pressed_ = false;
   }
 }
+void M5PaperS3DisplayM5GFX::loop() {
+  if (!this->initialized_) return;
+
+  // Update M5Unified subsystems
+  M5.update();
+
+  // Poll touch continuously
+  poll_touch();
+}
+
+
 }  // namespace m5papers3_display_m5gfx
 }  // namespace esphome
