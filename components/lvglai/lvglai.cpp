@@ -45,6 +45,12 @@ void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "Canvas created: %dx%d colorDepth=%d (PSRAM: %u free)",
            this->canvas_->width(), this->canvas_->height(), this->canvas_->getColorDepth(),
            heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+  // Enable touch
+  if (M5.Touch.isEnabled()) {
+    ESP_LOGI(TAG, "Touch controller (GT911) enabled");
+  } else {
+    ESP_LOGW(TAG, "Touch controller not detected");
+  }
 }
 
 void M5PaperS3DisplayM5GFX::update() {
