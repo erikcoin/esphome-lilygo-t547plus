@@ -26,6 +26,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   // Initialize M5 hardware as you had before
   auto cfg = M5.config();
   M5.begin(cfg);
+  M5.Touch.begin();
   vTaskDelay(pdMS_TO_TICKS(100));
 
   // create canvas now
