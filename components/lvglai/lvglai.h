@@ -3,7 +3,7 @@
 #include "esphome.h"
 #include <M5Unified.h>
 #include <M5GFX.h>
-//#include "esphome/components/touchscreen/touchscreen.h"
+#include "touchscreen.h"
 
 // LovyanGFX forward (we include proper header in cpp)
 namespace lgfx {
@@ -15,7 +15,7 @@ class LGFX_Sprite;
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-class M5PaperS3DisplayM5GFX : public esphome::display::Display,public esphome::touchscreen::Touchscreen
+class M5PaperS3DisplayM5GFX : public esphome::display::Display, public esphome::touchscreen::Touchscreen
 {
  public:
   void setup() override;
