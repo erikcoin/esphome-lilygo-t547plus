@@ -1,7 +1,7 @@
 #pragma once
 
-#include "esphome/components/display/display.h"
-#include "esphome/components/touchscreen/touchscreen.h"
+#include <esphome/components/display/display.h>
+#include <esphome/components/touchscreen/touchscreen.h>
 #include "esphome.h"
 #include <M5Unified.h>
 #include <M5GFX.h>
