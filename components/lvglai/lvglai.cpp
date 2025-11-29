@@ -170,20 +170,28 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 }
 
 void M5PaperS3DisplayM5GFX::poll_touch() {
+  static int64_t last_touch_time = 0;
+  const int DEBOUNCE_MS = 150;  // adjust to taste
+  
   if (!M5.Touch.isEnabled()) return;
   // Check how many touch points are active
   uint8_t count = M5.Touch.getCount();
   if (count > 0) {
     // Get the first touch point
     auto p = M5.Touch.getDetail(0);
+    int64_t now = esp_timer_get_time() / 1000;  // microseconds → ms
+    if (now - last_touch_time > DEBOUNCE_MS) {
     ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
     this->last_touch_x_ = p.x;
     this->last_touch_y_ = p.y;
     this->last_touch_pressed_ = p.isPressed();
-   // this->publish_state(p.x, p.y, p.isPressed());
+
+    last_touch_time = now;
+    }
+   
   } else {
     this->last_touch_pressed_ = false;
-   // this->publish_state(0, 0, false);
+
   }
 }
 void M5PaperS3DisplayM5GFX::loop() {
