@@ -191,10 +191,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
    
   } else {
     
-        // Only trigger redraw when touch is released
-    if (last_touch_pressed_) {
-      this->mark_dirty();
-    }
+
     last_touch_pressed_ = false;
 
   }
@@ -204,7 +201,7 @@ void M5PaperS3DisplayM5GFX::loop() {
   M5.update();
 
   // Poll touch continuously
-  poll_touch();
+ // poll_touch();
   lv_timer_handler();   // or lv_task_handler() depending on LVGL version
   if (this->dirty_.exchange(false)) {
     flush_canvas_to_display();
