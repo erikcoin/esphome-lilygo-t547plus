@@ -206,7 +206,7 @@ void M5PaperS3DisplayM5GFX::loop() {
   poll_touch();
  // lv_timer_handler();
   static int64_t last_flush_time = 0;
-  const int FLUSH_COOLDOWN_MS = 500;
+  const int FLUSH_COOLDOWN_MS = 1500;
   int64_t now = esp_timer_get_time() / 1000;
   if (this->dirty_.exchange(false)) {
     if (now - last_flush_time > FLUSH_COOLDOWN_MS) {
