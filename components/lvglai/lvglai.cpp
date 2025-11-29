@@ -191,7 +191,10 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
    
   } else {
     
-
+    if (last_touch_pressed_) {
+      // Touch just released → schedule final redraw
+      this->dirty_.store(true);
+    }
     last_touch_pressed_ = false;
 
   }
@@ -204,7 +207,7 @@ void M5PaperS3DisplayM5GFX::loop() {
 
   M5.update();
   poll_touch();
- // lv_timer_handler();
+ 
   static int64_t last_flush_time = 0;
   const int FLUSH_COOLDOWN_MS = 1500;
   int64_t now = esp_timer_get_time() / 1000;
