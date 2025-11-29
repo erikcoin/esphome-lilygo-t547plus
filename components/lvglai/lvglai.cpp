@@ -167,11 +167,13 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
 
     ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
 
-    this->last_touch_x_ = p.x;
-    this->last_touch_y_ = p.y;
-    this->last_touch_pressed_ = p.isPressed();
+    //this->last_touch_x_ = p.x;
+    //this->last_touch_y_ = p.y;
+    //this->last_touch_pressed_ = p.isPressed();
+    this->publish_touch(p.x, p.y, p.isPressed());
   } else {
-    this->last_touch_pressed_ = false;
+    //this->last_touch_pressed_ = false;
+    this->publish_touch(0, 0, false);
   }
 }
 void M5PaperS3DisplayM5GFX::loop() {
