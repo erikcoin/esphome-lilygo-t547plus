@@ -196,15 +196,23 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
 
   }
 }
+
+static int64_t last_flush_time = 0;
+const int FLUSH_COOLDOWN_MS = 500;
+
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
-  M5.update();
 
-  // Poll touch continuously
+  M5.update();
   poll_touch();
-  //lv_timer_handler();   // or lv_task_handler() depending on LVGL version
+  lv_timer_handler();
+
+  int64_t now = esp_timer_get_time() / 1000;
   if (this->dirty_.exchange(false)) {
-    flush_canvas_to_display();
+    if (now - last_flush_time > FLUSH_COOLDOWN_MS) {
+      flush_canvas_to_display();
+      last_flush_time = now;
+    }
   }
 }
 
