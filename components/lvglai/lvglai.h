@@ -15,7 +15,7 @@ class LGFX_Sprite;
 namespace esphome {
 namespace m5papers3_display_m5gfx {
 
-class M5PaperS3DisplayM5GFX : public esphome::Component, public esphome::display::Display
+class M5PaperS3DisplayM5GFX : public esphome::display::Display
 {
  public:
   void setup() override;
