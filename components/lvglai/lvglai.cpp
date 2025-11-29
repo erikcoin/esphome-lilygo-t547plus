@@ -171,7 +171,7 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
-  const int DEBOUNCE_MS = 350;  // adjust to taste
+  const int DEBOUNCE_MS = 850;  // adjust to taste
   
   if (!M5.Touch.isEnabled()) return;
   // Check how many touch points are active
