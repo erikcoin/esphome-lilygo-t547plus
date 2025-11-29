@@ -172,7 +172,7 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
   const int DEBOUNCE_MS = 850;  // adjust to taste
-  
+
   if (!M5.Touch.isEnabled()) return;
   // Check how many touch points are active
   uint8_t count = M5.Touch.getCount();
@@ -190,7 +190,12 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     }
    
   } else {
-    this->last_touch_pressed_ = false;
+    
+        // Only trigger redraw when touch is released
+    if (last_touch_pressed_) {
+      this->mark_dirty();
+    }
+    last_touch_pressed_ = false;
 
   }
 }
