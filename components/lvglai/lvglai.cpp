@@ -201,8 +201,8 @@ void M5PaperS3DisplayM5GFX::loop() {
   M5.update();
 
   // Poll touch continuously
- // poll_touch();
-  lv_timer_handler();   // or lv_task_handler() depending on LVGL version
+  poll_touch();
+  //lv_timer_handler();   // or lv_task_handler() depending on LVGL version
   if (this->dirty_.exchange(false)) {
     flush_canvas_to_display();
   }
