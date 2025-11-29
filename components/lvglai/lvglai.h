@@ -1,9 +1,11 @@
 #pragma once
 
+#include "esphome/components/display/display.h"
+#include "esphome/components/touchscreen/touchscreen.h"
 #include "esphome.h"
 #include <M5Unified.h>
 #include <M5GFX.h>
-#include "esphome/components/touchscreen/touchscreen.h"
+
 
 // LovyanGFX forward (we include proper header in cpp)
 namespace lgfx {
