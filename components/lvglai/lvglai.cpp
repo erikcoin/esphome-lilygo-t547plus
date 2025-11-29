@@ -22,12 +22,10 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
-
   // Initialize M5 hardware as you had before
   auto cfg = M5.config();
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
-
   // create canvas now
   this->ensure_canvas_created();
   if (!this->canvas_) {
@@ -38,7 +36,6 @@ void M5PaperS3DisplayM5GFX::setup() {
 
   // Fill canvas white initially (palette index 15 assumed white)
   this->canvas_->fillSprite(0x0F);
-
   // Mark initialized
   this->initialized_ = true;
   this->dirty_.store(true);  // initial full refresh
@@ -51,6 +48,22 @@ void M5PaperS3DisplayM5GFX::setup() {
   } else {
     ESP_LOGW(TAG, "Touch controller not detected");
   }
+//touchdoorsturennaaraesphome
+static lv_indev_drv_t indev_drv;
+lv_indev_drv_init(&indev_drv);
+indev_drv.type = LV_INDEV_TYPE_POINTER;
+indev_drv.read_cb = [](lv_indev_drv_t *drv, lv_indev_data_t *data) {
+  auto *comp = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+  data->point.x = comp->last_touch_x_;
+  data->point.y = comp->last_touch_y_;
+  data->state   = comp->last_touch_pressed_
+                    ? LV_INDEV_STATE_PR
+                    : LV_INDEV_STATE_REL;
+};
+indev_drv.user_data = this;
+lv_indev_drv_register(&indev_drv);
+
+  
 }
 
 void M5PaperS3DisplayM5GFX::update() {
