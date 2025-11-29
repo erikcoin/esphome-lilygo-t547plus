@@ -158,28 +158,23 @@ void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
 
 void M5PaperS3DisplayM5GFX::poll_touch() {
   if (!M5.Touch.isEnabled()) return;
-
   // Check how many touch points are active
   uint8_t count = M5.Touch.getCount();
   if (count > 0) {
     // Get the first touch point
     auto p = M5.Touch.getDetail(0);
-
     ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
-
     //this->last_touch_x_ = p.x;
     //this->last_touch_y_ = p.y;
     //this->last_touch_pressed_ = p.isPressed();
-    this->publish_touch(p.x, p.y, p.isPressed());
+    this->publish_state(p.x, p.y, p.isPressed());
   } else {
     //this->last_touch_pressed_ = false;
-    this->publish_touch(0, 0, false);
+    this->publish_state(0, 0, false);
   }
 }
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
-
-  // Update M5Unified subsystems
   M5.update();
 
   // Poll touch continuously
