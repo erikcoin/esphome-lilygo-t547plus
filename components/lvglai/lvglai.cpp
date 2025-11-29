@@ -208,14 +208,14 @@ void M5PaperS3DisplayM5GFX::loop() {
   M5.update();
   poll_touch();
  
-  static int64_t last_flush_time = 0;
-  const int FLUSH_COOLDOWN_MS = 1500;
-  int64_t now = esp_timer_get_time() / 1000;
+  //static int64_t last_flush_time = 0;
+  //const int FLUSH_COOLDOWN_MS = 1500;
+  //int64_t now = esp_timer_get_time() / 1000;
   if (this->dirty_.exchange(false)) {
-    if (now - last_flush_time > FLUSH_COOLDOWN_MS) {
+    //if (now - last_flush_time > FLUSH_COOLDOWN_MS) {
       flush_canvas_to_display();
-      last_flush_time = now;
-    }
+    //  last_flush_time = now;
+    //}
   }
 }
 
