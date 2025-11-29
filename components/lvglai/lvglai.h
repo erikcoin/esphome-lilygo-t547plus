@@ -23,6 +23,7 @@ class M5PaperS3DisplayM5GFX : public esphome::display::Display
   ~M5PaperS3DisplayM5GFX(); //override;
 void poll_touch();
 void loop();
+void publish_touch();
 int last_touch_x_{0};
 int last_touch_y_{0};
 bool last_touch_pressed_{false};
