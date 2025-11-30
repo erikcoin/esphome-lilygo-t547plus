@@ -16,12 +16,6 @@ from esphome.const import (
 DEPENDENCIES = ["network"]
 AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
 
-m5papers3_display_m5gfx_ns = cg.esphome_ns.namespace("m5papers3_display_m5gfx")
-
-M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
-    "M5PaperS3DisplayM5GFX", cg.Component, display.Display
-)
-
 BUTTON_SCHEMA = cv.Schema({
 
     cv.Required(CONF_WIDTH): cv.int_range(min=1),
