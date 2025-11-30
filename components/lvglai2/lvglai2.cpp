@@ -52,9 +52,9 @@ void M5PaperS3Display::flush_() {
       this->get_height(),
       fb_.data(),
       lgfx::grayscale_4bit
-);
 
-);
+
+
 
   );
 }
