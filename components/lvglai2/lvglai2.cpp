@@ -51,6 +51,10 @@ void M5PaperS3Display::flush_() {
       this->get_width(),
       this->get_height(),
       fb_.data(),
-      img_grayscale_4bit
+      lgfx::grayscale_4bit
+);
+
+);
+
   );
 }
