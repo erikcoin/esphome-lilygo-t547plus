@@ -7,6 +7,10 @@
 #include <M5Unified.h>
 #include <M5GFX.h>
 
+
+namespace esphome {
+namespace m5papers3ns {
+
 class M5PaperS3Display : public esphome::display::Display, public esphome::Component {
  public:
   void setup() override;
@@ -42,4 +46,5 @@ class M5PaperS3Display : public esphome::display::Display, public esphome::Compo
 
   std::atomic<bool> dirty_{false};
   M5GFX *gfx_ = nullptr;
+};
 };
