@@ -19,7 +19,8 @@ class M5PaperS3Display : public esphome::display::Display{
 ~M5PaperS3Display();
   // ESPHome calls this to draw pixels
   void draw_pixel_at(int x, int y, esphome::Color color) override;
-
+display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_BINARY; }
+  
  protected:
   int get_width_internal() override { return 960; }   // M5Paper S3 resolution
   int get_height_internal() override { return 540; }
