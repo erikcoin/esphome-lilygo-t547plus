@@ -1,7 +1,7 @@
 #include "lvglai2.h"
 
-using namespace esphome;
-namespace m5papers3ns;
+namespace esphome {
+namespace m5papers3ns {
 
 void M5PaperS3Display::setup() {
   ESP_LOGI("m5paper", "Initializing M5Paper S3 display...");
