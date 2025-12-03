@@ -16,7 +16,7 @@ class M5PaperS3Display : public esphome::display::Display, public esphome::Compo
   void setup() override;
   void loop() override { M5.update(); }
   void update() override;
-
+~M5PaperS3Display();
   // ESPHome calls this to draw pixels
   void draw_pixel_at(int x, int y, esphome::Color color) override;
 
