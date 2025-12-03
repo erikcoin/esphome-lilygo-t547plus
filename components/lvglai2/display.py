@@ -16,7 +16,7 @@ m5papers3ns = cg.esphome_ns.namespace("m5papers3ns")
 
 M5PaperS3Display = m5papers3ns.class_(
     "M5PaperS3Display", cg.Component, display.Display
-    
+)
 DEPENDENCIES = ["network"]
 AUTO_LOAD = ["display", "text_sensor", "binary_sensor"]
 
