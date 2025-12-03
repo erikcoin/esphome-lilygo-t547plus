@@ -59,4 +59,5 @@ void M5PaperS3Display::flush_() {
 
   );
 }
-}
+};
+};
