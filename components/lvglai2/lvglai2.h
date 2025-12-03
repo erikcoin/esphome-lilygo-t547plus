@@ -7,7 +7,7 @@
 #include <M5Unified.h>
 #include <M5GFX.h>
 
-class M5PaperS3Display : public esphome::display::DisplayBuffer, public esphome::Component {
+class M5PaperS3Display : public esphome::display::Display, public esphome::Component {
  public:
   void setup() override;
   void loop() override { M5.update(); }
