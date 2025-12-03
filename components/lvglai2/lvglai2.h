@@ -46,6 +46,6 @@ class M5PaperS3Display : public display::Display{
 
   std::atomic<bool> dirty_{false};
   M5GFX *gfx_ = nullptr;
-}
+};
 };
 };
