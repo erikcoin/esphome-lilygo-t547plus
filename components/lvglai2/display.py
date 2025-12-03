@@ -26,7 +26,7 @@ BUTTON_SCHEMA = cv.Schema({
 CONFIG_SCHEMA = cv.All(
     display.FULL_DISPLAY_SCHEMA.extend(
         {
-            cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
+            cv.GenerateID(): cv.declare_id(M5PaperS3Display),
 
         }
     ).extend(cv.COMPONENT_SCHEMA),
