@@ -11,7 +11,7 @@
 namespace esphome {
 namespace m5papers3ns {
 
-class M5PaperS3Display : public esphome::display::Display, public esphome::Component {
+class M5PaperS3Display : public display::Display, public esphome::Component {
  public:
   void setup() override;
   void loop() override { M5.update(); }
