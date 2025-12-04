@@ -51,7 +51,11 @@ M5.Display.setEpdMode(epd_mode_t::epd_quality);
   ESP_LOGI(TAG, "Framebuffer allocated: %dx%d, %u bytes (PSRAM free=%u)",
            fb_width_, fb_height_, fb_bytes,
            heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-
+ESP_LOGI(TAG, "Display: w=%d h=%d colorDepth=%d stride=%d",
+         M5.Display.width(),
+         M5.Display.height(),
+         M5.Display.getColorDepth(),
+         M5.Display.getPixelStride());
   // Touch registration (same as before)
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
