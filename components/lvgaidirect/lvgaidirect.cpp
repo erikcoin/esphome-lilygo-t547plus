@@ -28,7 +28,7 @@ void M5PaperS3DisplayM5GFX::setup() {
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
 M5.Display.setColorDepth(4);  // 4-bit grayscale
-M5.Display.setEpdMode(m5epd_mode_t::m5epd_mode_gc4);  
+M5.Display.setEpdMode(epd_mode_t::epd_quality);
   // Create framebuffer (4-bit grayscale => 2 pixels per byte)
   this->fb_width_  = this->get_width();
   this->fb_height_ = this->get_height();
