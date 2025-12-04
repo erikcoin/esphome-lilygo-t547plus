@@ -33,7 +33,7 @@ display::DisplayType get_display_type() override { return display::DisplayType::
   // ---- frame buffer (4-bit grayscale) ----
   std::vector<uint8_t> fb_;
 
-  inline void draw_absolute_pixel_internal(int x, int y, uint8_t idx) {
+  inline void draw_absolute_pixel_internal2(int x, int y, uint8_t idx) {
     int p = y * this->get_width() + x;
     int byte_index = p >> 1;
     bool high = !(p & 1);
@@ -44,6 +44,12 @@ display::DisplayType get_display_type() override { return display::DisplayType::
     else
       b = (b & 0xF0) | idx;
   }
+
+inline void draw_absolute_pixel_internal(int x, int y, uint8_t idx) {
+    // idx = 0–15 grayscale
+    fb_[y * this->get_width() + x] = idx & 0x0F;
+}
+
 
   std::atomic<bool> dirty_{false};
   M5GFX *gfx_ = nullptr;
