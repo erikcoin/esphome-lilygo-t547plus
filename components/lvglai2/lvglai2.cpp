@@ -16,7 +16,7 @@ void M5PaperS3Display::setup() {
   fb_.assign(total_pixels, 0xFF);  // white background
 
   gfx_->init();
-  gfx_->setEpdMode(epd_mode_t::epd_fast);  // faster refresh
+  gfx_->setEpdMode(epd_mode_t::epd_quality);  // faster refresh
 
   ESP_LOGI("m5paper", "M5Paper S3 display initialized.");
 }
