@@ -27,7 +27,8 @@ void M5PaperS3DisplayM5GFX::setup() {
   auto cfg = M5.config();
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
-
+M5.Display.setColorDepth(4);  // 4-bit grayscale
+M5.Display.setEpdMode(m5epd_mode_t::m5epd_mode_gc4);  
   // Create framebuffer (4-bit grayscale => 2 pixels per byte)
   this->fb_width_  = this->get_width();
   this->fb_height_ = this->get_height();
@@ -189,23 +190,12 @@ void M5PaperS3DisplayM5GFX::draw_pixel_internal_at(int x, int y, uint8_t idx) {
   }
 }
 void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
-  M5.Display.startWrite();
+  const int w = fb_width_;
+  const int h = fb_height_;
 
-  for (int y = 0; y < fb_height_; y++) {
-    for (int x = 0; x < fb_width_; x++) {
-
-      size_t index = y * fb_width_ + x;
-      size_t byte_index = index >> 1;
-
-      uint8_t byte = framebuffer_[byte_index];
-      uint8_t pix4 = (index & 1) ? (byte & 0x0F) : (byte >> 4);
-
-      // Push grayscale pixel directly
-      M5.Display.writePixel(x, y, pix4);
-    }
-  }
-
-  M5.Display.endWrite();
+  // M5PaperS3 expects packed 4-bit pixels (2 pixels per byte)
+  // This pushes the whole frame in one shot (correct for M5GFX)
+  M5.Display.pushImage(0, 0, w, h, framebuffer_);
 }
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
