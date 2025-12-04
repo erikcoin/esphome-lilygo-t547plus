@@ -22,90 +22,69 @@ M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
 
 void M5PaperS3DisplayM5GFX::setup() {
   ESP_LOGD(TAG, "M5PaperS3DisplayM5GFX::setup() start");
-  // Initialize M5 hardware as you had before
+
+  // Init M5 hardware
   auto cfg = M5.config();
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
-  // create canvas now
-  this->ensure_canvas_created();
-  if (!this->canvas_) {
-    ESP_LOGE(TAG, "Canvas creation failed, display will remain uninitialized");
+
+  // Create framebuffer (4-bit grayscale => 2 pixels per byte)
+  this->fb_width_  = this->get_width();
+  this->fb_height_ = this->get_height();
+
+  size_t fb_bytes = (fb_width_ * fb_height_) / 2;
+
+  this->framebuffer_ = (uint8_t*) heap_caps_malloc(fb_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+  if (!this->framebuffer_) {
+    ESP_LOGE(TAG, "Failed to allocate framebuffer in PSRAM!");
     this->initialized_ = false;
     return;
   }
 
-  // Fill canvas white initially (palette index 15 assumed white)
-  this->canvas_->fillSprite(0x0F);
-  // Mark initialized
-  this->initialized_ = true;
-  this->dirty_.store(true);  // initial full refresh
-  ESP_LOGD(TAG, "Canvas created: %dx%d colorDepth=%d (PSRAM: %u free)",
-           this->canvas_->width(), this->canvas_->height(), this->canvas_->getColorDepth(),
-           heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-  // Enable touch
-  if (M5.Touch.isEnabled()) {
-    ESP_LOGI(TAG, "Touch controller (GT911) enabled");
-  } else {
-    ESP_LOGW(TAG, "Touch controller not detected");
-  }
-//touchdoorsturennaaraesphome
-static lv_indev_drv_t indev_drv;
-lv_indev_drv_init(&indev_drv);
-indev_drv.type = LV_INDEV_TYPE_POINTER;
-indev_drv.read_cb = [](lv_indev_drv_t *drv, lv_indev_data_t *data) {
-  auto *comp = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
-  data->point.x = comp->last_touch_x_;
-  data->point.y = comp->last_touch_y_;
-  data->state   = comp->last_touch_pressed_
-                    ? LV_INDEV_STATE_PR
-                    : LV_INDEV_STATE_REL;
-};
-indev_drv.user_data = this;
-lv_indev_drv_register(&indev_drv);
+  memset(framebuffer_, 0xFF, fb_bytes);   // fill white (0xF)
 
-  
+  this->initialized_ = true;
+  this->dirty_.store(true);
+
+  ESP_LOGI(TAG, "Framebuffer allocated: %dx%d, %u bytes (PSRAM free=%u)",
+           fb_width_, fb_height_, fb_bytes,
+           heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+
+  // Touch registration (same as before)
+  static lv_indev_drv_t indev_drv;
+  lv_indev_drv_init(&indev_drv);
+  indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = [](lv_indev_drv_t *drv, lv_indev_data_t *data) {
+    auto *comp = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
+    data->point.x = comp->last_touch_x_;
+    data->point.y = comp->last_touch_y_;
+    data->state   = comp->last_touch_pressed_ ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+  };
+  indev_drv.user_data = this;
+  lv_indev_drv_register(&indev_drv);
 }
 
 void M5PaperS3DisplayM5GFX::update() {
-  // Called frequently by ESPHome loopTask. Keep it short.
-  if (!this->initialized_) return;
+  if (!initialized_) return;
 
-  // If any pixels changed, flush the whole canvas to the display once.
-  // This batches all pixel writes (from draw_pixel_at) into a single push.
-  if (this->dirty_.exchange(false)) {
-    // push sprite to screen
-    flush_canvas_to_display();
+  if (dirty_.exchange(false)) {
+    flush_framebuffer_to_display();
   }
-   // Poll touch here
+
   poll_touch();
 }
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
-  // Called by ESPHome/LVGL pixel renderer.
-  if (!this->initialized_) {
-    // ignore early drawing attempts during boot
-    return;
-  }
+  if (!initialized_) return;
+  if (x < 0 || y < 0 || x >= fb_width_ || y >= fb_height_) return;
 
-  // bounds check
-  if (x < 0 || y < 0 || x >= this->get_width() || y >= this->get_height()) return;
-
-  // make sure canvas exists
-  if (!this->canvas_) {
-    this->ensure_canvas_created();
-    if (!this->canvas_) return;
-  }
-
-  // compute palette index 0..15
   uint8_t idx = color_to_gray4(color);
+  draw_pixel_internal_at(x, y, idx);
 
-  // draw into sprite (fast, in RAM)
-  // LGFX Sprite in 4-bit mode expects color index (0..15)
-  this->canvas_->drawPixel(x, y, idx);
-
-  // mark dirty (will be flushed next update())
-  this->dirty_.store(true);
+  dirty_.store(true);
 }
+
 
 // convert esphome::Color to 4-bit grayscale palette index (0..15)
 // esphome::Color has r,g,b 0..255 accessors available via .red(), .green(), .blue()
@@ -196,8 +175,38 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
   }
 }
 
+void M5PaperS3DisplayM5GFX::draw_pixel_internal_at(int x, int y, uint8_t idx) {
+  // 4-bit mode: two pixels per byte
+  size_t index = y * fb_width_ + x;
+  size_t byte_index = index >> 1;
 
+  if (index & 1) {
+    // odd pixel => low nibble
+    framebuffer_[byte_index] = (framebuffer_[byte_index] & 0xF0) | (idx & 0x0F);
+  } else {
+    // even pixel => high nibble
+    framebuffer_[byte_index] = (framebuffer_[byte_index] & 0x0F) | (idx << 4);
+  }
+}
+void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
+  M5.Display.startWrite();
 
+  for (int y = 0; y < fb_height_; y++) {
+    for (int x = 0; x < fb_width_; x++) {
+
+      size_t index = y * fb_width_ + x;
+      size_t byte_index = index >> 1;
+
+      uint8_t byte = framebuffer_[byte_index];
+      uint8_t pix4 = (index & 1) ? (byte & 0x0F) : (byte >> 4);
+
+      // Push grayscale pixel directly
+      M5.Display.writePixel(x, y, pix4);
+    }
+  }
+
+  M5.Display.endWrite();
+}
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
 
