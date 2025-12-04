@@ -1,4 +1,4 @@
-#include "lvglaidirect.h"
+#include "lvgaidirect.h"
 
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
