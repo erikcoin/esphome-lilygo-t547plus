@@ -13,7 +13,7 @@ void M5PaperS3Display::setup() {
 
   // prepare framebuffer: 4-bit grayscale (2 pixels per byte)
   int total_pixels = this->get_width() * this->get_height();
-  fb_.assign(total_pixels / 2, 0xFF);  // white background
+  fb_.assign(total_pixels, 0xFF);  // white background
 
   gfx_->init();
   gfx_->setEpdMode(epd_mode_t::epd_fast);  // faster refresh
