@@ -33,7 +33,15 @@ bool last_touch_pressed_{false};
   display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_BINARY; }
   int get_width_internal() override { return 540; }   // your panel width
   int get_height_internal() override { return 960; }  // your panel height
- protected:
+ 
+uint8_t* framebuffer_ = nullptr;   // 4-bit/pixel buffer in PSRAM
+int fb_width_ = 0;
+int fb_height_ = 0;
+
+void draw_pixel_internal_at(int x, int y, uint8_t idx);
+void flush_framebuffer_to_display();
+
+protected:
   // Canvas (LGFX sprite) allocated in setup
   lgfx::v1::LGFX_Sprite *canvas_{nullptr};
 
