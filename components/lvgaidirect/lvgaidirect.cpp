@@ -9,7 +9,7 @@ namespace esphome {
 namespace m5papers3_display_m5gfx {
 
 static const char *TAG = "m5papers3.display_m5gfx";
-
+uint8_t* linebuf_ = nullptr;
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
   // free canvas if created
   if (this->canvas_) {
@@ -32,6 +32,7 @@ M5.Display.setEpdMode(epd_mode_t::epd_quality);
   // Create framebuffer (4-bit grayscale => 2 pixels per byte)
   this->fb_width_  = this->get_width();
   this->fb_height_ = this->get_height();
+linebuf_ = (uint8_t*)heap_caps_malloc(fb_width_, MALLOC_CAP_8BIT);
 
   size_t fb_bytes = (fb_width_ * fb_height_) / 2;
 
@@ -194,13 +195,37 @@ void M5PaperS3DisplayM5GFX::draw_pixel_internal_at(int x, int y, uint8_t idx) {
   }
 }
 void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
-  const int w = fb_width_;
-  const int h = fb_height_;
+    const int w = fb_width_;
+    const int h = fb_height_;
 
-  // M5PaperS3 expects packed 4-bit pixels (2 pixels per byte)
-  // This pushes the whole frame in one shot (correct for M5GFX)
-  M5.Display.pushImage(0, 0, w, h, framebuffer_);
+    M5.Display.startWrite();
+
+    for (int y = 0; y < h; y++) {
+        // --- Convert one line from 4-bit → 8-bit grayscale ---
+        int fb_index = (y * w) >> 1;  // byte index in packed FB
+
+        for (int x = 0; x < w; x++) {
+            uint8_t byte = framebuffer_[fb_index];
+
+            uint8_t gray4;
+            if (x & 1) {
+                gray4 = byte & 0x0F;
+                fb_index++;
+            } else {
+                gray4 = byte >> 4;
+            }
+
+            // convert to full 0–255 range
+            linebuf_[x] = (gray4 * 255) / 15;
+        }
+
+        // push converted line
+        M5.Display.pushImage(0, y, w, 1, linebuf_);
+    }
+
+    M5.Display.endWrite();
 }
+
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
 
