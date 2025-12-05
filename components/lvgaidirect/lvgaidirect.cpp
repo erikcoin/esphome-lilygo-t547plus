@@ -65,6 +65,14 @@ bool isEnabled(void) const { return _imu != imu_none; }
   };
   indev_drv.user_data = this;
   lv_indev_drv_register(&indev_drv);
+
+    if (!M5.Imu.isEnabled()) {
+        ESP_LOGW(TAG, "IMU not enabled");
+    } else {
+        ESP_LOGI(TAG, "Gyro/Accelerator initialized.");
+    }
+
+
 }
 
 void M5PaperS3DisplayM5GFX::update() {
