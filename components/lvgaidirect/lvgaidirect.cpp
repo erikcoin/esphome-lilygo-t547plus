@@ -12,11 +12,11 @@ static const char *TAG = "m5papers3.display_m5gfx";
 uint8_t* linebuf_ = nullptr;
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
   // free canvas if created
-  if (this->canvas_) {
-    this->canvas_->deleteSprite();
-    delete this->canvas_;
-    this->canvas_ = nullptr;
-  }
+////  if (this->canvas_) {
+////    this->canvas_->deleteSprite();
+////    delete this->canvas_;
+ ////   this->canvas_ = nullptr;
+////  }
   // don't call M5.Display.display() here
 }
 
@@ -87,9 +87,6 @@ void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
   dirty_.store(true);
 }
 
-
-// convert esphome::Color to 4-bit grayscale palette index (0..15)
-// esphome::Color has r,g,b 0..255 accessors available via .red(), .green(), .blue()
 uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
   // sRGB luma approximation
   uint8_t r = c.red;
@@ -100,54 +97,6 @@ uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
   // map to 0..15 (0=black, 15=white)
   uint8_t idx = (uint8_t)((lum * 15 + 127) / 255);
   return idx & 0x0F;
-}
-
-void M5PaperS3DisplayM5GFX::ensure_canvas_created() {
-  if (this->canvas_) return;
-
-  // create LGFX sprite in PSRAM
-  auto &gfx = M5.Display; // reference to LovyanGFX device
-  lgfx::v1::LGFX_Sprite *s = new lgfx::v1::LGFX_Sprite(&gfx);
-  if (!s) {
-    ESP_LOGE(TAG, "Failed to new LGFX_Sprite");
-    return;
-  }
-
-  s->setPsram(true);           // allocate sprite buffer in PSRAM
-  s->setColorDepth(4);         // 4-bit palette indices
-  s->setRotation(0);
-  s->setPaletteGrayscale();    // setup palette 0..15 => grayscale
-
-  // Create sprite sized to panel width/height
-  const int w = this->get_width();
-  const int h = this->get_height();
-
-  ESP_LOGD(TAG, "Creating sprite %d x %d in PSRAM...", w, h);
-  bool ok = s->createSprite(w, h);
-  if (!ok) {
-    ESP_LOGE(TAG, "createSprite failed! Free PSRAM: %u", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    delete s;
-    return;
-  }
-
-  // store pointer
-  this->canvas_ = s;
-  ESP_LOGD(TAG, "Sprite created: %d x %d colorDepth=%d buf=%p",
-           this->canvas_->width(), this->canvas_->height(), this->canvas_->getColorDepth(), (void*) this->canvas_->getBuffer());
-}
-
-void M5PaperS3DisplayM5GFX::flush_canvas_to_display() {
-  if (!this->canvas_) return;
-  // push sprite content to M5.Display internal buffer
-  // pushSprite copies sprite -> device framebuffer
-  // It's implemented inside LovyanGFX and will do the correct conversion.
-  ESP_LOGD(TAG, "Pushing sprite to display (pushSprite)...");
-  this->canvas_->pushSprite(0, 0);
-
-  // Then tell EPD to update to what's in its internal framebuffer
-  ESP_LOGD(TAG, "Calling M5.Display.display() to refresh EPD...");
-  M5.Display.display();
-  ESP_LOGD(TAG, "Display refresh requested.");
 }
 
 void M5PaperS3DisplayM5GFX::poll_touch() {
@@ -224,19 +173,9 @@ void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
 
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
-
   M5.update();
   poll_touch();
  
- // static int64_t last_flush_time = 0;
- // const int FLUSH_COOLDOWN_MS = 1000;
- // int64_t now = esp_timer_get_time() / 1000;
- // if (this->dirty_.exchange(false)) {
- //   if (now - last_flush_time >= FLUSH_COOLDOWN_MS) {
- //     flush_canvas_to_display();
- //     last_flush_time = now;
- //   }
- // }
 }
 
 
