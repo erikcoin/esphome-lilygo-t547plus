@@ -25,6 +25,7 @@ void M5PaperS3DisplayM5GFX::setup() {
 
   // Init M5 hardware
   auto cfg = M5.config();
+  cfg.internal_imu = false;
   M5.begin(cfg);
   vTaskDelay(pdMS_TO_TICKS(100));
 M5.Display.setColorDepth(4);  // 4-bit grayscale
