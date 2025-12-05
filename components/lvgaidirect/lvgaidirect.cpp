@@ -37,7 +37,7 @@ linebuf_ = (uint8_t*)heap_caps_malloc(fb_width_, MALLOC_CAP_8BIT);
   size_t fb_bytes = (fb_width_ * fb_height_) / 2;
 
   this->framebuffer_ = (uint8_t*) heap_caps_malloc(fb_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-
+bool isEnabled(void) const { return _imu != imu_none; }
   if (!this->framebuffer_) {
     ESP_LOGE(TAG, "Failed to allocate framebuffer in PSRAM!");
     this->initialized_ = false;
