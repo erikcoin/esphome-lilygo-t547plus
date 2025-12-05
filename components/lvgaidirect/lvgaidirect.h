@@ -43,7 +43,7 @@ void flush_framebuffer_to_display();
 
 protected:
   // Canvas (LGFX sprite) allocated in setup
-  lgfx::v1::LGFX_Sprite *canvas_{nullptr};
+//  lgfx::v1::LGFX_Sprite *canvas_{nullptr};
 
   // State
   bool initialized_{false};  // true after setup succeeded
@@ -51,8 +51,8 @@ protected:
 
   // Helpers
   uint8_t color_to_gray4(const esphome::Color &c);
-  void ensure_canvas_created();
-  void flush_canvas_to_display();  // pushes sprite to M5.Display and calls display()
+//  void ensure_canvas_created();
+//  void flush_canvas_to_display();  // pushes sprite to M5.Display and calls display()
 };
 
 }  // namespace m5papers3_display_m5gfx
