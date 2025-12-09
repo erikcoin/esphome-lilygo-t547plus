@@ -14,7 +14,8 @@ class M5P3LightSleep : public Component {
   bool turn_off_display_{true};
   bool verbose_{false};
   uint32_t min_inactive_ms_{30000};
-
+uint32_t wake_every_ms_{0};
+void set_wake_every(uint32_t ms) { wake_every_ms_ = ms; }
   uint32_t last_activity_{0};
   Trigger<> *on_wake_trigger_ = new Trigger<>();
 
@@ -50,33 +51,42 @@ class M5P3LightSleep : public Component {
     }
   }
 
-  void enter_sleep_() {
-    if (verbose_)
-      ESP_LOGI("m5p3_light_sleep", "Entering light sleep...");
+void enter_sleep_() {
+  if (verbose_)
+    ESP_LOGI("m5p3_light_sleep", "Entering light sleep...");
 
-    if (turn_off_display_) {
-      M5.Display.sleep();
-    }
-
-    M5.Power.setLed(255);
-
-    if (wake_on_touch_) {
-      gpio_wakeup_enable((gpio_num_t)48, GPIO_INTR_LOW_LEVEL);
-      esp_sleep_enable_gpio_wakeup();
-    }
-
-    esp_light_sleep_start();
-
-    gpio_wakeup_disable((gpio_num_t)48);
-
-    if (verbose_)
-      ESP_LOGI("m5p3_light_sleep", "Woke up!");
-
-    M5.Power.setLed(0);
-    M5.Display.wakeup();
-
-    on_wake_trigger_->trigger();
+  if (turn_off_display_) {
+    M5.Display.sleep();
   }
+
+  M5.Power.setLed(255);
+
+  // --- TOUCH WAKE ---
+  if (wake_on_touch_) {
+    gpio_wakeup_enable((gpio_num_t)48, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+  }
+
+  // --- TIMER WAKE ---
+  if (wake_every_ms_ > 0) {
+    esp_sleep_enable_timer_wakeup((uint64_t)wake_every_ms_ * 1000ULL);
+  }
+
+  esp_light_sleep_start();
+
+  // Cleanup wake sources
+  gpio_wakeup_disable((gpio_num_t)48);
+  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+
+  M5.Power.setLed(0);
+  M5.Display.wakeup();
+
+  if (verbose_)
+    ESP_LOGI("m5p3_light_sleep", "Wake event fired.");
+
+  on_wake_trigger_->trigger();
+}
+
 
   // Action callable from YAML
   void sleep_now() { enter_sleep_(); }
