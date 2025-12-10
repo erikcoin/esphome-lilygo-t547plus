@@ -6,7 +6,7 @@ namespace lightsleep {
 
 void LightSleepComponent::setup() {
   M5.begin();
-  last_activity_ = millis();
+  last_activity_ = esphome::millis();
   last_wake_timer_ = millis();
 }
 
