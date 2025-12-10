@@ -63,14 +63,25 @@ void LightSleepComponent::enter_light_sleep_() {
     ESP_LOGI(TAG, "Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
     esp_sleep_enable_timer_wakeup(us);
   }
-
+// --- Fix for long timer wakes ---
+if (WiFi.isConnected()) {
+    ESP_LOGI(TAG, "Disabling WiFi for real light sleep");
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+    // allow modem to shut down
+    vTaskDelay(pdMS_TO_TICKS(50));
+}
   ESP_LOGI(TAG, "Entering light sleep now...");
   esp_light_sleep_start();
-// Reset inactivity timers on wake because millis() jumps backward
-last_activity_ = esp_timer_get_time() / 1000ULL;
-last_wake_timer_ = last_activity_;
-  
-  // Execution resumes here after wake
+   // Execution resumes here after wake
+  // Reset inactivity timers on wake because millis() jumps backward
+     last_activity_ = esp_timer_get_time() / 1000ULL;
+     last_wake_timer_ = last_activity_;
+  // Restore WiFi if needed
+     WiFi.mode(WIFI_STA);
+     WiFi.begin();
+
+ 
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
   switch (cause) {
     case ESP_SLEEP_WAKEUP_TIMER:
