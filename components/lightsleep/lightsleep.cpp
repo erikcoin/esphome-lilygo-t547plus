@@ -17,7 +17,7 @@ void LightSleepComponent::loop() {
   // Trigger sleep if inactive too long
   if (min_inactive_time_ > 0 && (now - last_activity_) > min_inactive_time_) {
     enter_light_sleep_();
-    last_activity_ = millis();
+    last_activity_ = lgfx::v1::millis();
     last_wake_timer_ = lgfx::v1::millis();
   }
 
