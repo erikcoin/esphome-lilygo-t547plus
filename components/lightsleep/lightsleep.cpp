@@ -3,7 +3,7 @@
 
 namespace esphome {
 namespace lightsleep {
-
+static const char *TAG = "sleepp";
 void LightSleepComponent::setup() {
   M5.begin();
   last_activity_ = lgfx::v1::millis();
@@ -41,7 +41,7 @@ void LightSleepComponent::enter_light_sleep_() {
   if (wake_every_ > 0) {
     // esp_sleep_enable_timer_wakeup expects microseconds
     uint64_t us = (uint64_t)wake_every_ * 1000ULL;
-    ESP_LOGI(erik,"Enabling timer wakeup in" );
+    ESP_LOGI(TAG, "enabletimerwakeup up by TIMER");
     esp_sleep_enable_timer_wakeup(us);
   }
 
