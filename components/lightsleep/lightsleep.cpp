@@ -5,6 +5,28 @@ namespace esphome {
 namespace lightsleep {
 
 static const char *TAG = "lightsleep";
+void LightSleepComponent::setup() {
+  // Initialize timers
+  last_activity_ = millis();
+  last_wake_timer_ = millis();
+}
+
+void LightSleepComponent::loop() {
+  uint32_t now = millis();
+
+  // Trigger sleep if inactive too long
+  if (min_inactive_time_ > 0 && (now - last_activity_) > min_inactive_time_) {
+    enter_light_sleep_();
+    last_activity_ = millis();
+    last_wake_timer_ = millis();
+  }
+
+  // Trigger periodic sleep if configured
+  if (wake_every_ > 0 && (now - last_wake_timer_) >= wake_every_) {
+    enter_light_sleep_();
+    last_wake_timer_ = millis();
+  }
+}
 
 void LightSleepComponent::enter_light_sleep_() {
   ESP_LOGI(TAG, "Preparing to enter light sleep (wake_on_touch=%d, turn_off_display=%d, wake_every_ms=%u)",
