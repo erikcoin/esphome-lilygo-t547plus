@@ -38,6 +38,12 @@ void LightSleepComponent::enter_light_sleep_() {
   if (turn_off_display_) {
     M5.Display.sleep();
   }
+  if (wake_every_ > 0) {
+    // esp_sleep_enable_timer_wakeup expects microseconds
+    uint64_t us = (uint64_t)wake_every_ * 1000ULL;
+    ESP_LOGI(TAG, "Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
+    esp_sleep_enable_timer_wakeup(us);
+  }
 
   if (wake_on_touch_ && wakeup_pin_ >= 0) {
     gpio_wakeup_enable((gpio_num_t) wakeup_pin_, GPIO_INTR_LOW_LEVEL);
