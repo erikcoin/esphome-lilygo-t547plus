@@ -15,7 +15,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(LightSleepComponent),
 
     cv.Optional(CONF_WAKEUP_PIN): cv.int_,
-    cv.Optional(CONF_WAKEUP_MINUTES, default=0): cv.nonnegative_int,
+    cv.Optional(CONF_WAKEUP_MINUTES, default=0): cv.All(cv.int_, cv.Range(min=0)),
 })
 
 def to_code(config):
