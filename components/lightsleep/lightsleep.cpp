@@ -41,7 +41,7 @@ void LightSleepComponent::enter_light_sleep_() {
   if (wake_every_ > 0) {
     // esp_sleep_enable_timer_wakeup expects microseconds
     uint64_t us = (uint64_t)wake_every_ * 1000ULL;
-    ESP_LOGI(TAG, "Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
+    ESP_LOGI("Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
     esp_sleep_enable_timer_wakeup(us);
   }
 
