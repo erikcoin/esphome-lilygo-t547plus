@@ -7,24 +7,24 @@ namespace lightsleep {
 static const char *TAG = "lightsleep";
 void LightSleepComponent::setup() {
   // Initialize timers
-  last_activity_ = millis();
-  last_wake_timer_ = millis();
+  last_activity_ = lgfx::v1::millis();
+  last_wake_timer_ = lgfx::v1::millis();
 }
 
 void LightSleepComponent::loop() {
-  uint32_t now = millis();
+  uint32_t now = lgfx::v1::millis();
 
   // Trigger sleep if inactive too long
   if (min_inactive_time_ > 0 && (now - last_activity_) > min_inactive_time_) {
     enter_light_sleep_();
     last_activity_ = millis();
-    last_wake_timer_ = millis();
+    last_wake_timer_ = lgfx::v1::millis();
   }
 
   // Trigger periodic sleep if configured
   if (wake_every_ > 0 && (now - last_wake_timer_) >= wake_every_) {
     enter_light_sleep_();
-    last_wake_timer_ = millis();
+    last_wake_timer_ = lgfx::v1::millis();
   }
 }
 
