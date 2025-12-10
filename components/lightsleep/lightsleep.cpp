@@ -7,7 +7,7 @@ namespace lightsleep {
 void LightSleepComponent::setup() {
   M5.begin();
   last_activity_ = lgfx::v1::millis();
-  last_wake_timer_ = millis();
+  last_wake_timer_ = lgfx::v1::millis();
 }
 
 void LightSleepComponent::loop() {
@@ -15,10 +15,10 @@ void LightSleepComponent::loop() {
 
   // Check for activity (touch)
   if (M5.Touch.isEnabled() && M5.Touch.getCount() > 0) {
-    last_activity_ = millis();
+    last_activity_ = lgfx::v1::millis();
   }
 
-  const uint32_t now = millis();
+  const uint32_t now = lgfx::v1::millis();
 
   // 1️⃣ Periodic wake-up timer
   if (wake_every_ > 0 && (now - last_wake_timer_) >= wake_every_) {
