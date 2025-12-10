@@ -45,7 +45,7 @@ void LightSleepComponent::enter_light_sleep_() {
   }
 
   // Clear previously configured wake sources to start fresh
-  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+  //esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
   // Note: there is no esp_sleep_disable_wakeup_source for GPIO specifically on older IDs,
   // but we will explicitly disable gpio wake after waking.
 
@@ -87,7 +87,7 @@ void LightSleepComponent::enter_light_sleep_() {
     gpio_wakeup_disable((gpio_num_t)wakeup_pin_);
   }
   // Disable timer wake to avoid lingering
-  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+ // esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
 
   // Restore display if needed
   if (turn_off_display_) {
