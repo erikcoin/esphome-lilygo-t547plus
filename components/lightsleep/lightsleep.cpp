@@ -66,7 +66,10 @@ void LightSleepComponent::enter_light_sleep_() {
 
   ESP_LOGI(TAG, "Entering light sleep now...");
   esp_light_sleep_start();
-
+// Reset inactivity timers on wake because millis() jumps backward
+last_activity_ = esp_timer_get_time() / 1000ULL;
+last_wake_timer_ = last_activity_;
+  
   // Execution resumes here after wake
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
   switch (cause) {
