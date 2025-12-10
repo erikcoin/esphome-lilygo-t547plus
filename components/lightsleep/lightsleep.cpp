@@ -1,4 +1,5 @@
 #include "lightsleep.h"
+#include "esphome/core/helpers.h"
 
 namespace esphome {
 namespace lightsleep {
