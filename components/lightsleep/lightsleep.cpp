@@ -63,18 +63,6 @@ void LightSleepComponent::enter_light_sleep_() {
     ESP_LOGI(TAG, "Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
     esp_sleep_enable_timer_wakeup(us);
   }
-// --- Fix for long timer wakes ---
-    wifi_mode_t mode;
-    esp_wifi_get_mode(&mode);
-    bool wifi_active = (mode != WIFI_MODE_NULL);
-
-if (wifi_active) {
-    ESP_LOGI("lightsleep", "Disabling WiFi before sleep");
-    esp_wifi_stop();   // stop WiFi driver
-    esp_wifi_deinit(); // fully power it down
-}
-    // allow modem to shut down
-    vTaskDelay(pdMS_TO_TICKS(50));
 
   ESP_LOGI(TAG, "Entering light sleep now...");
   esp_light_sleep_start();
@@ -82,13 +70,7 @@ if (wifi_active) {
   // Reset inactivity timers on wake because millis() jumps backward
      last_activity_ = esp_timer_get_time() / 1000ULL;
      last_wake_timer_ = last_activity_;
-  // Restore WiFi if needed
-//ESP_LOGI("lightsleep", "Re-enabling WiFi after wake");
-//esp_wifi_init(&cfg);   // you must re-init with your cfg
-//esp_wifi_set_mode(WIFI_MODE_STA);
-//esp_wifi_start();
 
- 
   esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
   switch (cause) {
     case ESP_SLEEP_WAKEUP_TIMER:
