@@ -1,5 +1,8 @@
 #include "lightsleep.h"
 #include "esp_sleep.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_log.h
 
 namespace esphome {
 namespace lightsleep {
@@ -64,9 +67,33 @@ void LightSleepComponent::enter_light_sleep_() {
     esp_sleep_enable_timer_wakeup(us);
   }
 
+// Shut down WiFi safely before sleep (IDF API)
+// ---------------------------------------------
+wifi_mode_t current_mode;
+esp_wifi_get_mode(&current_mode);
+
+if (current_mode != WIFI_MODE_NULL) {
+  ESP_LOGI(TAG, "Stopping WiFi before sleep");
+  esp_wifi_stop();         // stops STA/AP
+  esp_wifi_set_mode(WIFI_MODE_NULL);
+  // tiny delay to settle
+  vTaskDelay(pdMS_TO_TICKS(50));
+}
+  
   ESP_LOGI(TAG, "Entering light sleep now...");
   esp_light_sleep_start();
    // Execution resumes here after wake
+
+  // Restore WiFi after wake (IDF API)
+// ---------------------------------------------
+ESP_LOGI(TAG, "Restarting WiFi after wake");
+
+esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
+esp_wifi_start();                   // bring WiFi up
+
+// Let ESPHome reconnect the network
+vTaskDelay(pdMS_TO_TICKS(200));
+  
   // Reset inactivity timers on wake because millis() jumps backward
      last_activity_ = esp_timer_get_time() / 1000ULL;
      last_wake_timer_ = last_activity_;
