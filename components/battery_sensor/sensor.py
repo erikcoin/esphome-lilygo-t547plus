@@ -26,3 +26,5 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await sensor.register_sensor(var, config)
+    if CONF_UPDATE_INTERVAL in config:
+        cg.add(var.set_update_interval(config[CONF_UPDATE_INTERVAL]))
