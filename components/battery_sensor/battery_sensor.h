@@ -9,7 +9,7 @@ namespace battery_sensor  {
 
 class MyBatterySensor : public sensor::Sensor, public PollingComponent {
  public:
-  MyBatterySensor() : PollingComponent(60000) {}  // elke 60s updaten
+  MyBatterySensor() : PollingComponent(0) {}  // elke 60s updaten
 
   void setup() override {
     // Zorg dat M5 al geïnitialiseerd is, dus M5.begin() moet al elders zijn aangeroepen
