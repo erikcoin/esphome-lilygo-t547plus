@@ -182,7 +182,7 @@ void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
 
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
-  vTaskDelay(pdMS_TO_TICKS(500))
+  vTaskDelay(pdMS_TO_TICKS(500));
   M5.update();
   poll_touch();
  
