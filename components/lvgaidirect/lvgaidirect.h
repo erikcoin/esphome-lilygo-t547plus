@@ -40,7 +40,10 @@ int fb_height_ = 0;
 
 void draw_pixel_internal_at(int x, int y, uint8_t idx);
 void flush_framebuffer_to_display();
-
+uint32_t sleep_duration_ms_{0};
+gpio_num_t touch_gpio_{GPIO_NUM_NC};
+bool enable_touch_wakeup_{false};
+int64_t last_activity_{0};
 protected:
   // Canvas (LGFX sprite) allocated in setup
 //  lgfx::v1::LGFX_Sprite *canvas_{nullptr};
