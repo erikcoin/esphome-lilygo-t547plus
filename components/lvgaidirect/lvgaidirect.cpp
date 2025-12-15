@@ -66,7 +66,7 @@ linebuf_ = (uint8_t*)heap_caps_malloc(fb_width_, MALLOC_CAP_8BIT);
   };
   indev_drv.user_data = this;
   lv_indev_drv_register(&indev_drv);
-
+last_activity_ = esp_timer_get_time() / 1000;  // ms
     if (!M5.Imu.isEnabled()) {
         ESP_LOGW(TAG, "IMU not enabled");
     } else {
@@ -124,8 +124,8 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     this->last_touch_x_ = p.x;
     this->last_touch_y_ = p.y;
     this->last_touch_pressed_ = p.isPressed();
-
     last_touch_time = now;
+    last_activity_ = now;   // reset activity timer
     }
    
   } else {
@@ -182,10 +182,31 @@ void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
 
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
-  vTaskDelay(pdMS_TO_TICKS(500));
+ // vTaskDelay(pdMS_TO_TICKS(500));
   M5.update();
   poll_touch();
- 
+
+  int64_t now = esp_timer_get_time() / 1000;
+  if (sleep_duration_ms_ > 0 && (now - last_activity_) > sleep_duration_ms_) {
+    ESP_LOGI(TAG, "Entering light sleep for %d ms", sleep_duration_ms_);
+
+    // Timer wakeup
+    esp_sleep_enable_timer_wakeup(sleep_duration_ms_ * 1000ULL);
+
+    // Touch wakeup
+    if (enable_touch_wakeup_ && touch_gpio_ != GPIO_NUM_NC) {
+      esp_sleep_enable_ext0_wakeup(touch_gpio_, 0); // wake on low
+    }
+
+    // Flush display before sleep
+    flush_framebuffer_to_display();
+
+    esp_light_sleep_start();
+
+    ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
+   // this->setup();  // re‑init display + touch
+    last_activity_ = esp_timer_get_time() / 1000;
+  }
 }
 
 
