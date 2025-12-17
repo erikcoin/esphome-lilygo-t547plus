@@ -191,11 +191,11 @@ void M5PaperS3DisplayM5GFX::loop() {
   poll_touch();
   ESP_LOGI(TAG, "testing light sleep for %d ms last activity %e ", sleep_duration_ms,last_activity_);
   int64_t now = esp_timer_get_time() / 1000;
-  if (sleep_duration_ms_ > 0 && (now - last_activity_) > sleep_duration_ms_) {
-    ESP_LOGI(TAG, "Entering light sleep for %d ms", sleep_duration_ms_);
+  if (sleep_duration_ms > 0 && (now - last_activity_) > sleep_duration_ms) {
+    ESP_LOGI(TAG, "Entering light sleep for %d ms", sleep_duration_ms);
 
     // Timer wakeup
-    esp_sleep_enable_timer_wakeup(sleep_duration_ms_ * 1000ULL);
+    esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
 
     // Touch wakeup
     if (enable_touch_wakeup_ && touch_gpio_ != GPIO_NUM_NC) {
