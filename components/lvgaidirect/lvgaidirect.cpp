@@ -189,7 +189,7 @@ void M5PaperS3DisplayM5GFX::loop() {
  // vTaskDelay(pdMS_TO_TICKS(500));
   M5.update();
   poll_touch();
-  ESP_LOGI(TAG, "testing light sleep for %d ms last activity %e ", sleep_duration_ms_,last_activity_);
+  ESP_LOGI(TAG, "testing light sleep for %d ms last activity %e ", sleep_duration_,last_activity_);
   int64_t now = esp_timer_get_time() / 1000;
   if (sleep_duration_ms_ > 0 && (now - last_activity_) > sleep_duration_ms_) {
     ESP_LOGI(TAG, "Entering light sleep for %d ms", sleep_duration_ms_);
