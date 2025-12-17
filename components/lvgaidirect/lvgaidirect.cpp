@@ -120,6 +120,9 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     // Get the first touch point
     auto p = M5.Touch.getDetail(0);
     int64_t now = esp_timer_get_time() / 1000;  // microseconds → ms
+        // Always reset activity timer on any touch
+    last_activity_ = now;
+    
     if (now - last_touch_time > DEBOUNCE_MS) {
     ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
     this->last_touch_x_ = p.x;
