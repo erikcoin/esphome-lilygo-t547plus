@@ -67,5 +67,5 @@ async def to_code(config):
     #if config[CONF_SLEEP_DURATION] > 0:
     cg.add(var.set_sleep_duration(config[CONF_SLEEP_DURATION]))
     cg.add(var.set_enable_touch_wakeup(config[CONF_TOUCH_WAKEUP]))
-    if config[CONF_TOUCH_GPIO] >= 0:
-        cg.add(var.set_touch_gpio(config[CONF_TOUCH_GPIO]))
+    #if config[CONF_TOUCH_GPIO] >= 0:
+    cg.add(var.set_touch_gpio(config[CONF_TOUCH_GPIO]))
