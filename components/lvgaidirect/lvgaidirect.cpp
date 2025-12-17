@@ -4,6 +4,7 @@
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
 //#include <lgfx/v1.h>         // LGFX Sprite type
 #include <atomic>
+#include "esp_sleep.h"
 
 namespace esphome {
 namespace m5papers3_display_m5gfx {
