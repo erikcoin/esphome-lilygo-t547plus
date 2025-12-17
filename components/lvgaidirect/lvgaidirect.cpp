@@ -198,8 +198,8 @@ void M5PaperS3DisplayM5GFX::loop() {
     esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
 
     // Touch wakeup
-    if (enable_touch_wakeup_ && touch_gpio_ != GPIO_NUM_NC) {
-      esp_sleep_enable_ext0_wakeup(touch_gpio_, 0); // wake on low
+    if (enable_touch_wakeup && touch_gpio != GPIO_NUM_NC) {
+      esp_sleep_enable_ext0_wakeup(touch_gpio, 0); // wake on low
     }
 
     // Flush display before sleep
