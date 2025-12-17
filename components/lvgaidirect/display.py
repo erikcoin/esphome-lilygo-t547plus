@@ -22,9 +22,9 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
     "M5PaperS3DisplayM5GFX", cg.Component, display.Display
 )
 # --- New constants for sleep options ---
-#CONF_SLEEP_DURATION = "sleep_duration"
-#CONF_TOUCH_WAKEUP = "touch_wakeup"
-#CONF_TOUCH_GPIO = "touch_gpio"
+sleep_duration = "sleep_duration"
+touch_wakeup = "touch_wakeup"
+touch_gpio = "touch_gpio"
 
 BUTTON_SCHEMA = cv.Schema({
 
