@@ -43,9 +43,9 @@ int fb_height_ = 0;
 
 void draw_pixel_internal_at(int x, int y, uint8_t idx);
 void flush_framebuffer_to_display();
-uint32_t sleep_duration_ms_{0};
-gpio_num_t touch_gpio_{GPIO_NUM_NC};
-bool enable_touch_wakeup_{false};
+//uint32_t sleep_duration_ms_{0};
+//gpio_num_t touch_gpio_{GPIO_NUM_NC};
+//bool enable_touch_wakeup_{false};
 int64_t last_activity_{0};
   void set_sleep_duration(uint32_t ms) { sleep_duration_ms = ms; };
   void set_touch_gpio(int gpio) { touch_gpio = (gpio_num_t) gpio; };
