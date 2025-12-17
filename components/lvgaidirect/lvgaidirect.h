@@ -44,6 +44,9 @@ uint32_t sleep_duration_ms_{0};
 gpio_num_t touch_gpio_{GPIO_NUM_NC};
 bool enable_touch_wakeup_{false};
 int64_t last_activity_{0};
+  void set_sleep_duration(uint32_t ms) { sleep_duration_ms = ms; };
+  void set_touch_gpio(int gpio) { touch_gpio = (gpio_num_t) gpio; };
+  void set_enable_touch_wakeup(bool en) { enable_touch_wakeup = en; };
 protected:
   // Canvas (LGFX sprite) allocated in setup
 //  lgfx::v1::LGFX_Sprite *canvas_{nullptr};
