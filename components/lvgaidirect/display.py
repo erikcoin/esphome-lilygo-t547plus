@@ -22,9 +22,9 @@ M5PaperS3DisplayM5GFX = m5papers3_display_m5gfx_ns.class_(
     "M5PaperS3DisplayM5GFX", cg.Component, display.Display
 )
 # --- New constants for sleep options ---
-sleep_duration = "sleep_duration"
-touch_wakeup = "touch_wakeup"
-touch_gpio = "touch_gpio"
+CONF_SLEEP_DURATION = "sleep_duration"
+CONF_TOUCH_WAKEUP = "touch_wakeup"
+CONF_TOUCH_GPIO = "touch_gpio"
 
 BUTTON_SCHEMA = cv.Schema({
 
@@ -38,9 +38,9 @@ CONFIG_SCHEMA = cv.All(
         {
             cv.GenerateID(): cv.declare_id(M5PaperS3DisplayM5GFX),
             # --- New sleep options ---
-            cv.Optional(sleep_duration, default=0): cv.int_,
-            cv.Optional(touch_wakeup, default=False): cv.boolean,
-            cv.Optional(touch_gpio, default=-1): cv.int_,
+            cv.Optional(CONF_SLEEP_DURATION, default=0): cv.int_,
+            cv.Optional(CONF_TOUCH_WAKEUP, default=False): cv.boolean,
+            cv.Optional(CONF_TOUCH_GPIO, default=-1): cv.int_,
         }
     ).extend(cv.COMPONENT_SCHEMA),
 )
@@ -64,8 +64,8 @@ async def to_code(config):
         cg.add_define("USE_M5PAPER_S3_M5GFX")
 
     # --- Pass sleep options to C++ ---
-    if config[sleep_duration] > 0:
-        cg.add(var.set_sleep_duration(config[sleep_duration]))
-    cg.add(var.set_enable_touch_wakeup(config[touch_wakeup]))
-    if config[touch_gpio] >= 0:
-        cg.add(var.set_touch_gpio(config[touch_gpio]))
+    if config[CONF_SLEEP_DURATION] > 0:
+        cg.add(var.set_sleep_duration(config[CONF_SLEEP_DURATION]))
+    cg.add(var.set_enable_touch_wakeup(config[CONF_TOUCH_WAKEUP]))
+    if config[CONF_TOUCH_GPIO] >= 0:
+        cg.add(var.set_touch_gpio(config[CONF_TOUCH_GPIO]))
