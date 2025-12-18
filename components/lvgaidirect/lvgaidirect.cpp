@@ -1,5 +1,7 @@
 #include "lvgaidirect.h"
 #include "esphome/components/api/api_server.h"
+#include "esphome/core/network_util.h"
+#include "esphome/core/helpers.h"
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
 //#include <lgfx/v1.h>         // LGFX Sprite type
@@ -214,6 +216,12 @@ void M5PaperS3DisplayM5GFX::loop() {
     esp_light_sleep_start();
 
     ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
+
+    // Wait until WiFi is connected
+while (!network::is_connected()) {
+  ESP_LOGD(TAG, "WiFi not ready yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
 while (!esphome::api::global_api_server->is_connected()) {
