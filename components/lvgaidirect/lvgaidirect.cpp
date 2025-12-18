@@ -79,17 +79,7 @@ last_activity_ = esp_timer_get_time() / 1000;  // ms
         ESP_LOGI(TAG, "Gyro/Accelerator initialized.");
     }
 
-  auto *wifi = esphome::wifi::global_wifi_component;
-  wifi->add_on_connect_callback([this]() {
-    ESP_LOGI(TAG, "WiFi connected");
-    wifi_ready_ = true;
-  });
-
-  auto *api = esphome::api::global_api_server;
-  api->add_on_connect_callback([this]() {
-    ESP_LOGI(TAG, "API connected");
-    api_ready_ = true;
-  });
+ 
 }
 
 void M5PaperS3DisplayM5GFX::update() {
