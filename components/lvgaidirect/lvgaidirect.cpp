@@ -1,6 +1,6 @@
 #include "lvgaidirect.h"
 #include "esphome/components/api/api_server.h"
-#include "esphome/core/network_util.h"
+
 #include "esphome/core/helpers.h"
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
