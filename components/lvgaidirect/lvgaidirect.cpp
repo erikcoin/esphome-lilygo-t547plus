@@ -75,7 +75,16 @@ last_activity_ = esp_timer_get_time() / 1000;  // ms
     } else {
         ESP_LOGI(TAG, "Gyro/Accelerator initialized.");
     }
-
+while (!network::is_connected()) {
+  ESP_LOGD(TAG, "WiFi not ready yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
+   // this->setup();  // re‑init display + touch
+    // Wait until WiFi is connected
+while (!esphome::api::global_api_server->is_connected()) {
+  ESP_LOGD(TAG, "API not connected yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
 
 }
 
