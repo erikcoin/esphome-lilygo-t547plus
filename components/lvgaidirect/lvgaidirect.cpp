@@ -215,6 +215,11 @@ void M5PaperS3DisplayM5GFX::loop() {
 
     ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
    // this->setup();  // re‑init display + touch
+    // Wait until WiFi is connected
+while (!network::is_connected()) {
+  ESP_LOGD(TAG, "WiFi not ready yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
     last_activity_ = esp_timer_get_time() / 1000;
   }
 }
