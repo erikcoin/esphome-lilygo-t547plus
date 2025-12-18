@@ -13,6 +13,9 @@ namespace m5papers3_display_m5gfx {
 
 static const char *TAG = "m5papers3.display_m5gfx";
 uint8_t* linebuf_ = nullptr;
+bool wifi_ready_ = false;
+bool api_ready_ = false;
+bool post_wakeup_ready_ = false;
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
   // free canvas if created
 ////  if (this->canvas_) {
@@ -76,7 +79,17 @@ last_activity_ = esp_timer_get_time() / 1000;  // ms
         ESP_LOGI(TAG, "Gyro/Accelerator initialized.");
     }
 
+  auto *wifi = esphome::wifi::global_wifi_component;
+  wifi->add_on_connect_callback([this]() {
+    ESP_LOGI(TAG, "WiFi connected");
+    wifi_ready_ = true;
+  });
 
+  auto *api = esphome::api::global_api_server;
+  api->add_on_connect_callback([this]() {
+    ESP_LOGI(TAG, "API connected");
+    api_ready_ = true;
+  });
 }
 
 void M5PaperS3DisplayM5GFX::update() {
@@ -194,6 +207,14 @@ void M5PaperS3DisplayM5GFX::loop() {
  // vTaskDelay(pdMS_TO_TICKS(500));
   M5.update();
   poll_touch();
+    if (!post_wakeup_ready_) {
+    if (wifi_ready_ && api_ready_) {
+      ESP_LOGI(TAG, "WiFi + API ready after wake");
+      post_wakeup_ready_ = true;
+    } else {
+      return;  // Let ESPHome breathe
+    }
+  }
   //ESP_LOGI(TAG, "testing light sleep for %d ms last activity %d and touch gpio is %d ", sleep_duration_ms,last_activity_,touch_gpio);
   int64_t now = esp_timer_get_time() / 1000;
   if (sleep_duration_ms > 0 && (now - last_activity_) > 45000 ) {
@@ -219,18 +240,14 @@ void M5PaperS3DisplayM5GFX::loop() {
     esp_light_sleep_start();
 
     ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
-
+wifi_ready_ = false;
+api_ready_ = false;
+post_wakeup_ready_ = false;
     // Wait until WiFi is connected
-while (!network::is_connected()) {
-  ESP_LOGD(TAG, "WiFi not ready yet, waiting...");
-  vTaskDelay(pdMS_TO_TICKS(500));
-}
+    esphome::wifi::global_wifi_component->is_connected()
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
-while (!esphome::api::global_api_server->is_connected()) {
-  ESP_LOGD(TAG, "API not connected yet, waiting...");
-  vTaskDelay(pdMS_TO_TICKS(500));
-}
+
     last_activity_ = esp_timer_get_time() / 1000;
   }
 }
