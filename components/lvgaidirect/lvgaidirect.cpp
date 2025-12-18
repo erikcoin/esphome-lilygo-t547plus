@@ -207,13 +207,33 @@ void M5PaperS3DisplayM5GFX::loop() {
  // vTaskDelay(pdMS_TO_TICKS(500));
   M5.update();
   poll_touch();
-    if (!post_wakeup_ready_) {
-    if (wifi_ready_ && api_ready_) {
-      ESP_LOGI(TAG, "WiFi + API ready after wake");
-      post_wakeup_ready_ = true;
+  // --- WiFi readiness ---
+  if (!wifi_ready_) {
+    auto *wifi = esphome::wifi::global_wifi_component;
+    if (wifi != nullptr && wifi->is_connected()) {
+      ESP_LOGI(TAG, "WiFi connected");
+      wifi_ready_ = true;
     } else {
-      return;  // Let ESPHome breathe
+      return;  // let ESPHome run
     }
+  }
+
+  // --- API readiness ---
+  if (!api_ready_) {
+    auto *api = esphome::api::global_api_server;
+    if (api != nullptr && api->is_connected()) {
+      ESP_LOGI(TAG, "API connected");
+      api_ready_ = true;
+    } else {
+      return;
+    }
+  }
+  // --- Fully ready ---
+  if (!post_wakeup_ready_) {
+    ESP_LOGI(TAG, "System fully ready after wake");
+    post_wakeup_ready_ = true;
+  }
+  
   }
   //ESP_LOGI(TAG, "testing light sleep for %d ms last activity %d and touch gpio is %d ", sleep_duration_ms,last_activity_,touch_gpio);
   int64_t now = esp_timer_get_time() / 1000;
@@ -244,7 +264,7 @@ wifi_ready_ = false;
 api_ready_ = false;
 post_wakeup_ready_ = false;
     // Wait until WiFi is connected
-    esphome::wifi::global_wifi_component->is_connected()
+  //  esphome::wifi::global_wifi_component->is_connected()
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
 
