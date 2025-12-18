@@ -88,10 +88,7 @@ void M5PaperS3DisplayM5GFX::update() {
 
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
-while (!esphome::api::global_api_server->is_connected()) {
-  ESP_LOGD(TAG, "API not connected yet, waiting...");
-  vTaskDelay(pdMS_TO_TICKS(500));
-}
+
   poll_touch();
 }
 
