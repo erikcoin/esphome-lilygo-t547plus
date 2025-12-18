@@ -114,7 +114,16 @@ uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
   const int DEBOUNCE_MS = 850;  // adjust to taste
-
+while (!network::is_connected()) {
+  ESP_LOGD(TAG, "WiFi not ready yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
+   // this->setup();  // re‑init display + touch
+    // Wait until WiFi is connected
+while (!esphome::api::global_api_server->is_connected()) {
+  ESP_LOGD(TAG, "API not connected yet, waiting...");
+  vTaskDelay(pdMS_TO_TICKS(500));
+}
   if (!M5.Touch.isEnabled()) return;
   // Check how many touch points are active
   uint8_t count = M5.Touch.getCount();
