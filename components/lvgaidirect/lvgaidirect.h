@@ -19,6 +19,10 @@ namespace m5papers3_display_m5gfx {
 
 class M5PaperS3DisplayM5GFX : public esphome::display::Display {
  public:
+  float get_setup_priority() const override {
+    return esphome::setup_priority::LATE;
+  }
+
   void setup() override;
   void update() override;
   ~M5PaperS3DisplayM5GFX(); //override;
