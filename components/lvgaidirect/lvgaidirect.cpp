@@ -140,7 +140,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
   const int DEBOUNCE_MS = 850;  // adjust to taste
 
   if (!M5.Touch.isEnabled()) return;
-  if (esphome::api::global_api_server->is_connected()) {
+ // if (esphome::api::global_api_server->is_connected()) {
   // Check how many touch points are active
   uint8_t count = M5.Touch.getCount();
   if (count > 0) {
@@ -159,7 +159,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     last_touch_time = now;
     last_activity_ = now;   // reset activity timer
     }
-    }
+    //}
   } else {
     
     last_touch_pressed_ = false;
