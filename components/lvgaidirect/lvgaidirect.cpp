@@ -101,7 +101,7 @@ void M5PaperS3DisplayM5GFX::update() {
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
 
-  poll_touch();
+  //poll_touch();
 }
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
@@ -242,7 +242,7 @@ void M5PaperS3DisplayM5GFX::loop() {
   }
   
   M5.update();
-  poll_touch();
+ // poll_touch();
   
   //ESP_LOGI(TAG, "testing light sleep for %d ms last activity %d and touch gpio is %d ", sleep_duration_ms,last_activity_,touch_gpio);
   int64_t now = esp_timer_get_time() / 1000;
