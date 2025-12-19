@@ -144,6 +144,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
   uint8_t count = M5.Touch.getCount();
   if (count > 0) {
     // Get the first touch point
+    if (esphome::api::global_api_server->is_connected()) {
     auto p = M5.Touch.getDetail(0);
     int64_t now = esp_timer_get_time() / 1000;  // microseconds → ms
         // Always reset activity timer on any touch
@@ -157,7 +158,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     last_touch_time = now;
     last_activity_ = now;   // reset activity timer
     }
-   
+    }
   } else {
     
     last_touch_pressed_ = false;
