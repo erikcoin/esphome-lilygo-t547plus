@@ -84,15 +84,15 @@ last_activity_ = esp_timer_get_time() / 1000;  // ms
 
 void M5PaperS3DisplayM5GFX::update() {
   if (!initialized_) return;
-  if (!api_ready_) {
-    auto *api = esphome::api::global_api_server;
-    if (api != nullptr && api->is_connected()) {
-      ESP_LOGI(TAG, "API connected");
-      api_ready_ = true;
-    } else {
-      return;
-    }
-  }
+//  if (!api_ready_) {
+//    auto *api = esphome::api::global_api_server;
+//    if (api != nullptr && api->is_connected()) {
+//      ESP_LOGI(TAG, "API connected");
+//      api_ready_ = true;
+//    } else {
+//      return;
+ //   }
+//  }
   if (esphome::api::global_api_server->is_connected()) {
   if (dirty_.exchange(false)) {
     flush_framebuffer_to_display();
