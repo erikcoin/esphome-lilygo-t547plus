@@ -242,7 +242,7 @@ void M5PaperS3DisplayM5GFX::loop() {
   }
   
   M5.update();
- // poll_touch();
+  poll_touch();
   
   //ESP_LOGI(TAG, "testing light sleep for %d ms last activity %d and touch gpio is %d ", sleep_duration_ms,last_activity_,touch_gpio);
   int64_t now = esp_timer_get_time() / 1000;
