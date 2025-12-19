@@ -269,14 +269,7 @@ void M5PaperS3DisplayM5GFX::loop() {
     esp_light_sleep_start();
 
     ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
-    // Pause LVGL
-lv_disp_t *disp = lv_disp_get_default();
-lv_disp_set_driver_data(disp, nullptr);  // or disable refresh temporarily
 
-// Wait for API
-while (!esphome::api::global_api_server->is_connected()) {
-  vTaskDelay(pdMS_TO_TICKS(500));
-}
 wifi_ready_ = false;
 api_ready_ = false;
 post_wakeup_ready_ = false;
