@@ -93,10 +93,11 @@ void M5PaperS3DisplayM5GFX::update() {
       return;
     }
   }
+  if (esphome::api::global_api_server->is_connected()) {
   if (dirty_.exchange(false)) {
     flush_framebuffer_to_display();
   }
-
+  }
    // this->setup();  // re‑init display + touch
     // Wait until WiFi is connected
 
