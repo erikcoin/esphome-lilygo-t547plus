@@ -63,8 +63,8 @@ linebuf_ = (uint8_t*)heap_caps_malloc(fb_width_, MALLOC_CAP_8BIT);
   // Touch registration (same as before)
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
-  lv_indev_t *indev_;
-  indev_ = lv_indev_drv_register(&indev_drv);
+  //lv_indev_t *indev_;
+  //indev_ = lv_indev_drv_register(&indev_drv);
   
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = [](lv_indev_drv_t *drv, lv_indev_data_t *data) {
