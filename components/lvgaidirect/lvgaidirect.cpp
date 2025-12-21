@@ -137,33 +137,38 @@ uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
 
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
-  const int DEBOUNCE_MS = 850;  // adjust to taste
+  const int DEBOUNCE_MS = 850;
 
   if (!M5.Touch.isEnabled()) return;
- // if (esphome::api::global_api_server->is_connected()) {
-  // Check how many touch points are active
-  uint8_t count = M5.Touch.getCount();
-  if (count > 0) {
-    // Get the first touch point
-    
-    auto p = M5.Touch.getDetail(0);
-    int64_t now = esp_timer_get_time() / 1000;  // microseconds → ms
-        // Always reset activity timer on any touch
-    last_activity_ = now;
-    
-    if (now - last_touch_time > DEBOUNCE_MS) {
-    ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
-    this->last_touch_x_ = p.x;
-    this->last_touch_y_ = p.y;
-    this->last_touch_pressed_ = p.isPressed();
-    last_touch_time = now;
-    last_activity_ = now;   // reset activity timer
-    }
-    //}
-  } else {
-    
-    last_touch_pressed_ = false;
 
+  uint8_t count = M5.Touch.getCount();
+  int64_t now = esp_timer_get_time() / 1000;  // µs → ms
+
+  if (count > 0) {
+    auto p = M5.Touch.getDetail(0);
+
+    // Always update activity timer
+    last_activity_ = now;
+
+    // --- Capture wake touch if LVGL input suppressed ---
+    if (suppress_lvgl_input_ && !pending_wake_touch_) {
+      pending_wake_touch_ = true;
+      pending_touch_x_ = p.x;
+      pending_touch_y_ = p.y;
+      ESP_LOGD(TAG, "Captured wake touch at (%d,%d)", p.x, p.y);
+    }
+
+    // Normal debounce + state update
+    if (now - last_touch_time > DEBOUNCE_MS) {
+      ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
+      last_touch_x_ = p.x;
+      last_touch_y_ = p.y;
+      last_touch_pressed_ = p.isPressed();
+      last_touch_time = now;
+    }
+
+  } else {
+    last_touch_pressed_ = false;
   }
 }
 
@@ -242,7 +247,26 @@ void M5PaperS3DisplayM5GFX::loop() {
     ESP_LOGI(TAG, "System fully ready after wake");
     post_wakeup_ready_ = true;
   }
-  
+    // --- Release LVGL suppression and replay wake touch ---
+  if (suppress_lvgl_input_) {
+    suppress_lvgl_input_ = false;
+    ESP_LOGI(TAG, "LVGL input enabled");
+
+    if (pending_wake_touch_) {
+      ESP_LOGI(TAG, "Replaying wake touch to LVGL");
+
+      // Inject press
+      last_touch_x_ = pending_touch_x_;
+      last_touch_y_ = pending_touch_y_;
+      last_touch_pressed_ = true;
+
+      lv_timer_handler();   // let LVGL process press
+
+      // Inject release
+      last_touch_pressed_ = false;
+      pending_wake_touch_ = false;
+    }
+  }
   M5.update();
   poll_touch();
   
@@ -267,7 +291,9 @@ void M5PaperS3DisplayM5GFX::loop() {
 
     // Flush display before sleep
     flush_framebuffer_to_display();
-
+    // Prepare for wake-touch capture
+    suppress_lvgl_input_ = true;
+    pending_wake_touch_ = false;
     esp_light_sleep_start();
 
     ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
