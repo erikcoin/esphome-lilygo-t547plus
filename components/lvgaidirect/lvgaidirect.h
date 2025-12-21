@@ -61,7 +61,7 @@ int64_t last_activity_{0};
   void set_enable_touch_wakeup(bool en) { enable_touch_wakeup = en; };
 
 bool suppress_lvgl_input_{false};
-
+lv_indev_t *indev_;
 bool pending_wake_touch_{false};
 int pending_touch_x_{0};
 int pending_touch_y_{0};
