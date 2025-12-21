@@ -59,6 +59,17 @@ int64_t last_activity_{0};
   void set_touch_gpio(int gpio) { touch_gpio = gpio; };
 //void set_wakeup_pin(int pin) { wakeup_pin_ = pin; }
   void set_enable_touch_wakeup(bool en) { enable_touch_wakeup = en; };
+
+bool suppress_lvgl_input_{false};
+
+bool pending_wake_touch_{false};
+int pending_touch_x_{0};
+int pending_touch_y_{0};
+
+uint64_t lvgl_input_enable_time_{0};
+static constexpr uint32_t LVGL_WAKE_GRACE_MS = 1200;
+
+
 protected:
   // Canvas (LGFX sprite) allocated in setup
 //  lgfx::v1::LGFX_Sprite *canvas_{nullptr};
