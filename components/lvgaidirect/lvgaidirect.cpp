@@ -105,15 +105,15 @@ void M5PaperS3DisplayM5GFX::update() {
 
 void M5PaperS3DisplayM5GFX::draw_pixel_at(int x, int y, esphome::Color color) {
   if (!initialized_) return;
-    if (!api_ready_) {
-    auto *api = esphome::api::global_api_server;
-    if (api != nullptr && api->is_connected()) {
-      ESP_LOGI(TAG, "API connected");
-      api_ready_ = true;
-    } else {
-      return;
-    }
-  }
+//    if (!api_ready_) {
+//    auto *api = esphome::api::global_api_server;
+//    if (api != nullptr && api->is_connected()) {
+//      ESP_LOGI(TAG, "API connected");
+//      api_ready_ = true;
+//    } else {
+//      return;
+//    }
+//  }
   if (x < 0 || y < 0 || x >= fb_width_ || y >= fb_height_) return;
 
   uint8_t idx = color_to_gray4(color);
