@@ -159,7 +159,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     last_activity_ = now;
 
     // --- Capture wake touch if LVGL input suppressed ---
-    if (suppress_lvgl_input_ && !pending_wake_touch_ && !api_ready_)) {
+    if (suppress_lvgl_input_ && !pending_wake_touch_ && !api_ready_) {
       pending_wake_touch_ = true;
       pending_touch_x_ = p.x;
       pending_touch_y_ = p.y;
