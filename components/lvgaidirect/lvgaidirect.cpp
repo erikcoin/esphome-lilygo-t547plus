@@ -159,7 +159,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
     last_activity_ = now;
 
     // --- Capture wake touch if LVGL input suppressed ---
-    if (suppress_lvgl_input_ && !pending_wake_touch_) {
+    if (suppress_lvgl_input_ && !pending_wake_touch_ && !api_ready_)) {
       pending_wake_touch_ = true;
       pending_touch_x_ = p.x;
       pending_touch_y_ = p.y;
@@ -227,103 +227,67 @@ void M5PaperS3DisplayM5GFX::flush_framebuffer_to_display() {
 
 void M5PaperS3DisplayM5GFX::loop() {
   if (!this->initialized_) return;
- // vTaskDelay(pdMS_TO_TICKS(500));
 
-  // --- WiFi readiness ---
+  // 1. Handle Connectivity first
   if (!wifi_ready_) {
     auto *wifi = esphome::wifi::global_wifi_component;
     if (wifi != nullptr && wifi->is_connected()) {
-      ESP_LOGI(TAG, "WiFi connected");
       wifi_ready_ = true;
-    } else {
-      return;  // let ESPHome run
-    }
+    } else { return; }
   }
 
-  // --- API readiness ---
   if (!api_ready_) {
     auto *api = esphome::api::global_api_server;
     if (api != nullptr && api->is_connected()) {
-      ESP_LOGI(TAG, "API connected");
       api_ready_ = true;
-    } else {
-      return;
-    }
+      // The API is finally back! Now we can allow the touch to be processed.
+    } else { return; }
   }
-  // --- Fully ready ---
-  if (!post_wakeup_ready_) {
-    ESP_LOGI(TAG, "System fully ready after wake");
-    post_wakeup_ready_ = true;
-  }
-    // --- Release LVGL suppression and replay wake touch ---
+
+  // 2. Replay Logic (Only runs once API is ready)
   if (suppress_lvgl_input_) {
-    suppress_lvgl_input_ = false;
-    ESP_LOGI(TAG, "LVGL input enabled");
-
     if (pending_wake_touch_) {
-      ESP_LOGI(TAG, "Replaying wake touch to LVGL");
-
-      // Inject press
+      ESP_LOGI(TAG, "Replaying wake touch to LVGL at (%d,%d)", pending_touch_x_, pending_touch_y_);
+      
+      // Set the coordinates for the input_read callback
       last_touch_x_ = pending_touch_x_;
       last_touch_y_ = pending_touch_y_;
+      
+      // Signal a press
       last_touch_pressed_ = true;
-
-      lv_timer_handler();   // let LVGL process press
-
-      // Inject release
+      // We don't call lv_timer_handler manually here; 
+      // we let the normal ESPHome LVGL component pick it up this frame.
+      
+      pending_wake_touch_ = false; 
+      // We keep suppress_lvgl_input_ = true for ONE more frame 
+      // to ensure the 'Release' is registered next.
+      return; 
+    } else {
+      // If we were suppressing and already replayed the press, 
+      // now we release and open the gates.
       last_touch_pressed_ = false;
-      lv_timer_handler();
-      pending_wake_touch_ = false;
+      suppress_lvgl_input_ = false; 
+      ESP_LOGI(TAG, "LVGL input fully unblocked");
     }
   }
+
   M5.update();
   poll_touch();
-  
-  //ESP_LOGI(TAG, "testing light sleep for %d ms last activity %d and touch gpio is %d ", sleep_duration_ms,last_activity_,touch_gpio);
+
+  // ... rest of your sleep logic ...
   int64_t now = esp_timer_get_time() / 1000;
   if (sleep_duration_ms > 0 && (now - last_activity_) > 45000 ) {
-    ESP_LOGI(TAG, "Entering light sleep for %d ms", sleep_duration_ms);
-
-    // Timer wakeup
-    esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
-
-
-  if (enable_touch_wakeup && touch_gpio >= 0) {
-    ESP_LOGI(TAG, "Enabling GPIO wake on pin %d (LOW level)", touch_gpio);
-    gpio_wakeup_enable((gpio_num_t)touch_gpio, GPIO_INTR_LOW_LEVEL);
-    esp_sleep_enable_gpio_wakeup();
-    
-    // Touch wakeup
- //   if (enable_touch_wakeup && touch_gpio != GPIO_NUM_NC) {
-   //   esp_sleep_enable_ext0_wakeup(touch_gpio, 0); // wake on low
-    }
-
-    // Flush display before sleep
-    flush_framebuffer_to_display();
-    // Prepare for wake-touch capture
-    suppress_lvgl_input_ = true;
-    pending_wake_touch_ = false;
-    last_touch_pressed_ = false;
-    esp_light_sleep_start();
-
-    ESP_LOGI(TAG, "Woke up from light sleep, reinitializing...");
-
-    if (indev_) {
-  lv_indev_reset(indev_, nullptr);
-}
-suppress_lvgl_input_ = true; 
-wifi_ready_ = false;
-api_ready_ = false;
-post_wakeup_ready_ = false;
-    // Wait until WiFi is connected
-  //  esphome::wifi::global_wifi_component->is_connected()
-   // this->setup();  // re‑init display + touch
-    // Wait until WiFi is connected
-
-    last_activity_ = esp_timer_get_time() / 1000;
+     // ... prep for sleep ...
+     suppress_lvgl_input_ = true; 
+     pending_wake_touch_ = false;
+     esp_light_sleep_start();
+     
+     // After wake:
+     wifi_ready_ = false;
+     api_ready_ = false;
+     last_activity_ = esp_timer_get_time() / 1000;
   }
 }
-
 
 }  // namespace m5papers3_display_m5gfx
 }  // namespace esphome
