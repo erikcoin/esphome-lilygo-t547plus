@@ -275,9 +275,13 @@ void M5PaperS3DisplayM5GFX::loop() {
   poll_touch();
 
   // ... rest of your sleep logic ...
+
   int64_t now = esp_timer_get_time() / 1000;
   if (sleep_duration_ms > 0 && (now - last_activity_) > 45000 ) {
      // ... prep for sleep ...
+     esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
+     gpio_wakeup_enable((gpio_num_t)touch_gpio, GPIO_INTR_LOW_LEVEL);
+     esp_sleep_enable_gpio_wakeup();
      suppress_lvgl_input_ = true; 
      pending_wake_touch_ = false;
      esp_light_sleep_start();
