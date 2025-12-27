@@ -275,7 +275,7 @@ void M5PaperS3DisplayM5GFX::loop() {
      esp_sleep_enable_gpio_wakeup();
   //   suppress_lvgl_input_ = true; 
    //  pending_wake_touch_ = false;
-    wifi.disconnect();
+    M5.WiFi.mode(WIFI_OFF);
    
    // esp_light_sleep_start();
      
