@@ -5,7 +5,7 @@
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
 #include <M5Unified.h>        // gives M5.Display and LovyanGFX (M5Unified)
 //#include <lgfx/v1.h>         // LGFX Sprite type
-#include <WiFi.h>
+#include "esphome/components/wifi/wifi_component.h"
 #include <atomic>
 #include "esp_sleep.h"
 
@@ -276,8 +276,8 @@ void M5PaperS3DisplayM5GFX::loop() {
      esp_sleep_enable_gpio_wakeup();
   //   suppress_lvgl_input_ = true; 
    //  pending_wake_touch_ = false;
-      WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
+
+    wifi::global_wifi_component->disable();
    
    // esp_light_sleep_start();
      
