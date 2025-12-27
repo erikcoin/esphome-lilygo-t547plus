@@ -70,10 +70,10 @@ linebuf_ = (uint8_t*)heap_caps_malloc(fb_width_, MALLOC_CAP_8BIT);
   indev_drv.read_cb = [](lv_indev_drv_t *drv, lv_indev_data_t *data) {
     auto *comp = static_cast<M5PaperS3DisplayM5GFX *>(drv->user_data);
       // 🚨 HARD BLOCK LVGL DURING WAKE
-  if (comp->suppress_lvgl_input_) {
-    data->state = LV_INDEV_STATE_REL;
-    return;
-  }
+  //if (comp->suppress_lvgl_input_) {
+ //   data->state = LV_INDEV_STATE_REL;
+ //   return;
+ // }
     data->point.x = comp->last_touch_x_;
     data->point.y = comp->last_touch_y_;
     data->state   = comp->last_touch_pressed_ ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
@@ -273,8 +273,8 @@ void M5PaperS3DisplayM5GFX::loop() {
      esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
      gpio_wakeup_enable((gpio_num_t)touch_gpio, GPIO_INTR_LOW_LEVEL);
      esp_sleep_enable_gpio_wakeup();
-     suppress_lvgl_input_ = true; 
-     pending_wake_touch_ = false;
+  //   suppress_lvgl_input_ = true; 
+   //  pending_wake_touch_ = false;
      esp_light_sleep_start();
      
      // After wake:
