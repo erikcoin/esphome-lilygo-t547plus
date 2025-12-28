@@ -277,9 +277,9 @@ void M5PaperS3DisplayM5GFX::loop() {
   //   suppress_lvgl_input_ = true; 
    //  pending_wake_touch_ = false;
 
- //   wifi::global_wifi_component->disable();
+    wifi::global_wifi_component->disable();
    
-   esp_light_sleep_start();
+//   esp_light_sleep_start();
      
      // After wake:
 //     wifi_ready_ = false;
