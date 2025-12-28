@@ -15,6 +15,7 @@ namespace m5papers3_display_m5gfx {
 static const char *TAG = "m5papers3.display_m5gfx";
 uint8_t* linebuf_ = nullptr;
 bool wifi_ready_ = false;
+bool wifi_disabled_ = false;
 bool api_ready_ = false;
 bool post_wakeup_ready_ = false;
 M5PaperS3DisplayM5GFX::~M5PaperS3DisplayM5GFX() {
@@ -138,7 +139,15 @@ uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
   const int DEBOUNCE_MS = 850;
+  if (wifi_disabled_) {
+    ESP_LOGI("m5paper", "Re-enabling WiFi due to activity");
 
+    if (wifi::global_wifi_component != nullptr) {
+      wifi::global_wifi_component->enable();
+    }
+
+    wifi_disabled_ = false;
+  }
   if (!M5.Touch.isEnabled()) return;
 
   uint8_t count = M5.Touch.getCount();
@@ -277,9 +286,9 @@ void M5PaperS3DisplayM5GFX::loop() {
   //   suppress_lvgl_input_ = true; 
    //  pending_wake_touch_ = false;
 
-  //  wifi::global_wifi_component->disable();
-   
-   esp_light_sleep_start();
+    wifi::global_wifi_component->disable();
+   wifi_disabled_ = true;
+ //  esp_light_sleep_start();
      
      // After wake:
 //     wifi_ready_ = false;
