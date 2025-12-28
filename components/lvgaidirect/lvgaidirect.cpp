@@ -154,6 +154,13 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
       wifi::global_wifi_component->enable();
     }
 
+  if (esphome::api::global_api_server != nullptr &&
+      esphome::api::global_api_server->is_connected()) {
+
+    ESP_LOGI("m5paper", "Home Assistant API connected");
+  //  api_ready_ = true;
+  }
+
     wifi_disabled_ = false;
   }
     // Always update activity timer
