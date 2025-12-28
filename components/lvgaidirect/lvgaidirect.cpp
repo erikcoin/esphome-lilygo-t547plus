@@ -139,6 +139,14 @@ uint8_t M5PaperS3DisplayM5GFX::color_to_gray4(const esphome::Color &c) {
 void M5PaperS3DisplayM5GFX::poll_touch() {
   static int64_t last_touch_time = 0;
   const int DEBOUNCE_MS = 850;
+
+  if (!M5.Touch.isEnabled()) return;
+
+  uint8_t count = M5.Touch.getCount();
+  int64_t now = esp_timer_get_time() / 1000;  // µs → ms
+
+  if (count > 0) {
+    auto p = M5.Touch.getDetail(0);
   if (wifi_disabled_) {
     ESP_LOGI("m5paper", "Re-enabling WiFi due to activity");
 
@@ -148,14 +156,6 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
 
     wifi_disabled_ = false;
   }
-  if (!M5.Touch.isEnabled()) return;
-
-  uint8_t count = M5.Touch.getCount();
-  int64_t now = esp_timer_get_time() / 1000;  // µs → ms
-
-  if (count > 0) {
-    auto p = M5.Touch.getDetail(0);
-
     // Always update activity timer
     last_activity_ = now;
 
