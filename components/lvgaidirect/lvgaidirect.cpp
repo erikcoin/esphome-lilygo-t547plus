@@ -148,7 +148,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
   if (count > 0) {
     auto p = M5.Touch.getDetail(0);
   if (wifi_disabled_) {
-    ESP_LOGI("m5paper", "Re-enabling WiFi due to activity");
+    ESP_LOGD("m5paper", "Re-enabling WiFi due to activity");
 
     if (wifi::global_wifi_component != nullptr) {
       wifi::global_wifi_component->enable();
@@ -157,7 +157,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
   if (esphome::api::global_api_server != nullptr &&
       esphome::api::global_api_server->is_connected()) {
 
-    ESP_LOGI("m5paper", "Home Assistant API connected");
+    ESP_LOGD("m5paper", "Home Assistant API connected");
   //  api_ready_ = true;
   }
 
