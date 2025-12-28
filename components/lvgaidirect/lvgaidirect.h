@@ -35,6 +35,8 @@ void loop();
 int last_touch_x_{0};
 bool wifi_ready_{false};
 bool api_ready_{false};
+bool wifi_disabled_{false};
+
 bool post_wakeup_ready_{false};
 int last_touch_y_{0};
 bool last_touch_pressed_{false};
