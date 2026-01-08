@@ -147,22 +147,22 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
 
   if (count > 0) {
     auto p = M5.Touch.getDetail(0);
-  if (wifi_disabled_) {
-    ESP_LOGD("m5paper", "Re-enabling WiFi due to activity");
+//  if (wifi_disabled_) {
+//    ESP_LOGD("m5paper", "Re-enabling WiFi due to activity");
 
-    if (wifi::global_wifi_component != nullptr) {
-      wifi::global_wifi_component->enable();
-    }
+ //   if (wifi::global_wifi_component != nullptr) {
+//      wifi::global_wifi_component->enable();
+//    }
 
-  if (esphome::api::global_api_server != nullptr &&
-      esphome::api::global_api_server->is_connected()) {
+//  if (esphome::api::global_api_server != nullptr &&
+//      esphome::api::global_api_server->is_connected()) {
 
-    ESP_LOGD("m5paper", "Home Assistant API connected");
+//    ESP_LOGD("m5paper", "Home Assistant API connected");
   //  api_ready_ = true;
-  }
+//  }
 
-    wifi_disabled_ = false;
-  }
+//    wifi_disabled_ = false;
+//  }
     // Always update activity timer
     last_activity_ = now;
 
@@ -284,24 +284,24 @@ void M5PaperS3DisplayM5GFX::loop() {
 
   // ... rest of your sleep logic ...
 
-  int64_t now = esp_timer_get_time() / 1000;
-  if (sleep_duration_ms > 0 && (now - last_activity_) > 45000 ) {
+ // int64_t now = esp_timer_get_time() / 1000;
+ // if (sleep_duration_ms > 0 && (now - last_activity_) > 45000 ) {
      // ... prep for sleep ...
-     esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
-     gpio_wakeup_enable((gpio_num_t)touch_gpio, GPIO_INTR_LOW_LEVEL);
-     esp_sleep_enable_gpio_wakeup();
+ //   esp_sleep_enable_timer_wakeup(sleep_duration_ms * 1000ULL);
+ //    gpio_wakeup_enable((gpio_num_t)touch_gpio, GPIO_INTR_LOW_LEVEL);
+ //    esp_sleep_enable_gpio_wakeup();
   //   suppress_lvgl_input_ = true; 
    //  pending_wake_touch_ = false;
 
-    wifi::global_wifi_component->disable();
-   wifi_disabled_ = true;
+//    wifi::global_wifi_component->disable();
+//   wifi_disabled_ = true;
  //  esp_light_sleep_start();
      
      // After wake:
 //     wifi_ready_ = false;
 //     api_ready_ = false;
-     last_activity_ = esp_timer_get_time() / 1000;
-  }
+  //   last_activity_ = esp_timer_get_time() / 1000;
+//  }
 }
 
 }  // namespace m5papers3_display_m5gfx
