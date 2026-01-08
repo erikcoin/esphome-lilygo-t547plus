@@ -1,5 +1,5 @@
 #include "lvgaidirect.h"
-#include "esphome/components/api/api_server.h"
+//#include "esphome/components/api/api_server.h"
 
 #include "esphome/core/helpers.h"
 // include LovyanGFX + M5Unified (adjust if your project uses different header names)
