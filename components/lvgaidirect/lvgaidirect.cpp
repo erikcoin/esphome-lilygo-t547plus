@@ -176,7 +176,7 @@ void M5PaperS3DisplayM5GFX::poll_touch() {
 
     // Normal debounce + state update
     if (now - last_touch_time > DEBOUNCE_MS) {
-      ESP_LOGD(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
+      ESP_LOGI(TAG, "Touch at (%d,%d) pressed=%d", p.x, p.y, p.isPressed());
       last_touch_x_ = p.x;
       last_touch_y_ = p.y;
       last_touch_pressed_ = p.isPressed();
