@@ -7,11 +7,19 @@ namespace ram_logger {
 
 static constexpr size_t LOG_BUF_SIZE = 4096;
 
-// 🔁 Change to RTC_DATA_ATTR if you want deep-sleep persistence
+// Use RTC_DATA_ATTR if you want deep-sleep persistence
 static char log_buffer[LOG_BUF_SIZE];
 static size_t log_pos = 0;
 
+// 🔗 Pointer to original logger
+static vprintf_like_t original_vprintf = nullptr;
+
 static int ram_log_vprintf(const char *fmt, va_list args) {
+  // Copy args because they can only be used once
+  va_list args_copy;
+  va_copy(args_copy, args);
+
+  // --- Store in RAM buffer ---
   char temp[256];
   int len = vsnprintf(temp, sizeof(temp), fmt, args);
 
@@ -22,11 +30,19 @@ static int ram_log_vprintf(const char *fmt, va_list args) {
     log_buffer[log_pos] = '\0';
   }
 
-  return len;
+  // --- Forward to original logger (serial / USB / ESPHome) ---
+  int ret = 0;
+  if (original_vprintf != nullptr) {
+    ret = original_vprintf(fmt, args_copy);
+  }
+
+  va_end(args_copy);
+  return ret;
 }
 
 void RamLogger::setup() {
-  esp_log_set_vprintf(ram_log_vprintf);
+  // Save previous logger and install ours
+  original_vprintf = esp_log_set_vprintf(ram_log_vprintf);
   ESP_LOGI("ram_logger", "RAM log buffer installed");
 }
 
