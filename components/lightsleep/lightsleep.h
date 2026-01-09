@@ -6,6 +6,7 @@
 #include <esp_wifi.h>
 #include <driver/gpio.h>
 #include <driver/rtc_io.h>
+#include <M5Unified.h>
 
 namespace esphome {
 namespace light_sleep {
