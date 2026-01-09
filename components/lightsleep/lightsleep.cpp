@@ -44,7 +44,7 @@ void LightSleepComponent::setup() {
       this->gpio_configured_ = true;
       ESP_LOGCONFIG(TAG, "  EXT0 wake-up: GPIO%d (level: %s)", gpio_num, 
                     this->wakeup_level_ ? "HIGH" : "LOW");
-    #endif
+   
   }
   
   // Record initial boot time
