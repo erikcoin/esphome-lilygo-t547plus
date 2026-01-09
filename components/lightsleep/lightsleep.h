@@ -3,7 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
 
-#ifdef USE_ESP32
+##ifdef USE_ESP32
 #include <esp_sleep.h>
 #include <esp_wifi.h>
 #include <driver/gpio.h>
