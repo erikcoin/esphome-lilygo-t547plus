@@ -36,23 +36,23 @@ void LightSleepComponent::setup() {
       }
       
       // Configure pin as input with pull-up/pull-down
-      gpio_config_t config;
-      config.pin_bit_mask = (1ULL << gpio_num);
-      config.mode = GPIO_MODE_INPUT;
-      config.intr_type = GPIO_INTR_DISABLE;
+      //gpio_config_t config;
+      //config.pin_bit_mask = (1ULL << gpio_num);
+     /// config.mode = GPIO_MODE_INPUT;
+  //    config.intr_type = GPIO_INTR_DISABLE;
+ //     
+ //     if (this->wakeup_level_ == 0) {
+ //       config.pull_up_en = GPIO_PULLUP_ENABLE;
+ //       config.pull_down_en = GPIO_PULLDOWN_DISABLE;
+  //    } else {
+  //      config.pull_up_en = GPIO_PULLUP_DISABLE;
+  //      config.pull_down_en = GPIO_PULLDOWN_ENABLE;
+  //    }
       
-      if (this->wakeup_level_ == 0) {
-        config.pull_up_en = GPIO_PULLUP_ENABLE;
-        config.pull_down_en = GPIO_PULLDOWN_DISABLE;
-      } else {
-        config.pull_up_en = GPIO_PULLUP_DISABLE;
-        config.pull_down_en = GPIO_PULLDOWN_ENABLE;
-      }
-      
-      gpio_config(&config);
+    //  gpio_config(&config);
       
       this->gpio_configured_ = true;
-      ESP_LOGCONFIG(TAG, "  GPIO wake-up: GPIO%d (level: %s)", gpio_num, 
+      ESP_LOGD(TAG, "  GPIO wake-up: GPIO%d (level: %s)", gpio_num, 
                     this->wakeup_level_ ? "HIGH" : "LOW");
 //    #else
       // For ESP32 (original), use ext0 wakeup
