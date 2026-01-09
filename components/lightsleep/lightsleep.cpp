@@ -11,11 +11,35 @@
 namespace esphome {
 namespace light_sleep {
 
+
+static constexpr size_t LOG_BUF_SIZE = 4096;
+static char log_buffer[LOG_BUF_SIZE];
+static size_t log_pos = 0;
+
+extern "C" void esp_log_set_vprintf(int (*func)(const char *, va_list));
+
+int ram_log_vprintf(const char *fmt, va_list args) {
+  char temp[256];
+  int len = vsnprintf(temp, sizeof(temp), fmt, args);
+
+  if (len > 0) {
+    size_t copy_len = std::min((size_t)len, LOG_BUF_SIZE - log_pos - 1);
+    memcpy(&log_buffer[log_pos], temp, copy_len);
+    log_pos += copy_len;
+    log_buffer[log_pos] = 0;
+  }
+  return len;
+}
+
+
+
+
+
 static const char *const TAG = "light_sleep";
 
 void LightSleepComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Light Sleep...");
-  
+  esp_log_set_vprintf(ram_log_vprintf);
   // Configure timer wake-up
   esp_sleep_enable_timer_wakeup(this->sleep_duration_ms_ * 1000ULL);
   ESP_LOGCONFIG(TAG, "  Timer wake-up: %u ms", this->sleep_duration_ms_);
@@ -174,7 +198,8 @@ void LightSleepComponent::loop() {
     
     // Restore system after sleep
     this->restore_after_sleep_();
-    
+    ESP_LOGI("WAKE", "Dumping buffered logs:\n%s", log_buffer);
+log_pos = 0;
     // Reset the timer and state
     this->last_wakeup_time_ = millis();
     this->sleeping_ = false;
