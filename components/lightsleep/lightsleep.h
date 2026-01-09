@@ -6,7 +6,6 @@
 #ifdef USE_ESP32
 #include <esp_sleep.h>
 #include <esp_wifi.h>
-#include <esp_bt.h>
 #include <driver/gpio.h>
 #include <driver/rtc_io.h>
 
