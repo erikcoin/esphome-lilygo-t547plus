@@ -25,26 +25,55 @@ void LightSleepComponent::setup() {
   if (this->wakeup_pin_ != nullptr) {
     gpio_num_t gpio_num = (gpio_num_t) this->wakeup_pin_->get_pin();
     
-
-      // For ESP32 (original), use ext0 wakeup
-      esp_sleep_enable_ext0_wakeup(gpio_num, this->wakeup_level_);
-      
-      // Configure RTC GPIO
-      rtc_gpio_init(gpio_num);
-      rtc_gpio_set_direction(gpio_num, RTC_GPIO_MODE_INPUT_ONLY);
-      
+   // #if defined(USE_ESP32_VARIANT_ESP32S2) || defined(USE_ESP32_VARIANT_ESP32S3)
+      // ESP32-S2 and S3 support GPIO wakeup in light sleep
       if (this->wakeup_level_ == 0) {
-        rtc_gpio_pullup_en(gpio_num);
-        rtc_gpio_pulldown_dis(gpio_num);
+        esp_sleep_enable_gpio_wakeup();
+        ESP_ERROR_CHECK(gpio_wakeup_enable(gpio_num, GPIO_INTR_LOW_LEVEL));
       } else {
-        rtc_gpio_pulldown_en(gpio_num);
-        rtc_gpio_pullup_dis(gpio_num);
+        esp_sleep_enable_gpio_wakeup();
+        ESP_ERROR_CHECK(gpio_wakeup_enable(gpio_num, GPIO_INTR_HIGH_LEVEL));
       }
       
+      // Configure pin as input with pull-up/pull-down
+      gpio_config_t config;
+      config.pin_bit_mask = (1ULL << gpio_num);
+      config.mode = GPIO_MODE_INPUT;
+      config.intr_type = GPIO_INTR_DISABLE;
+      
+      if (this->wakeup_level_ == 0) {
+        config.pull_up_en = GPIO_PULLUP_ENABLE;
+        config.pull_down_en = GPIO_PULLDOWN_DISABLE;
+      } else {
+        config.pull_up_en = GPIO_PULLUP_DISABLE;
+        config.pull_down_en = GPIO_PULLDOWN_ENABLE;
+      }
+      
+      gpio_config(&config);
+      
       this->gpio_configured_ = true;
-      ESP_LOGCONFIG(TAG, "  EXT0 wake-up: GPIO%d (level: %s)", gpio_num, 
+      ESP_LOGCONFIG(TAG, "  GPIO wake-up: GPIO%d (level: %s)", gpio_num, 
                     this->wakeup_level_ ? "HIGH" : "LOW");
-   
+//    #else
+      // For ESP32 (original), use ext0 wakeup
+//      esp_sleep_enable_ext0_wakeup(gpio_num, this->wakeup_level_);
+      
+      // Configure RTC GPIO
+//      rtc_gpio_init(gpio_num);
+//      rtc_gpio_set_direction(gpio_num, RTC_GPIO_MODE_INPUT_ONLY);
+      
+//      if (this->wakeup_level_ == 0) {
+//        rtc_gpio_pullup_en(gpio_num);
+//        rtc_gpio_pulldown_dis(gpio_num);
+//      } else {
+//        rtc_gpio_pulldown_en(gpio_num);
+//        rtc_gpio_pullup_dis(gpio_num);
+//      }
+      
+//      this->gpio_configured_ = true;
+//      ESP_LOGCONFIG(TAG, "  EXT0 wake-up: GPIO%d (level: %s)", gpio_num, 
+//                    this->wakeup_level_ ? "HIGH" : "LOW");
+//    #endif
   }
   
   // Record initial boot time
