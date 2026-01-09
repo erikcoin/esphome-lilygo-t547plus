@@ -2,7 +2,8 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
-#ifdef USE_ESP32
+#include <esp_sleep.h>
+#include <esp_wifi.h>
 
 namespace esphome {
 namespace light_sleep {
