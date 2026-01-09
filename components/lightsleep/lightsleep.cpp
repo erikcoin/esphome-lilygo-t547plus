@@ -2,8 +2,11 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
-#include <esp_sleep.h>
-#include <esp_wifi.h>
+#include "esp_sleep.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_log.h"
+
 
 namespace esphome {
 namespace light_sleep {
