@@ -1,4 +1,4 @@
-#include "light_sleep_component.h"
+#include "lightsleep.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
