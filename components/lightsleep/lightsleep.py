@@ -18,7 +18,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(LightSleepComponent),
     cv.Optional(CONF_SLEEP_DURATION, default="5min"): cv.positive_time_period_milliseconds,
     cv.Optional(CONF_RUN_DURATION, default="1min"): cv.positive_time_period_milliseconds,
-    cv.Optional(CONF_WAKEUP_PIN, default=41): pins.internal_gpio_input_pin_schema,
+    cv.Optional(CONF_WAKEUP_PIN): pins.internal_gpio_input_pin_schema,
     cv.Optional(CONF_WAKEUP_LEVEL, default=0): cv.int_range(min=0, max=1),
 }).extend(cv.COMPONENT_SCHEMA)
 
