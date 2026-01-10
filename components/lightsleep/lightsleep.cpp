@@ -30,7 +30,7 @@ void LightSleepComponent::setup() {
       // ESP32-S2 and S3 support GPIO wakeup in light sleep
       if (this->wakeup_level_ == 0) {
         esp_sleep_enable_gpio_wakeup();
-        ESP_ERROR_CHECK(gpio_wakeup_enable(gpio_num, GPIO_INTR_LOW_LEVEL));
+        ESP_ERROR_CHECK(gpio_wakeup_enable(GPIO_NUM_48, GPIO_INTR_LOW_LEVEL));
       } else {
         esp_sleep_enable_gpio_wakeup();
         ESP_ERROR_CHECK(gpio_wakeup_enable(gpio_num, GPIO_INTR_HIGH_LEVEL));
