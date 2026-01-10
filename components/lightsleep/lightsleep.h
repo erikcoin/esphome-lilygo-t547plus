@@ -19,7 +19,7 @@ class LightSleepComponent : public Component {
 
   void set_sleep_duration(uint32_t duration_ms) { sleep_duration_ms_ = duration_ms; }
   void set_run_duration(uint32_t duration_ms) { run_duration_ms_ = duration_ms; }
-  void set_wakeup_pin(InternalGPIOPin *pin) { wakeup_pin_ = 48; } //was pin
+  void set_wakeup_pin(InternalGPIOPin *pin) { wakeup_pin_ = pin; } 
   void set_wakeup_level(int level) { wakeup_level_ = level; }
 
  protected:
