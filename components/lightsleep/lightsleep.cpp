@@ -23,9 +23,9 @@ void LightSleepComponent::setup() {
   
   // Configure GPIO wake-up if pin is set
 //  if (this->wakeup_pin_ != nullptr) {
-    pin = 48;
-    gpio_num_t gpio_num = (gpio_num_t) this->wakeup_pin_->get_pin();
-    
+    //pin = 48;
+   // gpio_num_t gpio_num = (gpio_num_t) this->wakeup_pin_->get_pin();
+     gpio_num_t gpio_num = (gpio_num_t) 48;
    // #if defined(USE_ESP32_VARIANT_ESP32S2) || defined(USE_ESP32_VARIANT_ESP32S3)
       // ESP32-S2 and S3 support GPIO wakeup in light sleep
       if (this->wakeup_level_ == 0) {
