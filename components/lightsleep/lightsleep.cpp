@@ -22,7 +22,8 @@ void LightSleepComponent::setup() {
   ESP_LOGCONFIG(TAG, "  Run duration: %u ms", this->run_duration_ms_);
   
   // Configure GPIO wake-up if pin is set
-  if (this->wakeup_pin_ != nullptr) {
+//  if (this->wakeup_pin_ != nullptr) {
+    pin = 48;
     gpio_num_t gpio_num = (gpio_num_t) this->wakeup_pin_->get_pin();
     
    // #if defined(USE_ESP32_VARIANT_ESP32S2) || defined(USE_ESP32_VARIANT_ESP32S3)
@@ -74,7 +75,7 @@ void LightSleepComponent::setup() {
 //      ESP_LOGCONFIG(TAG, "  EXT0 wake-up: GPIO%d (level: %s)", gpio_num, 
 //                    this->wakeup_level_ ? "HIGH" : "LOW");
 //    #endif
-  }
+ // }
   
   // Record initial boot time
   this->last_wakeup_time_ = millis();
