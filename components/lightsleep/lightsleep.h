@@ -1,40 +1,38 @@
+
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/core/hal.h"
-#include <esp_sleep.h>
-#include <esp_wifi.h>
-#include <driver/gpio.h>
-#include <driver/rtc_io.h>
-// #include <M5Unified.h>
+#include "driver/gpio.h"
+#include "esp_sleep.h"
+#include <M5Unified.h>
 
 namespace esphome {
-namespace light_sleep {
+namespace lightsleep {
 
 class LightSleepComponent : public Component {
  public:
+  void set_wakeup_pin(int pin) { wakeup_pin_ = pin; }
+  void set_wake_on_touch(bool v) { wake_on_touch_ = v; }
+  void set_turn_off_display(bool v) { turn_off_display_ = v; }
+  void set_min_inactive_time(uint32_t ms) { min_inactive_time_ = ms; }
+  void set_wake_every(uint32_t ms) { wake_every_ = ms; }
+
   void setup() override;
   void loop() override;
-  float get_setup_priority() const override { return setup_priority::LATE; }
-
-  void set_sleep_duration(uint32_t duration_ms) { sleep_duration_ms_ = duration_ms; }
-  void set_run_duration(uint32_t duration_ms) { run_duration_ms_ = duration_ms; }
-  void set_wakeup_pin(InternalGPIOPin *pin) { wakeup_pin_ = pin; } 
-  void set_wakeup_level(int level) { wakeup_level_ = level; }
 
  protected:
-  void prepare_for_sleep_();
-  void restore_after_sleep_();
-  
-  uint32_t sleep_duration_ms_{300000};  // 5 minutes default
-  uint32_t run_duration_ms_{60000};     // 1 minute default
-  InternalGPIOPin *wakeup_pin_{nullptr};
-  int wakeup_level_{0};  // 0 = LOW, 1 = HIGH
-  bool gpio_configured_{false};
-  uint32_t last_wakeup_time_{0};
-  bool sleeping_{false};
-  bool wifi_was_enabled_{false};
+  int wakeup_pin_{-1};
+  bool wake_on_touch_{true};
+  bool turn_off_display_{false};
+
+  uint32_t min_inactive_time_{30000};
+  uint32_t wake_every_{0};
+
+  uint32_t last_activity_{0};
+  uint32_t last_wake_timer_{0};
+
+  void enter_light_sleep_();
 };
 
-}  // namespace light_sleep
+}  // namespace lightsleep
 }  // namespace esphome
