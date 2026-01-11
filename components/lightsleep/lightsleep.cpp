@@ -51,9 +51,10 @@ void LightSleepComponent::enter_light_sleep_() {
   //esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
   // Note: there is no esp_sleep_disable_wakeup_source for GPIO specifically on older IDs,
   // but we will explicitly disable gpio wake after waking.
-
+  wakeup_pin_ = 48;
   // Configure GPIO touch wake if requested and pin valid
-  if (wake_on_touch_ && wakeup_pin_ >= 0) {
+ // if (wake_on_touch_ && wakeup_pin_ >= 0) {
+  if (wake_on_touch_ > 0) {
     ESP_LOGI(TAG, "Enabling GPIO wake on pin %d (LOW level)", wakeup_pin_);
     gpio_wakeup_enable((gpio_num_t)wakeup_pin_, GPIO_INTR_LOW_LEVEL);
     esp_sleep_enable_gpio_wakeup();
