@@ -37,13 +37,13 @@ void LightSleepComponent::enter_light_sleep_() {
 
   // Give touch IRQs a chance to clear so we don't immediately wake on a stale IRQ
   for (int i = 0; i < 3; i++) {
-    M5.update();
+//    M5.update();
     lgfx::v1::delay(50);
   }
 
   if (turn_off_display_) {
     ESP_LOGI(TAG, "Putting display to sleep");
-    M5.Display.sleep();
+ //   M5.Display.sleep();
     lgfx::v1::delay(10);
   }
 
@@ -123,7 +123,7 @@ vTaskDelay(pdMS_TO_TICKS(200));
   // Restore display if needed
   if (turn_off_display_) {
     lgfx::v1::delay(10);
-    M5.Display.wakeup();
+ //   M5.Display.wakeup();
   }
 
   // small delay to settle
