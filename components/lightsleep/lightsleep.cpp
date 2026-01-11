@@ -20,7 +20,7 @@ void LightSleepComponent::loop() {
   uint32_t now = millis();
 
   // Trigger sleep if inactive too long
-  if (min_inactive_time_ > 0 && (now - esphome::last_activity_) > min_inactive_time_) {
+  if (min_inactive_time_ > 0 && (now - last_activity_) > min_inactive_time_) {
     enter_light_sleep_();
     last_activity_ = millis();
     last_wake_timer_ = millis();
