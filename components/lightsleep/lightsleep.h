@@ -4,7 +4,7 @@
 #include "esphome/core/component.h"
 #include "driver/gpio.h"
 #include "esp_sleep.h"
-#include <M5Unified.h>
+#include "esp_timer.h"
 
 namespace esphome {
 namespace lightsleep {
