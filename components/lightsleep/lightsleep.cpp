@@ -1,187 +1,133 @@
 #include "lightsleep.h"
-#include "esphome/core/log.h"
-#include "esphome/core/application.h"
-
 #include "esp_sleep.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "esp_timer.h"
 
 namespace esphome {
-namespace light_sleep {
+namespace lightsleep {
 
-static const char *const TAG = "light_sleep";
-
+static const char *TAG = "lightsleep";
 void LightSleepComponent::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up Light Sleep...");
- ;
-  // Configure timer wake-up
-  esp_sleep_enable_timer_wakeup(this->sleep_duration_ms_ * 1000ULL);
-  ESP_LOGCONFIG(TAG, "  Timer wake-up: %u ms", this->sleep_duration_ms_);
-  ESP_LOGCONFIG(TAG, "  Run duration: %u ms", this->run_duration_ms_);
-  
-  // Configure GPIO wake-up if pin is set
-  if (this->wakeup_pin_ != nullptr) {
-    gpio_num_t gpio_num = (gpio_num_t) this->wakeup_pin_->get_pin();
-    
-   // #if defined(USE_ESP32_VARIANT_ESP32S2) || defined(USE_ESP32_VARIANT_ESP32S3)
-      // ESP32-S2 and S3 support GPIO wakeup in light sleep
-      if (this->wakeup_level_ == 0) {
-        //esp_sleep_enable_gpio_wakeup();
-     //  gpio_wakeup_enable(GPIO_NUM_48, GPIO_INTR_LOW_LEVEL);
-        gpio_wakeup_enable((gpio_num_t)48, GPIO_INTR_LOW_LEVEL);
-        esp_sleep_enable_gpio_wakeup();
-      } else {
-        esp_sleep_enable_gpio_wakeup();
-        ESP_ERROR_CHECK(gpio_wakeup_enable(gpio_num, GPIO_INTR_HIGH_LEVEL));
-      }
-      
-      // Configure pin as input with pull-up/pull-down
-      //gpio_config_t config;
-      //config.pin_bit_mask = (1ULL << gpio_num);
-     /// config.mode = GPIO_MODE_INPUT;
-  //    config.intr_type = GPIO_INTR_DISABLE;
- //     
- //     if (this->wakeup_level_ == 0) {
- //       config.pull_up_en = GPIO_PULLUP_ENABLE;
- //       config.pull_down_en = GPIO_PULLDOWN_DISABLE;
-  //    } else {
-  //      config.pull_up_en = GPIO_PULLUP_DISABLE;
-  //      config.pull_down_en = GPIO_PULLDOWN_ENABLE;
-  //    }
-      
-    //  gpio_config(&config);
-      
-      this->gpio_configured_ = true;
-      ESP_LOGD(TAG, "  GPIO wake-up: GPIO%d (level: %s)", gpio_num, 
-                    this->wakeup_level_ ? "HIGH" : "LOW");
-//    #else
-      // For ESP32 (original), use ext0 wakeup
-//      esp_sleep_enable_ext0_wakeup(gpio_num, this->wakeup_level_);
-      
-      // Configure RTC GPIO
-//      rtc_gpio_init(gpio_num);
-//      rtc_gpio_set_direction(gpio_num, RTC_GPIO_MODE_INPUT_ONLY);
-      
-//      if (this->wakeup_level_ == 0) {
-//        rtc_gpio_pullup_en(gpio_num);
-//        rtc_gpio_pulldown_dis(gpio_num);
-//      } else {
-//        rtc_gpio_pulldown_en(gpio_num);
-//        rtc_gpio_pullup_dis(gpio_num);
-//      }
-      
-//      this->gpio_configured_ = true;
-//      ESP_LOGCONFIG(TAG, "  EXT0 wake-up: GPIO%d (level: %s)", gpio_num, 
-//                    this->wakeup_level_ ? "HIGH" : "LOW");
-//    #endif
-  }
-  
-  // Record initial boot time
-  this->last_wakeup_time_ = millis();
-}
-
-void LightSleepComponent::prepare_for_sleep_() {
-  ESP_LOGI(TAG, "Preparing for sleep...");
-  
-  // Disable WiFi to save power during sleep
-  #ifdef USE_WIFI
-  wifi_mode_t mode;
-  esp_err_t err = esp_wifi_get_mode(&mode);
-  if (err == ESP_OK && mode != WIFI_MODE_NULL) {
-    this->wifi_was_enabled_ = true;
-    ESP_LOGI(TAG, "  Stopping WiFi...");
-    esp_wifi_stop();
-    delay(10); // Give WiFi time to stop gracefully
-  } else {
-    this->wifi_was_enabled_ = false;
-  }
-  #endif
-  
-  // Flush all pending logs before sleeping
-  ESP_LOGI(TAG, "  Flushing logs...");
-  esp_log_level_set("*", ESP_LOG_NONE);
-  delay(50);
-  
-  // Allow other components to finish their work
-  App.loop();
-}
-
-void LightSleepComponent::restore_after_sleep_() {
-  ESP_LOGI(TAG, "Restoring after sleep...");
-  
-  // Re-enable logging
-  esp_log_level_set("*", ESP_LOG_DEBUG);
-  
-  // Restart WiFi if it was enabled before sleep
-  #ifdef USE_WIFI
-  if (this->wifi_was_enabled_) {
-    ESP_LOGI(TAG, "  Restarting WiFi...");
-    esp_wifi_start();
-    delay(10); // Give WiFi time to start
-  }
-  #endif
-  
-  // Give components time to reinitialize
-  delay(100);
-  App.loop();
+  // Initialize timers
+  last_activity_ = lgfx::v1::millis();
+  last_wake_timer_ = lgfx::v1::millis();
 }
 
 void LightSleepComponent::loop() {
-  // Check if we should enter sleep
-  uint32_t current_time = millis();
-  uint32_t time_awake = current_time - this->last_wakeup_time_;
-  
-  // Only enter sleep if we've been awake for the configured duration
-  if (time_awake >= this->run_duration_ms_ && !this->sleeping_) {
-    this->sleeping_ = true;
-    
-    // Log wake-up cause from previous sleep
-    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-    
-    switch (wakeup_reason) {
-      case ESP_SLEEP_WAKEUP_GPIO:
-        ESP_LOGI(TAG, "Previous wake: GPIO interrupt");
-        break;
-      case ESP_SLEEP_WAKEUP_EXT0:
-        ESP_LOGI(TAG, "Previous wake: EXT0 (GPIO)");
-        break;
-      case ESP_SLEEP_WAKEUP_TIMER:
-        ESP_LOGI(TAG, "Previous wake: Timer");
-        break;
-      case ESP_SLEEP_WAKEUP_UNDEFINED:
-        ESP_LOGD(TAG, "Initial boot");
-        break;
-      default:
-        ESP_LOGD(TAG, "Previous wake: Other source (%d)", wakeup_reason);
-        break;
-    }
-    
-    // Prepare system for sleep
-    this->prepare_for_sleep_();
-    
-    ESP_LOGI(TAG, "Entering light sleep (awake time: %u ms)...", time_awake);
-    
-    // Enter light sleep - this is the actual sleep call
-    int64_t sleep_start = esp_timer_get_time();
-    esp_err_t err = esp_light_sleep_start();
-    int64_t sleep_duration = (esp_timer_get_time() - sleep_start) / 1000;
-    
-    if (err == ESP_OK) {
-      ESP_LOGI(TAG, "Woke up after %lld ms", sleep_duration);
-    } else {
-      ESP_LOGW(TAG, "Light sleep failed: %d", err);
-    }
-    
-    // Restore system after sleep
-    this->restore_after_sleep_();
+  uint32_t now = lgfx::v1::millis();
 
-    // Reset the timer and state
-    this->last_wakeup_time_ = millis();
-    this->sleeping_ = false;
+  // Trigger sleep if inactive too long
+  if (min_inactive_time_ > 0 && (now - last_activity_) > min_inactive_time_) {
+    enter_light_sleep_();
+    last_activity_ = lgfx::v1::millis();
+    last_wake_timer_ = lgfx::v1::millis();
+  }
+
+  // Trigger periodic sleep if configured
+  if (wake_every_ > 0 && (now - last_wake_timer_) >= wake_every_) {
+    enter_light_sleep_();
+    last_wake_timer_ = lgfx::v1::millis();
   }
 }
 
-}  // namespace light_sleep
+void LightSleepComponent::enter_light_sleep_() {
+  ESP_LOGI(TAG, "Preparing to enter light sleep (wake_on_touch=%d, turn_off_display=%d, wake_every_ms=%u)",
+           (int)wake_on_touch_, (int)turn_off_display_, (unsigned)wake_every_);
+
+  // Give touch IRQs a chance to clear so we don't immediately wake on a stale IRQ
+  for (int i = 0; i < 3; i++) {
+    M5.update();
+    lgfx::v1::delay(50);
+  }
+
+  if (turn_off_display_) {
+    ESP_LOGI(TAG, "Putting display to sleep");
+    M5.Display.sleep();
+    lgfx::v1::delay(10);
+  }
+
+  // Clear previously configured wake sources to start fresh
+  //esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+  // Note: there is no esp_sleep_disable_wakeup_source for GPIO specifically on older IDs,
+  // but we will explicitly disable gpio wake after waking.
+
+  // Configure GPIO touch wake if requested and pin valid
+  if (wake_on_touch_ && wakeup_pin_ >= 0) {
+    ESP_LOGI(TAG, "Enabling GPIO wake on pin %d (LOW level)", wakeup_pin_);
+    gpio_wakeup_enable((gpio_num_t)wakeup_pin_, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+  }
+
+  // Configure timer wake if requested (wake_every_ is in milliseconds)
+  if (wake_every_ > 0) {
+    // esp_sleep_enable_timer_wakeup expects microseconds
+    uint64_t us = (uint64_t)wake_every_ * 1000ULL;
+    ESP_LOGI(TAG, "Enabling timer wakeup in %llu us (%u ms)", (unsigned long long)us, (unsigned)wake_every_);
+    esp_sleep_enable_timer_wakeup(us);
+  }
+
+// Shut down WiFi safely before sleep (IDF API)
+// ---------------------------------------------
+wifi_mode_t current_mode;
+esp_wifi_get_mode(&current_mode);
+
+if (current_mode != WIFI_MODE_NULL) {
+  ESP_LOGI(TAG, "Stopping WiFi before sleep");
+  esp_wifi_stop();         // stops STA/AP
+  esp_wifi_set_mode(WIFI_MODE_NULL);
+  // tiny delay to settle
+  vTaskDelay(pdMS_TO_TICKS(50));
+}
+  
+  ESP_LOGI(TAG, "Entering light sleep now...");
+  esp_light_sleep_start();
+   // Execution resumes here after wake
+
+  // Restore WiFi after wake (IDF API)
+// ---------------------------------------------
+ESP_LOGI(TAG, "Restarting WiFi after wake");
+
+esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
+esp_wifi_start();                   // bring WiFi up
+
+// Let ESPHome reconnect the network
+vTaskDelay(pdMS_TO_TICKS(200));
+  
+  // Reset inactivity timers on wake because millis() jumps backward
+     last_activity_ = esp_timer_get_time() / 1000ULL;
+     last_wake_timer_ = last_activity_;
+
+  esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+  switch (cause) {
+    case ESP_SLEEP_WAKEUP_TIMER:
+      ESP_LOGI(TAG, "Woke up by TIMER");
+      break;
+    case ESP_SLEEP_WAKEUP_GPIO:
+      ESP_LOGI(TAG, "Woke up by GPIO");
+      break;
+    case ESP_SLEEP_WAKEUP_UNDEFINED:
+    default:
+      ESP_LOGI(TAG, "Woke up by OTHER/UNDEFINED reason: %d", (int)cause);
+      break;
+  }
+
+  // Cleanup: disable gpio wake if we enabled it
+  if (wakeup_pin_ >= 0) {
+    gpio_wakeup_disable((gpio_num_t)wakeup_pin_);
+  }
+  // Disable timer wake to avoid lingering
+ // esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+
+  // Restore display if needed
+  if (turn_off_display_) {
+    lgfx::v1::delay(10);
+    M5.Display.wakeup();
+  }
+
+  // small delay to settle
+  lgfx::v1::delay(50);
+}
+
+}  // namespace lightsleep
 }  // namespace esphome
