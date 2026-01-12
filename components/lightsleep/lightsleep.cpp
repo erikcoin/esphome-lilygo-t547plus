@@ -84,13 +84,6 @@ gpio_config(&io_conf);
         ESP_LOGI(TAG, "Failed to set GPIO Wake-Up as wake-up source.");
     
     }
-
-    // Attach interrupts to GPIO pins
- //   attachInterrupt(digitalPinToInterrupt(buttonPin1), handleInterrupt1, FALLING);
-   // attachInterrupt(digitalPinToInterrupt(buttonPin2), handleInterrupt2, RISING);
-
-    
-   // esp_sleep_enable_gpio_wakeup();
   }
 
   // Configure timer wake if requested (wake_every_ is in milliseconds)
