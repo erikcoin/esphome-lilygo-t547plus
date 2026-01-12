@@ -19,6 +19,8 @@ void IRAM_ATTR handleInterrupt1() {
 
 void LightSleepComponent::setup() {
   // Initialize timers
+
+
   last_activity_ = millis();
   last_wake_timer_ = millis();
 }
@@ -66,7 +68,13 @@ void LightSleepComponent::enter_light_sleep_() {
   if (wake_on_touch_ > 0) {
     ESP_LOGI(TAG, "Enabling GPIO wake on pin %d (LOW level)", wakeup_pin_);
    // gpio_wakeup_enable((gpio_num_t)wakeup_pin_, GPIO_INTR_LOW_LEVEL);
-
+   gpio_config_t io_conf{};
+io_conf.mode = GPIO_MODE_INPUT;
+io_conf.pin_bit_mask = 1ULL << GPIO_NUM_48;
+io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+io_conf.intr_type = GPIO_INTR_DISABLE;
+gpio_config(&io_conf);
     gpio_wakeup_enable(buttonPin1, GPIO_INTR_LOW_LEVEL); // Trigger wake-up on high level
 
     // Enable GPIO wake-up source
