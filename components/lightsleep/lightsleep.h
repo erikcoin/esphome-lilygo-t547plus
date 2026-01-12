@@ -11,7 +11,9 @@ namespace lightsleep {
 
 class LightSleepComponent : public Component {
  public:
-  void set_gt911(gt911::GT911Component *gt911) { gt911_ = gt911; }
+    void set_my_touchscreen(gt911::GT911Component *display) {
+    my_touchscreen_ = display;
+  }
   void set_wakeup_pin(int pin) { wakeup_pin_ = pin; }
   void set_wake_on_touch(bool v) { wake_on_touch_ = v; }
   void set_turn_off_display(bool v) { turn_off_display_ = v; }
@@ -22,7 +24,7 @@ class LightSleepComponent : public Component {
   void loop() override;
 
  protected:
-gt911::GT911Component *gt911_{nullptr};
+gt911::GT911Component *my_touchscreen_{nullptr};
   int wakeup_pin_{-1};
   bool wake_on_touch_{true};
   bool turn_off_display_{false};
