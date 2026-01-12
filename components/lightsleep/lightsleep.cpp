@@ -12,6 +12,7 @@ namespace lightsleep {
 
 static const char *TAG = "lightsleep";
 const gpio_num_t buttonPin1 = GPIO_NUM_48;
+int wakeup_gpio; // Variable to store the GPIO that caused wake-up
 void IRAM_ATTR handleInterrupt1() {
     wakeup_gpio = buttonPin1;
 }
