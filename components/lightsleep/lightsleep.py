@@ -10,7 +10,7 @@ CONF_WAKE_ON_TOUCH = "wake_on_touch"
 CONF_TURN_OFF_DISPLAY = "turn_off_display"
 CONF_MIN_INACTIVE_TIME = "min_inactive_time"
 CONF_WAKE_EVERY = "wake_every"
-CONF_GT911 = "gt911"
+CONF_MY_DISPLAY = "my_display"
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(LightSleepComponent),
