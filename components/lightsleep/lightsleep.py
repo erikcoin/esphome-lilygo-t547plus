@@ -26,7 +26,7 @@ CONFIG_SCHEMA = cv.Schema({
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
+    await cg.register_component(var, config)
 
     if CONF_WAKEUP_PIN in config:
         cg.add(var.set_wakeup_pin(config[CONF_WAKEUP_PIN]))
