@@ -104,7 +104,7 @@ if (current_mode != WIFI_MODE_NULL) {
   esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 
   //esp_wifi_stop();         // stops STA/AP
-  esp_wifi_set_mode(WIFI_MODE_NULL);
+  //esp_wifi_set_mode(WIFI_MODE_NULL);
   // tiny delay to settle
   vTaskDelay(pdMS_TO_TICKS(50));
 }
@@ -117,9 +117,9 @@ if (current_mode != WIFI_MODE_NULL) {
 // ---------------------------------------------
 ESP_LOGI(TAG, "Restarting WiFi after wake");
 
-esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
-esp_wifi_start();                   // bring WiFi up
-esp_wifi_reconnect();
+///esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
+///esp_wifi_start();                   // bring WiFi up
+
 // Let ESPHome reconnect the network
 vTaskDelay(pdMS_TO_TICKS(200));
     if (my_touchscreen_ != nullptr) {
