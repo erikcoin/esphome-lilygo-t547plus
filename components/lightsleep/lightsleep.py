@@ -24,7 +24,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_WAKE_EVERY, default="0s"): cv.positive_time_period_milliseconds,
 })
 
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
 
