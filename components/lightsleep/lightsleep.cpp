@@ -6,6 +6,7 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "driver/gpio.h"
 namespace esphome {
 namespace lightsleep {
 
