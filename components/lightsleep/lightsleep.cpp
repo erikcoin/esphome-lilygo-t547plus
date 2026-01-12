@@ -129,7 +129,10 @@ esp_wifi_start();                   // bring WiFi up
 
 // Let ESPHome reconnect the network
 vTaskDelay(pdMS_TO_TICKS(200));
-  
+    if (gt911_ != nullptr) {
+    ESP_LOGI(TAG, "Reinitializing GT911 touchscreen");
+    gt911_->setup();
+  }
   // Reset inactivity timers on wake because millis() jumps backward
      last_activity_ = esp_timer_get_time() / 1000ULL;
      last_wake_timer_ = last_activity_;
