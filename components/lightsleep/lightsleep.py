@@ -38,5 +38,5 @@ def to_code(config):
     cg.add(var.set_wake_every(config[CONF_WAKE_EVERY].total_milliseconds))
     
     if CONF_MY_TOUCHSCREEN in config:
-    display = await cg.get_variable(config[CONF_MY_TOUCHSCREEN])
-    cg.add(var.set_my_touchscreen(display))
+        display = await cg.get_variable(config[CONF_MY_TOUCHSCREEN])
+        cg.add(var.set_my_touchscreen(display))
