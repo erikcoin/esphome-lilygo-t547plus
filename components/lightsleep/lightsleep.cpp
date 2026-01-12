@@ -73,9 +73,10 @@ void LightSleepComponent::enter_light_sleep_() {
     esp_err_t result = esp_sleep_enable_gpio_wakeup();
 
     if (result == ESP_OK) {
-        Serial.println("GPIO Wake-Up set successfully.");
+        ESP_LOGI(TAG, "GPIO Wake-Up set successfully.");
     } else {
-        Serial.println("Failed to set GPIO Wake-Up as wake-up source.");
+        ESP_LOGI(TAG, "Failed to set GPIO Wake-Up as wake-up source.");
+    
     }
 
     // Attach interrupts to GPIO pins
