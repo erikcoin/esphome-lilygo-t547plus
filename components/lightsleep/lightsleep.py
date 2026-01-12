@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_WAKEUP_PIN
-from esphome.components import gt911
+from esphome.components import touchscreen
 
 lightsleep_ns = cg.esphome_ns.namespace("lightsleep")
 LightSleepComponent = lightsleep_ns.class_("LightSleepComponent", cg.Component)
@@ -18,7 +18,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_WAKEUP_PIN): cv.int_,
     cv.Optional(CONF_WAKE_ON_TOUCH, default=True): cv.boolean,
     cv.Optional(CONF_TURN_OFF_DISPLAY, default=False): cv.boolean,
-    cv.Optional(CONF_MY_TOUCHSCREEN): cv.use_id(gt911.GT911Touchscreen),
+    cv.Optional(CONF_MY_TOUCHSCREEN): cv.use_id(touchscreen.Touchscreen),
     # Duration types (seconds, ms, etc.)
     cv.Optional(CONF_MIN_INACTIVE_TIME, default="30s"): cv.positive_time_period_milliseconds,
     cv.Optional(CONF_WAKE_EVERY, default="0s"): cv.positive_time_period_milliseconds,
@@ -38,5 +38,5 @@ async def to_code(config):
     cg.add(var.set_wake_every(config[CONF_WAKE_EVERY].total_milliseconds))
     
     if CONF_MY_TOUCHSCREEN in config:
-        display = await cg.get_variable(config[CONF_MY_TOUCHSCREEN])
+        ts = await cg.get_variable(config[CONF_MY_TOUCHSCREEN])
         cg.add(var.set_my_display(display))
