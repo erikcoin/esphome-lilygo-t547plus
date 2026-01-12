@@ -18,7 +18,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_WAKEUP_PIN): cv.int_,
     cv.Optional(CONF_WAKE_ON_TOUCH, default=True): cv.boolean,
     cv.Optional(CONF_TURN_OFF_DISPLAY, default=False): cv.boolean,
-    cv.Optional(CONF_MY_TOUCHSCREEN): cv.use_id(gt911.GT911Component),
+    cv.Optional(CONF_MY_TOUCHSCREEN): cv.use_id(gt911.GT911Touchscreen),
     # Duration types (seconds, ms, etc.)
     cv.Optional(CONF_MIN_INACTIVE_TIME, default="30s"): cv.positive_time_period_milliseconds,
     cv.Optional(CONF_WAKE_EVERY, default="0s"): cv.positive_time_period_milliseconds,
