@@ -101,7 +101,9 @@ esp_wifi_get_mode(&current_mode);
 
 if (current_mode != WIFI_MODE_NULL) {
   ESP_LOGI(TAG, "Stopping WiFi before sleep");
-  esp_wifi_stop();         // stops STA/AP
+  esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
+
+  //esp_wifi_stop();         // stops STA/AP
   esp_wifi_set_mode(WIFI_MODE_NULL);
   // tiny delay to settle
   vTaskDelay(pdMS_TO_TICKS(50));
