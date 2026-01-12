@@ -10,6 +10,11 @@ namespace esphome {
 namespace lightsleep {
 
 static const char *TAG = "lightsleep";
+const gpio_num_t buttonPin1 = GPIO_NUM_48;
+void IRAM_ATTR handleInterrupt1() {
+    wakeup_gpio = buttonPin1;
+}
+
 void LightSleepComponent::setup() {
   // Initialize timers
   last_activity_ = millis();
@@ -58,8 +63,25 @@ void LightSleepComponent::enter_light_sleep_() {
  // if (wake_on_touch_ && wakeup_pin_ >= 0) {
   if (wake_on_touch_ > 0) {
     ESP_LOGI(TAG, "Enabling GPIO wake on pin %d (LOW level)", wakeup_pin_);
-    gpio_wakeup_enable((gpio_num_t)wakeup_pin_, GPIO_INTR_LOW_LEVEL);
-    esp_sleep_enable_gpio_wakeup();
+   // gpio_wakeup_enable((gpio_num_t)wakeup_pin_, GPIO_INTR_LOW_LEVEL);
+
+    gpio_wakeup_enable(buttonPin1, GPIO_INTR_LOW_LEVEL); // Trigger wake-up on high level
+
+    // Enable GPIO wake-up source
+    esp_err_t result = esp_sleep_enable_gpio_wakeup();
+
+    if (result == ESP_OK) {
+        Serial.println("GPIO Wake-Up set successfully.");
+    } else {
+        Serial.println("Failed to set GPIO Wake-Up as wake-up source.");
+    }
+
+    // Attach interrupts to GPIO pins
+    attachInterrupt(digitalPinToInterrupt(buttonPin1), handleInterrupt1, FALLING);
+   // attachInterrupt(digitalPinToInterrupt(buttonPin2), handleInterrupt2, RISING);
+
+    
+   // esp_sleep_enable_gpio_wakeup();
   }
 
   // Configure timer wake if requested (wake_every_ is in milliseconds)
