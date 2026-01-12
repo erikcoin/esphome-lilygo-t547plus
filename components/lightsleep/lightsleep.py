@@ -39,4 +39,4 @@ def to_code(config):
     
     if CONF_MY_TOUCHSCREEN in config:
         display = await cg.get_variable(config[CONF_MY_TOUCHSCREEN])
-        cg.add(var.set_my_touchscreen(display))
+        cg.add(var.set_my_display(display))
