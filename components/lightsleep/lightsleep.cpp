@@ -117,7 +117,7 @@ ESP_LOGI(TAG, "Restarting WiFi after wake");
 
 esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
 esp_wifi_start();                   // bring WiFi up
-
+esp_wifi_reconnect();
 // Let ESPHome reconnect the network
 vTaskDelay(pdMS_TO_TICKS(200));
     if (my_touchscreen_ != nullptr) {
