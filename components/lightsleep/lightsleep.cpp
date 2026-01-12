@@ -80,7 +80,7 @@ void LightSleepComponent::enter_light_sleep_() {
     }
 
     // Attach interrupts to GPIO pins
-    attachInterrupt(digitalPinToInterrupt(buttonPin1), handleInterrupt1, FALLING);
+ //   attachInterrupt(digitalPinToInterrupt(buttonPin1), handleInterrupt1, FALLING);
    // attachInterrupt(digitalPinToInterrupt(buttonPin2), handleInterrupt2, RISING);
 
     
