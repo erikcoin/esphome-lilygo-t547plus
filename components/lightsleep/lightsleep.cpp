@@ -1,9 +1,9 @@
 #include "lightsleep.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
-#include "esphome/components/wifi/wifi_component.h"
+//#include "esphome/components/wifi/wifi_component.h"
 #include "esp_sleep.h"
-#include "esp_wifi.h"
+//#include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -97,18 +97,18 @@ gpio_config(&io_conf);
 
 // Shut down WiFi safely before sleep (IDF API)
 // ---------------------------------------------
-wifi_mode_t current_mode;
-esp_wifi_get_mode(&current_mode);
+////wifi_mode_t current_mode;
+////esp_wifi_get_mode(&current_mode);
 
-if (current_mode != WIFI_MODE_NULL) {
-  ESP_LOGI(TAG, "Stopping WiFi before sleep");
+////if (current_mode != WIFI_MODE_NULL) {
+////  ESP_LOGI(TAG, "Stopping WiFi before sleep");
  // esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
-  wifi::global_wifi_component->disable();
+////  wifi::global_wifi_component->disable();
   //esp_wifi_stop();         // stops STA/AP
   //esp_wifi_set_mode(WIFI_MODE_NULL);
   // tiny delay to settle
-  vTaskDelay(pdMS_TO_TICKS(50));
-}
+////  vTaskDelay(pdMS_TO_TICKS(50));
+////}
   
   ESP_LOGI(TAG, "Entering light sleep now...");
   esp_light_sleep_start();
@@ -120,7 +120,7 @@ ESP_LOGI(TAG, "Restarting WiFi after wake");
 
 ///esp_wifi_set_mode(WIFI_MODE_STA);   // we want normal station mode
 ///esp_wifi_start();                   // bring WiFi up
-wifi::global_wifi_component->enable();
+////wifi::global_wifi_component->enable();
 // Let ESPHome reconnect the network
 vTaskDelay(pdMS_TO_TICKS(200));
     if (my_touchscreen_ != nullptr) {
