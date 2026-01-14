@@ -3,7 +3,7 @@
 #include "esphome/core/application.h"
 //#include "esphome/components/wifi/wifi_component.h"
 #include "esp_sleep.h"
-//#include "esp_wifi.h"
+#include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_timer.h"
